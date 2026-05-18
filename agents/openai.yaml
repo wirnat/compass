@@ -1,0 +1,3 @@
+display_name: Compass
+short_description: Route engineering work with project principles.
+default_prompt: Classify this engineering task, seed missing docs if needed, and tell me the right workflow to follow.

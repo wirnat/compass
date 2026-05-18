@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task-types-reference>
+  <purpose>Map development task types to common labels, usage, and commit hints.</purpose>
+
+  <task-types>
+    <task-type id="new_feature" commit-hint="feat">
+      <common-labels>feature, story, feat</common-labels>
+      <use-when>Add new behavior or capability.</use-when>
+    </task-type>
+    <task-type id="feature_update" commit-hint="feat or fix">
+      <common-labels>enhancement, improvement</common-labels>
+      <use-when>Intentionally change existing behavior.</use-when>
+    </task-type>
+    <task-type id="bug_fix" commit-hint="fix">
+      <common-labels>bug, defect, regression</common-labels>
+      <use-when>Restore expected behavior after a failure.</use-when>
+    </task-type>
+    <task-type id="hotfix_incident" commit-hint="fix">
+      <common-labels>incident, hotfix</common-labels>
+      <use-when>Production or active users are currently impacted.</use-when>
+    </task-type>
+    <task-type id="refactor" commit-hint="refactor">
+      <common-labels>refactor</common-labels>
+      <use-when>Change internal structure without behavior change.</use-when>
+    </task-type>
+    <task-type id="architecture_change" commit-hint="refactor or docs plus code type">
+      <common-labels>architecture, design change</common-labels>
+      <use-when>Change boundaries, dependency direction, module structure, platform categories, or cross-module contracts.</use-when>
+    </task-type>
+    <task-type id="performance" commit-hint="perf">
+      <common-labels>perf, optimization</common-labels>
+      <use-when>Improve latency, throughput, memory, query cost, or resource usage.</use-when>
+    </task-type>
+    <task-type id="security" commit-hint="fix">
+      <common-labels>security fix, hardening</common-labels>
+      <use-when>Address auth, data exposure, injection, secrets, crypto, or vulnerability risk.</use-when>
+    </task-type>
+    <task-type id="db_migration" commit-hint="depends on behavior">
+      <common-labels>schema change, migration</common-labels>
+      <use-when>Change tables, columns, indexes, constraints, migrations, or persistence ownership.</use-when>
+    </task-type>
+    <task-type id="dependency_update" commit-hint="build or chore">
+      <common-labels>upgrade, dependency bump</common-labels>
+      <use-when>Update libraries, runtimes, lockfiles, generated clients, or tool versions.</use-when>
+    </task-type>
+    <task-type id="build_ci_tooling" commit-hint="build or ci">
+      <common-labels>build, CI, tooling</common-labels>
+      <use-when>Change build scripts, pipelines, commands, generators, or developer tools.</use-when>
+    </task-type>
+    <task-type id="docs_only" commit-hint="docs">
+      <common-labels>docs, comments, diagrams</common-labels>
+      <use-when>Change documentation, comments, specs, diagrams, or onboarding only.</use-when>
+    </task-type>
+    <task-type id="test_only" commit-hint="test">
+      <common-labels>tests</common-labels>
+      <use-when>Add or adjust tests without production behavior change.</use-when>
+    </task-type>
+    <task-type id="cleanup_chore" commit-hint="chore">
+      <common-labels>chore, maintenance</common-labels>
+      <use-when>Small maintenance with no behavior, test, or architecture intent.</use-when>
+    </task-type>
+    <task-type id="research_spike" commit-hint="usually none or docs">
+      <common-labels>spike, investigation</common-labels>
+      <use-when>Investigate feasibility, options, root causes, or unknowns before implementation.</use-when>
+    </task-type>
+    <task-type id="release_deploy" commit-hint="chore">
+      <common-labels>release, deploy</common-labels>
+      <use-when>Prepare versioning, changelog, tags, packaging, release, or deployment.</use-when>
+    </task-type>
+  </task-types>
+
+  <vocabulary-sources>
+    <source>GitHub issue types commonly include task, bug, and feature.</source>
+    <source>Jira software commonly uses epic, story, task, subtask, and bug.</source>
+    <source>Jira service workflows commonly include incident, problem, change, service request, and new feature.</source>
+    <source>Conventional Commits uses feat and fix as core types and commonly extends with docs, refactor, perf, test, build, ci, chore, and style.</source>
+  </vocabulary-sources>
+
+  <routing-principle>Use this taxonomy for workflow routing because it maps directly to engineering evidence and risk.</routing-principle>
+</task-types-reference>

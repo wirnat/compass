@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classification-reference>
+  <purpose>Classify by the workflow and risk needed, not only by the user's words.</purpose>
+
+  <decision-tree>
+    <question order="1" type-if-yes="hotfix_incident">Is production currently degraded, blocked, or urgent?</question>
+    <question order="2" type-if-yes="research_spike">Is the main goal to discover feasibility, compare options, or investigate without a committed implementation?</question>
+    <question order="3" type-if-yes="architecture_change">Does the task alter architecture boundaries, dependency direction, module structure, shared kernel concepts, platform categories, or cross-module contracts?</question>
+    <question order="4" type-if-yes="db_migration">Does it change database schema, migrations, indexes, constraints, seed data, or persistence ownership?</question>
+    <question order="5" type-if-yes="new_feature">Does it add user-visible or business behavior that did not exist?</question>
+    <question order="6" type-if-yes="feature_update">Does it intentionally change existing behavior?</question>
+    <question order="7" type-if-yes="bug_fix">Does it restore expected behavior after a defect?</question>
+    <question order="8" type-if-yes="refactor">Does it change internal structure without intended behavior change?</question>
+    <question order="9" type-if-yes="performance">Does it improve latency, throughput, memory, query cost, or resource usage?</question>
+    <question order="10" type-if-yes="security">Does it address auth, authorization, secrets, injection, data exposure, crypto, dependency vulnerability, or abuse prevention?</question>
+    <question order="11" type-if-yes="dependency_update">Does it update libraries, runtimes, generated clients, or lockfiles?</question>
+    <question order="12" type-if-yes="build_ci_tooling">Does it change build scripts, CI, local tooling, codegen commands, linters, or developer automation?</question>
+    <question order="13" type-if-yes="docs_only">Is it only documentation, comments, diagrams, onboarding, or specifications?</question>
+    <question order="14" type-if-yes="test_only">Is it only tests or test infrastructure without production behavior change?</question>
+    <question order="15" type-if-yes="cleanup_chore">Is it small maintenance with no behavior or architecture intent?</question>
+    <question order="16" type-if-yes="release_deploy">Is it release, versioning, changelog, tagging, packaging, or deployment preparation?</question>
+  </decision-tree>
+
+  <tie-breakers>
+    <rule>Architecture beats feature: if a feature requires a new boundary, classify as architecture_change with new_feature secondary.</rule>
+    <rule>Incident beats bug: if users or production are currently affected, classify as hotfix_incident.</rule>
+    <rule>Security beats normal fix: if exploitability or data exposure is involved, classify as security.</rule>
+    <rule>Migration is often secondary: pair db_migration with the behavior task unless schema work is the whole request.</rule>
+    <rule>Refactor must not change behavior. If behavior changes, it is not only refactor.</rule>
+    <rule>Docs-only must not modify production behavior.</rule>
+  </tie-breakers>
+
+  <clarifying-questions max-per-turn="1">
+    <question>Is production currently impacted, or is this normal backlog work?</question>
+    <question>Should this change user-visible behavior, or only internal structure?</question>
+    <question>Does this require database schema or migration changes?</question>
+    <question>Is the goal to implement, or only investigate and recommend?</question>
+    <question>Does this touch module boundaries or dependency direction?</question>
+  </clarifying-questions>
+</classification-reference>

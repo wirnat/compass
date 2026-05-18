@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bootstrap-rules>
+  <purpose>Seed durable engineering documentation into a project when Compass is first used.</purpose>
+
+  <trigger>
+    <rule>Run bootstrap when one or more seed docs are missing from the target project's docs directory.</rule>
+    <rule>Do not run bootstrap when the user explicitly asks for no file changes.</rule>
+    <rule>Do not overwrite existing files unless the user explicitly asks for force mode.</rule>
+  </trigger>
+
+  <command>
+    <default>.skills/compass/scripts/bootstrap-docs.sh --target .</default>
+    <dry-run>.skills/compass/scripts/bootstrap-docs.sh --target . --dry-run</dry-run>
+    <force>.skills/compass/scripts/bootstrap-docs.sh --target . --force</force>
+  </command>
+
+  <seed-docs>
+    <doc>docs/README.md</doc>
+    <doc>docs/foundation/engineering-philosophy.md</doc>
+    <doc>docs/foundation/architecture-principles.md</doc>
+    <doc>docs/foundation/documentation-principles.md</doc>
+    <doc>docs/foundation/testing-principles.md</doc>
+    <doc>docs/architecture/README.md</doc>
+    <doc>docs/decisions/README.md</doc>
+    <doc>docs/foundation/README.md</doc>
+    <doc>docs/modules/README.md</doc>
+    <doc>docs/process/README.md</doc>
+    <doc>docs/process/implementation-workflow.md</doc>
+    <doc>docs/reference/README.md</doc>
+    <doc>docs/reference/note-schema.md</doc>
+    <doc>docs/runbooks/README.md</doc>
+    <doc>docs/_templates/README.md</doc>
+    <doc>docs/_templates/decision-record.md</doc>
+    <doc>docs/_templates/module-note.md</doc>
+  </seed-docs>
+
+  <completion-evidence>
+    <item>List created files.</item>
+    <item>List skipped files.</item>
+    <item>Report whether force mode was used.</item>
+  </completion-evidence>
+</bootstrap-rules>

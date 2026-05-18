@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<documentation-policy>
+  <purpose>Keep project documentation useful, traceable, and free from competing sources of truth.</purpose>
+
+  <principles>
+    <rule>Documentation is part of design, not an appendix after implementation.</rule>
+    <rule>One document should have one primary job.</rule>
+    <rule>One important topic should have one primary source of truth.</rule>
+    <rule>Location carries meaning; use the docs taxonomy before creating files.</rule>
+    <rule>Metadata should stay lightweight and maintained.</rule>
+    <rule>Links should express real relationships, not decoration.</rule>
+  </principles>
+
+  <taxonomy>
+    <category name="foundation">Durable principles and philosophy.</category>
+    <category name="architecture">System shape, boundaries, dependency direction, and high-level structure.</category>
+    <category name="decisions">Long-lived engineering decisions with context, options, rationale, and consequences.</category>
+    <category name="modules">Specific business capabilities, components, domains, packages, or bounded areas.</category>
+    <category name="process">How the team builds, reviews, tests, and ships work.</category>
+    <category name="runbooks">Concrete operational procedures.</category>
+    <category name="reference">Lookup-oriented schemas, glossary, contracts, and naming rules.</category>
+    <category name="_templates">Reusable note shapes.</category>
+  </taxonomy>
+
+  <document-status>
+    <status name="draft">Still being shaped and not yet authoritative.</status>
+    <status name="active">Current source of truth.</status>
+    <status name="superseded">Replaced by a newer document.</status>
+    <status name="archived">Kept for history, not current guidance.</status>
+  </document-status>
+
+  <rules>
+    <rule>Do not create root-level markdown files unless the project entry point requires it.</rule>
+    <rule>Use docs/README.md to choose the target category.</rule>
+    <rule>Use folder README files as category hubs.</rule>
+    <rule>New non-root notes should include a parent relationship.</rule>
+    <rule>If a document replaces another, mark the older document superseded and link the replacement.</rule>
+    <rule>Do not duplicate long source-of-truth content into another document.</rule>
+  </rules>
+</documentation-policy>
