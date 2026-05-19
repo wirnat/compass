@@ -53,6 +53,18 @@ Practical rules:
 - do not hide important rules inside generic helpers
 - if a reader must jump across many files to understand a simple flow, review the design
 
+## Named Constants For Shared Values
+
+Repeated or contract-sensitive values should have one clear name.
+
+Practical rules:
+
+- avoid bare literal strings for statuses, event names, routes, permissions, configuration keys, feature flags, error codes, provider names, and cross-boundary identifiers
+- define named constants close to the owner of the concept
+- keep constants grouped by responsibility, not in a generic dumping ground
+- use the constant everywhere the value represents the same concept
+- allow local literals only when the value is incidental, used once, and not part of a contract or rule
+
 ## Intuitive Comments Are Mandatory
 
 Comments must help readers understand:
@@ -83,6 +95,7 @@ Practical rules:
 - Are names easy to understand?
 - Will this decision still make sense six months from now?
 - Can a junior developer follow the flow?
+- Are repeated or contract-sensitive values named as constants instead of repeated literal strings?
 - Do comments explain important reasons, not obvious mechanics?
 - Do tests prove behavior, not implementation details?
 - Does any abstraction still lack a real need?

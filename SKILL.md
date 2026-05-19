@@ -104,6 +104,8 @@ If a referenced doc is missing, continue with the best available docs and record
 
 When planning or implementing, ground architecture, naming, test strategy, and documentation updates in the loaded project docs. If code and docs disagree, stop before broad changes and state the conflict.
 
+When implementation introduces or touches repeated or contract-sensitive values such as statuses, event names, routes, permissions, configuration keys, feature flags, error codes, provider names, or cross-boundary identifiers, avoid bare literal strings. Prefer named constants owned by the relevant module or boundary so the concept has one source of truth.
+
 ## Language And Stack Adaptation
 
 Preset docs are authoritative for principles and detail, not for copying language-specific filenames blindly. When bootstrapping a new project or repairing seed docs, Compass must adapt generated architecture and process docs to the developer's selected or detected language and framework.
