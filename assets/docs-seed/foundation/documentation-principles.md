@@ -55,6 +55,12 @@ Frontmatter should be short, consistent, and sufficient to explain status, type,
 
 Use a link when there is a real relationship: parent, related decision, definition reference, or companion document that should be read together.
 
+### Docs Are The Agent Context Pack
+
+Compass-guided work must use the project `docs/` directory as the automatic context source. Architecture, foundation, process, module, decision, runbook, and reference notes do not need to be duplicated or linked from `AGENTS.md`.
+
+`AGENTS.md` may still provide repository-specific instructions when the repository has one, but it is not the source of truth for project documentation.
+
 ### Documents Should Age Gracefully
 
 Not every document lasts forever. Lifecycle must be clear: `draft`, `active`, `superseded`, or `archived`.
@@ -64,6 +70,7 @@ Not every document lasts forever. Lifecycle must be clear: `draft`, `active`, `s
 - creating a new file for every idea without checking the existing source of truth
 - mixing principles, tutorials, decisions, checklists, and references in one note
 - assuming every document must appear in the root README
+- assuming Compass docs must be duplicated or linked from `AGENTS.md`
 - using tags as a replacement for folder structure and hub notes
 - writing so much metadata that it stops being maintained
 - leaving old documents active after they have been replaced

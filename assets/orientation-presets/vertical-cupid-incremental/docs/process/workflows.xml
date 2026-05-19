@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workflows-reference preset="vertical-cupid-incremental">
+  <purpose>Provide Vertical Slice plus CUPID/YAGNI/KISS workflows for Compass tasks.</purpose>
+
+  <documentation-context>
+    <rule>Read docs/decisions/0001-orientation-lock.md first.</rule>
+    <rule>Read docs/architecture/vertical-slice-architecture.md and docs/architecture/feature-slice-structure.md before design or implementation.</rule>
+    <rule>Read docs/foundation/cupid-yagni-principles.md before creating abstractions or shared code.</rule>
+    <rule>Read docs/process/incremental-test-workflow.md before choosing verification.</rule>
+    <rule>Read relevant docs/modules notes for the touched feature area.</rule>
+  </documentation-context>
+
+  <workflow type="new_feature">
+    <description>Add one feature-local behavior through a vertical slice.</description>
+    <enforcement>
+      <rule>Run phases sequentially: slice discovery, slice design, implementation.</rule>
+      <rule>Execute exactly one behavior slice per workflow.</rule>
+      <rule>Do not create global layers or shared abstractions before current callers prove the need.</rule>
+      <rule>Design should be lightweight enough to keep implementation local.</rule>
+      <rule>Implementation must stop after each verified slice checkpoint.</rule>
+    </enforcement>
+    <phase name="slice-discovery" gate="developer_approval_required">
+      <purpose>Name the user-visible command, query, or workflow and decide the smallest useful slice.</purpose>
+      <actions>
+        <action>Read the vertical slice architecture, feature-slice structure, CUPID/YAGNI, and incremental test docs.</action>
+        <action>Restate the behavior as a command, query, endpoint, or workflow step.</action>
+        <action>Identify the feature area and proposed slice folder.</action>
+        <action>Split unrelated behaviors into pending slices.</action>
+        <action>State non-goals and what will stay local for now.</action>
+      </actions>
+      <phase-output>
+        <slice-name>Feature area and slice name.</slice-name>
+        <behavior>Observable behavior.</behavior>
+        <non-goals>Behaviors not included in this slice.</non-goals>
+        <docs-context>Docs read and docs missing.</docs-context>
+      </phase-output>
+    </phase>
+    <phase name="slice-design" gate="developer_approval_required">
+      <purpose>Design only the local slice shape and closest useful tests.</purpose>
+      <actions>
+        <action>Choose slice files from docs/architecture/feature-slice-structure.md.</action>
+        <action>Define request or command or query input, handler responsibility, result or response, local persistence needs, and emitted events if any.</action>
+        <action>Apply CUPID: composable, single-purpose, predictable, idiomatic, and domain-based names.</action>
+        <action>Apply YAGNI: reject abstractions without current callers.</action>
+        <action>Create an incremental test matrix: local policy, handler, persistence, endpoint, or workflow tests as needed.</action>
+      </actions>
+      <phase-output>
+        <slice-structure>Files and ownership inside the slice.</slice-structure>
+        <shared-code-decision>None, or justified current callers.</shared-code-decision>
+        <test-matrix>Closest useful tests from common path to failure paths.</test-matrix>
+        <docs-impact>Docs or decisions to update.</docs-impact>
+      </phase-output>
+    </phase>
+    <phase name="implementation" gate="manual_checkpoint_required">
+      <purpose>Implement the approved vertical slice through small checkpoints.</purpose>
+      <actions>
+        <action>Keep code mostly inside the selected slice folder.</action>
+        <action>Implement the closest behavior first, then adapters or persistence only when needed.</action>
+        <action>Run slice-level verification first.</action>
+        <action>Broaden verification only when shared code, platform, public contracts, or persistence changed.</action>
+        <action>Stop and ask before implementing the next slice.</action>
+      </actions>
+      <phase-output>
+        <current-slice>Slice implemented.</current-slice>
+        <changed-files>Files changed.</changed-files>
+        <verification>Commands run and results.</verification>
+        <shared-changes>Shared code changed and why, or none.</shared-changes>
+      </phase-output>
+    </phase>
+    <evidence>Approved slice design, local behavior tests, shared-code justification if any, and docs update when boundaries change.</evidence>
+  </workflow>
+
+  <workflow type="feature_update">
+    <steps>
+      <step order="1">Find the owning feature slice.</step>
+      <step order="2">Add or update the closest behavior test for that slice.</step>
+      <step order="3">Change code locally inside the slice first.</step>
+      <step order="4">Extract shared code only when current callers prove the need.</step>
+      <step order="5">Run slice tests, then broader tests only if boundaries changed.</step>
+    </steps>
+    <evidence>Slice-local tests and explicit shared-change justification.</evidence>
+  </workflow>
+
+  <workflow type="bug_fix">
+    <steps>
+      <step order="1">Reproduce the bug in the owning slice.</step>
+      <step order="2">Add a focused regression test at the closest useful level.</step>
+      <step order="3">Fix the smallest local cause.</step>
+      <step order="4">Avoid refactoring unrelated slices.</step>
+      <step order="5">Run slice tests and broaden only when shared code changed.</step>
+    </steps>
+    <evidence>Regression test, local fix, and targeted verification.</evidence>
+  </workflow>
+
+  <workflow type="architecture_change">
+    <steps>
+      <step order="1">Identify whether the change is a slice boundary, shared platform, or cross-slice contract change.</step>
+      <step order="2">Compare local duplication, shared extraction, and platform abstraction.</step>
+      <step order="3">Document why YAGNI no longer applies if extracting shared code.</step>
+      <step order="4">Update architecture or decision docs.</step>
+      <step order="5">Implement in one affected slice or shared area at a time.</step>
+      <step order="6">Run affected slice tests and broader boundary tests.</step>
+    </steps>
+    <evidence>Decision record, caller evidence, affected slice tests, and boundary verification.</evidence>
+  </workflow>
+</workflows-reference>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workflows-reference preset="research-based">
+  <purpose>Provide workflows for selecting and applying an evidence-based architecture orientation.</purpose>
+
+  <documentation-context>
+    <rule>Read docs/decisions/0001-orientation-lock.md first.</rule>
+    <rule>Read docs/architecture/research-based-architecture.md, docs/foundation/researched-principles.md, and docs/process/researched-workflow.md before planning.</rule>
+    <rule>Use current primary or authoritative sources when the selected direction is not yet locked.</rule>
+    <rule>Cite sources in decision docs before implementation depends on the researched choice.</rule>
+  </documentation-context>
+
+  <workflow type="new_feature">
+    <description>Add one capability only after research has selected the architecture, principles, and workflow to apply.</description>
+    <enforcement>
+      <rule>Run phases sequentially: research lock, design, implementation.</rule>
+      <rule>Do not implement feature code until the researched orientation is selected and recorded.</rule>
+      <rule>Research must compare at least three viable combinations when the direction is unknown.</rule>
+      <rule>Implementation follows the workflow recorded by the research decision.</rule>
+    </enforcement>
+    <phase name="research-lock" gate="developer_approval_required">
+      <purpose>Select the orientation from current evidence before feature design.</purpose>
+      <actions>
+        <action>Read existing docs and inspect the codebase.</action>
+        <action>Browse current primary or authoritative sources for architecture, principles, and workflow options.</action>
+        <action>Compare at least three viable combinations.</action>
+        <action>Recommend one direction with trade-offs and source links.</action>
+        <action>Update research-based architecture, principles, workflow, and decision docs after approval.</action>
+      </actions>
+      <phase-output>
+        <options>Compared architecture/principle/workflow combinations.</options>
+        <recommendation>Selected direction and rationale.</recommendation>
+        <sources>Authoritative source links.</sources>
+        <trade-offs>Accepted costs and rejected options.</trade-offs>
+      </phase-output>
+    </phase>
+    <phase name="design" gate="developer_approval_required">
+      <purpose>Design the feature according to the approved researched orientation.</purpose>
+      <actions>
+        <action>Translate the researched orientation into concrete boundaries, tests, and docs for the selected feature.</action>
+        <action>Define behavior contract, ownership, data flow, and verification strategy.</action>
+        <action>Mark behavior selected, rejected, or postponed.</action>
+      </actions>
+      <phase-output>
+        <orientation-application>How the researched direction shapes this feature.</orientation-application>
+        <behavior-test-matrix>Scenarios and verification levels.</behavior-test-matrix>
+        <docs-impact>Docs or decisions to update.</docs-impact>
+      </phase-output>
+    </phase>
+    <phase name="implementation" gate="manual_checkpoint_required">
+      <purpose>Implement the approved feature under the researched orientation.</purpose>
+      <actions>
+        <action>Follow the approved researched workflow.</action>
+        <action>Implement one verified slice at a time.</action>
+        <action>Verify behavior and any assumptions from the researched architecture.</action>
+        <action>Stop after each checkpoint.</action>
+      </actions>
+      <phase-output>
+        <current-slice>Slice implemented.</current-slice>
+        <changed-files>Files changed.</changed-files>
+        <verification>Commands run and results.</verification>
+        <research-assumptions>Assumptions verified or still risky.</research-assumptions>
+      </phase-output>
+    </phase>
+    <evidence>Approved research lock, cited sources, approved design, and implementation verification.</evidence>
+  </workflow>
+
+  <workflow type="research_spike">
+    <steps>
+      <step order="1">State the research question and decision to be unlocked.</step>
+      <step order="2">Gather current primary or authoritative sources.</step>
+      <step order="3">Compare at least three options when selecting orientation.</step>
+      <step order="4">Recommend one option with trade-offs.</step>
+      <step order="5">Update research docs or decision records when the user approves.</step>
+    </steps>
+    <evidence>Sources, comparison, recommendation, and documented trade-offs.</evidence>
+  </workflow>
+</workflows-reference>

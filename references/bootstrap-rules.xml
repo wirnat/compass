@@ -1,21 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bootstrap-rules>
-  <purpose>Seed durable engineering documentation into a project when Compass is first used.</purpose>
+  <purpose>Seed durable engineering documentation and preset-specific process workflows into a project when Compass is first used.</purpose>
 
   <trigger>
-    <rule>Run bootstrap when one or more seed docs are missing from the target project's docs directory.</rule>
+    <rule>When one or more seed docs are missing from the target project's docs directory, offer orientation presets before running bootstrap.</rule>
+    <rule>Do not run bootstrap immediately with a silent default preset.</rule>
+    <rule>Bootstrap may run without asking only when Compass selects existing-architecture-lock from observed existing-project evidence.</rule>
     <rule>Do not run bootstrap when the user explicitly asks for no file changes.</rule>
     <rule>Do not overwrite existing files unless the user explicitly asks for force mode.</rule>
+    <rule>After bootstrap, adapt copied preset docs to the target language, framework, and project conventions before reporting docs ready.</rule>
   </trigger>
 
   <command>
-    <default>.skills/compass/scripts/bootstrap-docs.sh --target .</default>
-    <dry-run>.skills/compass/scripts/bootstrap-docs.sh --target . --dry-run</dry-run>
-    <force>.skills/compass/scripts/bootstrap-docs.sh --target . --force</force>
+    <path-resolution>Resolve scripts/bootstrap-docs.sh relative to the loaded Compass SKILL.md directory, not relative to the target workspace.</path-resolution>
+    <list-presets>scripts/bootstrap-docs.sh --list-presets</list-presets>
+    <apply>scripts/bootstrap-docs.sh --target . --preset selected-preset</apply>
+    <dry-run>scripts/bootstrap-docs.sh --target . --preset selected-preset --dry-run</dry-run>
+    <force>scripts/bootstrap-docs.sh --target . --preset selected-preset --force</force>
   </command>
+
+  <orientation-lock>
+    <purpose>Lock architecture, foundation principles, and development workflow before implementation begins.</purpose>
+    <selection-rule>Ask the user to choose a preset before bootstrap unless existing-architecture-lock is selected from observed existing-project evidence.</selection-rule>
+    <preset id="clean-solid-tdd">
+      <architecture>Clean Architecture plus explicit folder/file structure</architecture>
+      <principles>SOLID</principles>
+      <workflow>TDD</workflow>
+      <short>Enterprise-grade Clean Architecture layering, explicit folder/file structure, SOLID, and TDD.</short>
+      <best-fit>Frontend, backend, full-stack, API, and business systems that need protected dependency direction, clear boundaries, and test-first discipline.</best-fit>
+    </preset>
+    <preset id="vertical-cupid-incremental">
+      <architecture>Vertical Slice Architecture plus explicit feature-slice structure</architecture>
+      <principles>CUPID, YAGNI, KISS</principles>
+      <workflow>Incremental tests</workflow>
+      <short>Vertical Slice Architecture, explicit feature-slice structure, CUPID/YAGNI/KISS, and incremental tests.</short>
+      <best-fit>Small to medium products that benefit from feature-local change, low ceremony, and avoiding over-layering.</best-fit>
+    </preset>
+    <preset id="ddd-solid-bdd">
+      <architecture>Domain-Driven Design plus explicit bounded-context structure</architecture>
+      <principles>Domain modeling and SOLID</principles>
+      <workflow>BDD plus TDD</workflow>
+      <short>Domain-Driven Design, explicit bounded-context structure, domain modeling, SOLID, and BDD plus TDD.</short>
+      <best-fit>Complex business domains that need ubiquitous language, bounded contexts, aggregates, and executable behavior examples.</best-fit>
+    </preset>
+    <preset id="existing-architecture-lock">
+      <architecture>Existing project architecture</architecture>
+      <principles>Existing project principles</principles>
+      <workflow>Existing project workflow</workflow>
+      <short>Preserve and document the architecture, principles, and workflow already present in the project.</short>
+      <best-fit>Mature projects with a coherent existing structure that should be extended instead of replaced.</best-fit>
+    </preset>
+    <preset id="research-based">
+      <architecture>Selected after current-source research</architecture>
+      <principles>Selected after current-source research</principles>
+      <workflow>Selected after current-source research</workflow>
+      <short>Research current sources, compare options, cite evidence, then lock the selected direction.</short>
+      <best-fit>Unknown domains, unfamiliar teams, or explicit requests to research architecture alternatives.</best-fit>
+      <rule>Browse current sources, compare at least three options, prefer primary or authoritative sources, and cite links before finalizing the lock.</rule>
+    </preset>
+  </orientation-lock>
+
+  <language-adaptation>
+    <purpose>Prevent preset reference docs from being copied as language-specific boilerplate into projects using a different stack.</purpose>
+    <rule>Detect the target language and framework from existing files when possible.</rule>
+    <rule>If the project is empty or ambiguous, ask the developer which language or stack to target before adapting docs.</rule>
+    <rule>Use preset docs as detailed references, not immutable text.</rule>
+    <rule>Rewrite generated folder structures, file names, entrypoints, adapter names, test placement, and examples to target-stack idioms.</rule>
+    <rule>Preserve architecture principles, dependency direction, SOLID rules, TDD gates, checklists, and completion evidence.</rule>
+    <rule>Do not create static stack profiles in the Compass skill; the LLM performs the adaptation at bootstrap time.</rule>
+    <rule>For clean-solid-tdd, do not leave Go-only examples such as cmd, internal, .go files, module.go, or adapters/postgres in non-Go projects unless the target project actually uses those conventions.</rule>
+    <rule>For clean-solid-tdd, review and adapt docs/architecture/folder-file-structure.md, docs/architecture/clean-architecture.md, docs/process/tdd-workflow.md, and docs/process/workflows.xml when stack-specific wording appears.</rule>
+  </language-adaptation>
 
   <seed-docs>
     <doc>docs/README.md</doc>
+    <doc>docs/decisions/0001-orientation-lock.md</doc>
     <doc>docs/foundation/engineering-philosophy.md</doc>
     <doc>docs/foundation/architecture-principles.md</doc>
     <doc>docs/foundation/documentation-principles.md</doc>
@@ -26,8 +85,10 @@
     <doc>docs/modules/README.md</doc>
     <doc>docs/process/README.md</doc>
     <doc>docs/process/implementation-workflow.md</doc>
+    <doc>docs/process/workflows.xml</doc>
     <doc>docs/reference/README.md</doc>
     <doc>docs/reference/note-schema.md</doc>
+    <doc>docs/reference/orientation-presets.md</doc>
     <doc>docs/runbooks/README.md</doc>
     <doc>docs/_templates/README.md</doc>
     <doc>docs/_templates/decision-record.md</doc>
@@ -37,6 +98,10 @@
   <completion-evidence>
     <item>List created files.</item>
     <item>List skipped files.</item>
+    <item>Report selected orientation preset.</item>
+    <item>Report detected or selected language/framework.</item>
+    <item>Report which copied docs were adapted from preset references.</item>
+    <item>Report whether docs/process/workflows.xml came from the selected preset.</item>
     <item>Report whether force mode was used.</item>
   </completion-evidence>
 </bootstrap-rules>

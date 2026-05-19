@@ -5,6 +5,7 @@ This folder contains documents about how the project is built.
 Good fits:
 
 - implementation workflow
+- Compass task workflows
 - testing strategy
 - review flow
 - change splitting

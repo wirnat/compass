@@ -30,6 +30,9 @@
   </document-status>
 
   <rules>
+    <rule>Compass project docs are integrated through the target project's docs directory, not through AGENTS.md.</rule>
+    <rule>Before planning or editing, read the available docs relevant to the task, including the orientation lock when present.</rule>
+    <rule>If a linked or relevant doc is missing, record the gap instead of asking the user to duplicate links in AGENTS.md.</rule>
     <rule>Do not create root-level markdown files unless the project entry point requires it.</rule>
     <rule>Use docs/README.md to choose the target category.</rule>
     <rule>Use folder README files as category hubs.</rule>
