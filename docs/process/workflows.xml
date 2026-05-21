@@ -9,12 +9,20 @@
     <rule>When docs are still draft, fill them from observed evidence before broad implementation work.</rule>
   </documentation-context>
 
+  <task-memory-gate>
+    <rule>For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
+    <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
+    <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
+  </task-memory-gate>
+
   <workflow type="new_feature">
     <description>Add one capability by observing, preserving, and extending the existing architecture.</description>
     <enforcement>
       <rule>Run phases sequentially: evidence discovery, fit design, implementation.</rule>
       <rule>Do not introduce competing architecture names or folders without a decision record.</rule>
       <rule>Implementation must use the existing composition, testing, naming, and dependency style unless a change is approved.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
     </enforcement>
     <phase name="evidence-discovery" gate="developer_approval_required">
       <purpose>Discover how the current project already organizes similar behavior.</purpose>
@@ -48,6 +56,7 @@
       <purpose>Implement one approved slice while preserving existing structure.</purpose>
       <actions>
         <action>Use existing patterns and commands.</action>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
         <action>Do not create new root architecture folders without approval.</action>
         <action>Run the closest existing verification.</action>
         <action>Stop after each verified slice.</action>

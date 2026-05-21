@@ -11,6 +11,16 @@
     <rule>If the task has only one implementation slice, do not create task memory unless the developer explicitly asks for it.</rule>
   </activation>
 
+  <pre-implementation-gate>
+    <purpose>Make task memory impossible to forget once a long multi-slice goal is aligned.</purpose>
+    <rule>Evaluate this gate after align-context, fit-design, or the approved design phase has produced implementation slices.</rule>
+    <rule>Implementation must not start until Compass reports one outcome: created, resumed, or not-required.</rule>
+    <rule>For created or resumed, report the task memory folder path and current active slice.</rule>
+    <rule>For not-required, report the reason and the concrete slice count.</rule>
+    <rule>If task memory is required but cannot be created or loaded, stop before implementation and report the blocker unless the developer explicitly overrides the gate.</rule>
+    <rule>If the target project is missing docs/_templates task memory files, use the installed Compass templates or this reference structure. Missing templates are a documentation gap, not a reason to skip the gate.</rule>
+  </pre-implementation-gate>
+
   <location>
     <root>docs/.tasks</root>
     <folder-format>YYYYMMDD-HHMM_goal-slug</folder-format>
@@ -18,6 +28,13 @@
     <required-file>diagram.md</required-file>
     <required-file>memories.md</required-file>
   </location>
+
+  <templates>
+    <preferred-source>docs/_templates/task-goal.md, docs/_templates/task-diagram.md, and docs/_templates/task-memories.md in the target project.</preferred-source>
+    <fallback-source>assets/docs-seed/_templates/task-goal.md, task-diagram.md, and task-memories.md from the installed Compass skill.</fallback-source>
+    <fallback-source>Use the required file purposes, statuses, lifecycle, resume rules, and Mermaid rules in this XML when no template file is available.</fallback-source>
+    <rule>Do not skip task memory because templates are missing.</rule>
+  </templates>
 
   <goal-statuses>
     <status name="active">The goal is currently in progress.</status>

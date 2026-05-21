@@ -9,6 +9,13 @@
     <rule>Cite sources in decision docs before implementation depends on the researched choice.</rule>
   </documentation-context>
 
+  <task-memory-gate>
+    <rule>For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
+    <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
+    <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
+  </task-memory-gate>
+
   <workflow type="new_feature">
     <description>Add one capability only after research has selected the architecture, principles, and workflow to apply.</description>
     <enforcement>
@@ -16,6 +23,7 @@
       <rule>Do not implement feature code until the researched orientation is selected and recorded.</rule>
       <rule>Research must compare at least three viable combinations when the direction is unknown.</rule>
       <rule>Implementation follows the workflow recorded by the research decision.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
     </enforcement>
     <phase name="research-lock" gate="developer_approval_required">
       <purpose>Select the orientation from current evidence before feature design.</purpose>
@@ -49,6 +57,7 @@
     <phase name="implementation" gate="manual_checkpoint_required">
       <purpose>Implement the approved feature under the researched orientation.</purpose>
       <actions>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
         <action>Follow the approved researched workflow.</action>
         <action>Implement one verified slice at a time.</action>
         <action>Verify behavior and any assumptions from the researched architecture.</action>

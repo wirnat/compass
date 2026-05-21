@@ -10,6 +10,13 @@
     <rule>Read relevant docs/modules notes for the touched feature area.</rule>
   </documentation-context>
 
+  <task-memory-gate>
+    <rule>For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
+    <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
+    <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
+  </task-memory-gate>
+
   <workflow type="new_feature">
     <description>Add one feature-local behavior through a vertical slice.</description>
     <enforcement>
@@ -18,6 +25,7 @@
       <rule>Do not create global layers or shared abstractions before current callers prove the need.</rule>
       <rule>Design should be lightweight enough to keep implementation local.</rule>
       <rule>Implementation must stop after each verified slice checkpoint.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
     </enforcement>
     <phase name="slice-discovery" gate="developer_approval_required">
       <purpose>Name the user-visible command, query, or workflow and decide the smallest useful slice.</purpose>
@@ -54,6 +62,7 @@
     <phase name="implementation" gate="manual_checkpoint_required">
       <purpose>Implement the approved vertical slice through small checkpoints.</purpose>
       <actions>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
         <action>Keep code mostly inside the selected slice folder.</action>
         <action>Implement the closest behavior first, then adapters or persistence only when needed.</action>
         <action>Run slice-level verification first.</action>

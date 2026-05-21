@@ -10,6 +10,13 @@
     <rule>Read relevant docs/modules notes for the bounded context or domain capability.</rule>
   </documentation-context>
 
+  <task-memory-gate>
+    <rule>For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
+    <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
+    <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
+  </task-memory-gate>
+
   <workflow type="new_feature">
     <description>Add one business capability by clarifying language, context, examples, model, and tests before implementation.</description>
     <enforcement>
@@ -18,6 +25,7 @@
       <rule>BDD examples must clarify behavior before technical TDD begins.</rule>
       <rule>Do not place behavior in a context until ownership and language are explicit.</rule>
       <rule>Implementation must stop after each verified domain/application/adapter checkpoint.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
     </enforcement>
     <phase name="language-discovery" gate="developer_approval_required">
       <purpose>Align ubiquitous language and behavior examples before designing code.</purpose>
@@ -55,6 +63,7 @@
     <phase name="implementation" gate="manual_checkpoint_required">
       <purpose>Implement approved DDD behavior through domain, application, and adapter checkpoints.</purpose>
       <actions>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
         <action>Start with domain behavior or application use case tests from approved examples.</action>
         <action>Implement domain model and application orchestration before adapters unless approved otherwise.</action>
         <action>Keep dependencies inward and interfaces consumer-owned.</action>

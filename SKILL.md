@@ -115,12 +115,20 @@ When implementation introduces or touches repeated or contract-sensitive values 
 
 Compass uses task memory to preserve context for long or risky work that has multiple implementation slices. Task memory is not created for every task.
 
+Task memory is a pre-implementation hard gate. After align-context, fit-design, or the last approved design phase has produced at least two concrete implementation slices, implementation must not start until Compass reports one of these outcomes:
+
+- `created`: new task memory folder was created for this goal
+- `resumed`: one active relevant task memory folder was loaded and updated if needed
+- `not-required`: the task is small, single-slice, or otherwise below the task memory threshold
+
 Load `references/task-memory.xml` when both conditions are true:
 
 - the task type or discovered risk suggests long-running work, such as `new_feature`, `architecture_change`, large refactor, or another task with meaningful checkpoint risk
 - after align-context or fit-design, Compass has at least two concrete slices that the developer and agent understand
 
 When task memory is required, create `docs/.tasks/<YYYYMMDD-HHMM>_<goal_slug>/` in the target project before the first implementation slice starts. The folder must contain `goal.md`, `diagram.md`, and `memories.md`, based on the task memory templates from `docs/_templates/`.
+
+If the target project is missing `docs/_templates/task-goal.md`, `docs/_templates/task-diagram.md`, or `docs/_templates/task-memories.md`, that is a documentation gap, not permission to skip task memory. Use the installed Compass templates from `assets/docs-seed/_templates/` or the structure in `references/task-memory.xml`, create the required task files, and report the missing target templates.
 
 Update task memory whenever a slice starts, completes, becomes blocked, changes, or whenever the goal changes. If slices change but the goal remains stable, update the same task folder. If the goal changes, create a new task folder, mark the old goal `superseded`, cross-link both goals, and record the reason in both memory histories.
 
@@ -158,7 +166,7 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 9. Load `references/documentation-policy.xml` when creating or changing documentation.
 10. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
 11. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
-12. After the active workflow reaches align-context or fit-design for long or risky work, inspect or create task memory using `references/task-memory.xml` only when at least two concrete slices exist and before implementation starts.
+12. Before implementation starts, run the Task Memory Gate. If long or risky work has at least two concrete slices after align-context, fit-design, or the approved design phase, inspect or create task memory using `references/task-memory.xml`. Report `created`, `resumed`, or `not-required` with the folder path or reason.
 13. If implementation is requested, continue only after all earlier gated phases have explicit developer approval, then verify with the task's completion evidence.
 
 ## Hard Gates
@@ -172,6 +180,8 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 - After brainstorming, stop and ask whether to challenge the shared understanding or continue to design.
 - After design, stop and ask whether to adjust suggested behavior or continue to implementation.
 - Implementation may start only after the developer explicitly approves the design phase.
+- Implementation may start only after the Task Memory Gate has been reported. For required task memory, `docs/.tasks/<task>/goal.md`, `diagram.md`, and `memories.md` must exist before the first implementation edit or command.
+- Missing task memory templates in the target project do not waive the gate; use the installed Compass templates or `references/task-memory.xml`, then report the project-doc gap.
 - Implementation must run as small manual checkpoints. Implement exactly one approved slice, run the relevant verification, stop, report what changed and what passed or failed, then ask the developer before continuing to the next slice.
 - A general request such as "build feature Y" or "implement Z" is not approval to skip brainstorming and design. Treat it as the start of the `new_feature` workflow.
 - If the user explicitly says to skip a phase, state the skipped gate and risk before continuing.

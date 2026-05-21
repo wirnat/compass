@@ -24,6 +24,17 @@
         >If clean-solid-tdd docs were just bootstrapped, adapt Go-oriented reference examples to the target language or stack before using them as project rules.</rule>
   </documentation-context>
 
+  <task-memory-gate>
+    <rule
+        >For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule
+        >Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
+    <rule
+        >When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
+    <rule
+        >Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
+  </task-memory-gate>
+
   <workflow type="new_feature">
     <description>Add a new capability through three gated phases.</description>
     <enforcement>
@@ -40,6 +51,8 @@
             >Design must produce a usecase-first contract, domain shape, and behavior-test matrix before implementation is allowed.</rule>
       <rule
             >Implementation must run one small approved slice at a time, then stop for developer validation before the next slice.</rule>
+      <rule
+            >Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
       <rule
             >Stop after each developer_approval_required phase and wait for explicit developer approval before loading or executing the next phase.</rule>
       <rule
@@ -202,6 +215,8 @@
                 >Read the required docs, orientation-linked docs, and relevant module or decision docs before editing files.</action>
         <action
                 >Confirm that brainstorming and design were approved before editing files.</action>
+        <action
+                >Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
         <action
                 >Implement only the selected feature slice from the approved design. Do not opportunistically implement pending TODO feature slices.</action>
         <action

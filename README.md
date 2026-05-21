@@ -94,9 +94,9 @@ Compass follows this flow:
 3. Seed project docs, including `docs/decisions/0001-orientation-lock.md`.
 4. Copy the selected preset workflow to `docs/process/workflows.xml`.
 5. Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.
-6. For long multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment so context survives session changes.
-7. Classify the task by engineering risk, not by wording alone.
-8. Run the active workflow from `docs/process/workflows.xml`.
+6. Classify the task by engineering risk, not by wording alone.
+7. Run the active workflow from `docs/process/workflows.xml`.
+8. Before implementation, run the Task Memory Gate: for long multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment and report `created`, `resumed`, or `not-required`.
 9. Allow implementation only through the workflow's gates and required evidence.
 
 Important rule: **Compass does not use a root-skill workflow fallback.** If a project does not have `docs/process/workflows.xml`, Compass must seed or migrate the project docs first. One active workflow source. Two compasses on one desk is how people start arguing with furniture.
@@ -163,7 +163,8 @@ For `new_feature`, Compass is intentionally strict:
 
 1. **Brainstorming**: understand the problem, users, success criteria, scope, and non-goals.
 2. **Design**: define the contract, domain shape, behavior-test matrix, and behavior decisions.
-3. **Implementation**: build one small slice, verify it, then stop for validation.
+3. **Task Memory Gate**: before implementation, create or resume `docs/.tasks/<task>/` for long multi-slice work, or state why it is not required.
+4. **Implementation**: build one small slice, verify it, then stop for validation.
 
 A request to "build feature X" is not permission to skip brainstorming and design. It is the starting bell, not the finish line.
 
