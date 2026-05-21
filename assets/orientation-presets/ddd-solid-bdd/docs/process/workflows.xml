@@ -81,14 +81,80 @@
   </workflow>
 
   <workflow type="feature_update">
-    <steps>
-      <step order="1">Find the owning bounded context and current ubiquitous language.</step>
-      <step order="2">Add or update Given/When/Then examples for changed behavior.</step>
-      <step order="3">Map examples to domain, application, adapter, or integration tests.</step>
-      <step order="4">Change the model or use case in the smallest owning context.</step>
-      <step order="5">Update context/module docs if language or ownership changed.</step>
-    </steps>
-    <evidence>Updated examples, tests, and context docs if needed.</evidence>
+    <description>Change existing domain behavior by controlling the delta from protected bounded-context behavior.</description>
+    <enforcement>
+      <rule>Run phases sequentially: baseline-discovery, delta-design, implementation-checkpoints, and rollout-cleanup when rollout guards or compatibility paths are introduced.</rule>
+      <rule>Classify as architecture_change first when the update changes bounded-context ownership, aggregate ownership, integration contracts, or dependency direction.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any long, risky, or multi-slice update.</rule>
+      <rule>Use ubiquitous language consistently and do not duplicate another context's rule locally.</rule>
+      <rule>High-risk updates must define rollback, feature-flag, dark-launch, compatibility, or cleanup evidence before implementation.</rule>
+    </enforcement>
+    <phase name="baseline-discovery" gate="developer_approval_required">
+      <purpose>Protect current domain language, examples, and context ownership before deciding what may change.</purpose>
+      <actions>
+        <action>Find the owning bounded context, aggregate or use case, current ubiquitous language, examples, tests, docs, commands, and integration points.</action>
+        <action>State current domain behavior, invariants, policies, integration contracts, and expectations that must remain stable.</action>
+        <action>Classify update risk as minor, medium, or high based on blast radius, reversibility, data impact, user visibility, and context-boundary impact.</action>
+        <action>Record ambiguity before designing the delta.</action>
+      </actions>
+      <phase-output>
+        <baseline>Owning context, language, behavior examples, tests, docs, and verification commands observed.</baseline>
+        <preserve-list>Behavior, language, invariants, contracts, and non-goals that must not drift.</preserve-list>
+        <risk-level>minor, medium, or high with reason.</risk-level>
+        <ambiguity>Conflicts or unknowns.</ambiguity>
+      </phase-output>
+    </phase>
+    <phase name="delta-design" gate="developer_approval_required">
+      <purpose>Define the exact domain behavior change and executable examples before editing.</purpose>
+      <actions>
+        <action>State old behavior, new behavior, unchanged behavior, and intentionally removed behavior if any.</action>
+        <action>Add or update Given/When/Then examples for preserved and changed behavior.</action>
+        <action>Map examples to domain, application, adapter, or integration tests at the cheapest sufficient level.</action>
+        <action>Define the smallest owning context, aggregate, policy, use case, or adapter to change.</action>
+        <action>Decide whether the update needs a feature flag, dark launch, compatibility path, rollback plan, monitoring, docs update, or decision record.</action>
+        <action>Define the implementation slices and verification command for each slice.</action>
+      </actions>
+      <phase-output>
+        <delta>Approved behavior change and unchanged behavior.</delta>
+        <examples>Updated behavior examples and test mapping.</examples>
+        <slices>Ordered implementation checkpoints.</slices>
+        <rollout-risk>Flag, rollback, monitoring, compatibility, cleanup, or not needed.</rollout-risk>
+        <docs-impact>Context docs, language docs, decisions, or none.</docs-impact>
+      </phase-output>
+    </phase>
+    <phase name="implementation-checkpoints" gate="manual_checkpoint_required">
+      <purpose>Apply one approved delta slice inside the owning context.</purpose>
+      <actions>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
+        <action>Add or update the approved examples and tests for the current slice when practical.</action>
+        <action>Change the smallest owning domain model, application use case, adapter, or integration point and avoid introducing competing language.</action>
+        <action>Run the current slice verification command.</action>
+        <action>Stop after each verified slice and ask before continuing.</action>
+      </actions>
+      <phase-output>
+        <current-slice>Delta slice implemented.</current-slice>
+        <baseline-protection>Example or regression evidence added or reused.</baseline-protection>
+        <changed-files>Files changed.</changed-files>
+        <verification>Commands run and results.</verification>
+        <context-impact>Bounded context or integration impact.</context-impact>
+        <remaining-risk>Known gaps or follow-up work.</remaining-risk>
+      </phase-output>
+    </phase>
+    <phase name="rollout-cleanup" gate="manual_checkpoint_required">
+      <purpose>Close temporary risk controls introduced for the update.</purpose>
+      <actions>
+        <action>Record feature flag, dark launch, compatibility path, monitoring, rollback, or cleanup status when any were introduced.</action>
+        <action>Remove stale flags or inactive compatibility paths after the update is fully accepted.</action>
+        <action>Update context docs, decisions, public contracts, or runbooks when behavior or rollout expectations changed.</action>
+        <action>Run final verification for the touched scope.</action>
+      </actions>
+      <phase-output>
+        <rollout-state>Flag, rollout, compatibility, rollback, or cleanup state.</rollout-state>
+        <docs-updated>Docs changed or intentionally unchanged.</docs-updated>
+        <verification>Commands run and results.</verification>
+      </phase-output>
+    </phase>
+    <evidence>Approved baseline, approved delta design, updated examples, regression coverage for preserved behavior, changed-behavior verification, slice checkpoints, and rollout or cleanup evidence when needed.</evidence>
   </workflow>
 
   <workflow type="bug_fix">

@@ -25,13 +25,18 @@ Compass must inspect:
 - documented commands
 - CI configuration
 - package scripts or make targets
+- installed skill update source and Session Update Gate command
 - test naming and placement
 - migration and generation workflows
 - release or review conventions
+- existing feature owners, baseline behavior, regression coverage, rollout
+  controls, and cleanup conventions for feature updates
 
 ## Fill This In
 
 - Design workflow:
+- Session update gate:
+- Feature update workflow:
 - Test workflow:
 - Build command:
 - Lint command:

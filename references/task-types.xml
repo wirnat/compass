@@ -5,11 +5,11 @@
   <task-types>
     <task-type id="new_feature" commit-hint="feat">
       <common-labels>feature, story, feat</common-labels>
-      <use-when>Add new behavior or capability.</use-when>
+      <use-when>Add new behavior, use case, or capability, even when it belongs inside an existing module or feature area.</use-when>
     </task-type>
     <task-type id="feature_update" commit-hint="feat or fix">
       <common-labels>enhancement, improvement</common-labels>
-      <use-when>Intentionally change existing behavior.</use-when>
+      <use-when>Intentionally change the expected behavior of an already-existing use case, rule, contract, or user flow.</use-when>
     </task-type>
     <task-type id="bug_fix" commit-hint="fix">
       <common-labels>bug, defect, regression</common-labels>

@@ -72,14 +72,78 @@
   </workflow>
 
   <workflow type="feature_update">
-    <steps>
-      <step order="1">Find the existing owner and similar behavior.</step>
-      <step order="2">Add or update tests in the existing style.</step>
-      <step order="3">Change the smallest existing module or component.</step>
-      <step order="4">Avoid introducing competing patterns.</step>
-      <step order="5">Run the existing verification command.</step>
-    </steps>
-    <evidence>Existing-style regression coverage and verification.</evidence>
+    <description>Change existing behavior by controlling the delta from known baseline behavior.</description>
+    <enforcement>
+      <rule>Run phases sequentially: baseline-discovery, delta-design, implementation-checkpoints, and rollout-cleanup when rollout guards or compatibility paths are introduced.</rule>
+      <rule>Classify as architecture_change first when the update changes boundaries, dependency direction, module structure, platform categories, or cross-module contracts.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any long, risky, or multi-slice update.</rule>
+      <rule>Implement one approved delta slice at a time and stop after verification.</rule>
+      <rule>High-risk updates must define rollback, feature-flag, dark-launch, compatibility, or cleanup evidence before implementation.</rule>
+    </enforcement>
+    <phase name="baseline-discovery" gate="developer_approval_required">
+      <purpose>Protect current behavior before deciding what may change.</purpose>
+      <actions>
+        <action>Find the existing owner, similar behavior, tests, docs, commands, and composition points.</action>
+        <action>State the current behavior, public contracts, integrations, configuration, and user-visible expectations that must remain stable.</action>
+        <action>Classify update risk as minor, medium, or high based on blast radius, reversibility, data impact, user visibility, and boundary impact.</action>
+        <action>Record ambiguity before designing the delta.</action>
+      </actions>
+      <phase-output>
+        <baseline>Existing owner, behavior, tests, docs, and verification commands observed.</baseline>
+        <preserve-list>Behavior, contracts, and non-goals that must not drift.</preserve-list>
+        <risk-level>minor, medium, or high with reason.</risk-level>
+        <ambiguity>Conflicts or unknowns.</ambiguity>
+      </phase-output>
+    </phase>
+    <phase name="delta-design" gate="developer_approval_required">
+      <purpose>Define the exact behavior change and the regression evidence before editing.</purpose>
+      <actions>
+        <action>State old behavior, new behavior, unchanged behavior, and intentionally removed behavior if any.</action>
+        <action>Define regression tests for preserved behavior and changed-behavior tests in the existing project style.</action>
+        <action>Define the smallest owning module or component to change.</action>
+        <action>Decide whether the update needs a feature flag, dark launch, compatibility path, rollback plan, monitoring, docs update, or decision record.</action>
+        <action>Define the implementation slices and verification command for each slice.</action>
+      </actions>
+      <phase-output>
+        <delta>Approved behavior change and unchanged behavior.</delta>
+        <tests>Regression and changed-behavior test plan.</tests>
+        <slices>Ordered implementation checkpoints.</slices>
+        <rollout-risk>Flag, rollback, monitoring, compatibility, cleanup, or not needed.</rollout-risk>
+        <docs-impact>Docs or decisions to update, or none.</docs-impact>
+      </phase-output>
+    </phase>
+    <phase name="implementation-checkpoints" gate="manual_checkpoint_required">
+      <purpose>Apply one approved delta slice while keeping the baseline protected.</purpose>
+      <actions>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
+        <action>Add or update the approved regression and changed-behavior tests for the current slice when practical.</action>
+        <action>Change the smallest existing module or component and avoid introducing competing patterns.</action>
+        <action>Run the current slice verification command.</action>
+        <action>Stop after each verified slice and ask before continuing.</action>
+      </actions>
+      <phase-output>
+        <current-slice>Delta slice implemented.</current-slice>
+        <baseline-protection>Regression evidence added or reused.</baseline-protection>
+        <changed-files>Files changed.</changed-files>
+        <verification>Commands run and results.</verification>
+        <remaining-risk>Known gaps or follow-up work.</remaining-risk>
+      </phase-output>
+    </phase>
+    <phase name="rollout-cleanup" gate="manual_checkpoint_required">
+      <purpose>Close temporary risk controls introduced for the update.</purpose>
+      <actions>
+        <action>Record feature flag, dark launch, compatibility path, monitoring, rollback, or cleanup status when any were introduced.</action>
+        <action>Remove stale flags or inactive compatibility paths after the update is fully accepted.</action>
+        <action>Update docs, decisions, public contracts, or runbooks when behavior or rollout expectations changed.</action>
+        <action>Run final verification for the touched scope.</action>
+      </actions>
+      <phase-output>
+        <rollout-state>Flag, rollout, compatibility, rollback, or cleanup state.</rollout-state>
+        <docs-updated>Docs changed or intentionally unchanged.</docs-updated>
+        <verification>Commands run and results.</verification>
+      </phase-output>
+    </phase>
+    <evidence>Approved baseline, approved delta design, regression coverage for preserved behavior, changed-behavior verification, slice checkpoints, and rollout or cleanup evidence when needed.</evidence>
   </workflow>
 
   <workflow type="architecture_change">

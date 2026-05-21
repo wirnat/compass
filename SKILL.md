@@ -13,6 +13,34 @@ Compass keeps engineering work pointed in the right direction before files chang
 
 Use this skill for software work in any language or stack. Do not add language-specific best practices here. Project and language details come from the repository being worked on.
 
+## Session Update Gate
+
+At the first Compass-guided task in each Codex session, before project bootstrap,
+classification, planning, or implementation, verify that the installed Compass
+skill matches the latest `main` revision from `https://github.com/wirnat/compass`.
+
+Resolve paths relative to this `SKILL.md` file's directory, not relative to the
+target workspace. Run:
+
+```bash
+scripts/update-skill.sh --skill-dir <installed-compass-skill-dir>
+```
+
+If the script reports that Compass is already up to date, continue normally.
+
+If the script updates the skill, re-open and follow the updated
+`<installed-compass-skill-dir>/SKILL.md` before continuing. Do not continue from
+stale instructions after an update.
+
+If the script is missing, `git` is unavailable, the network check fails, or the
+update fails, stop before implementation or docs bootstrap work. Report the
+reason and ask whether the developer wants to continue with the installed
+version for this session. Do not silently skip this gate.
+
+If the developer explicitly forbids updating or network checks for the session,
+state that the Session Update Gate was skipped by request and continue only with
+that risk visible.
+
 ## First Run Bootstrap
 
 At the start of a Compass-guided task, check whether the current project has the seed documentation:
@@ -156,18 +184,19 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 ## Quick Start
 
 1. Restate the user's request in one sentence.
-2. Check missing seed docs and orientation lock. If docs are missing, offer preset choices before bootstrapping; do not auto-run bootstrap.
-3. If bootstrap just ran, adapt copied preset docs to the target language or stack before treating docs as ready.
-4. Build the project docs context from `docs/` using the Project Docs Integration rules.
-5. Classify the task using `references/classification.xml`.
-6. Load the matching task definition from `references/task-types.xml`.
-7. Load the matching workflow from project `docs/process/workflows.xml`. If it is missing, do not use a fallback workflow; seed or migrate Compass docs first.
-8. Load `references/bootstrap-rules.xml` when docs or orientation lock need to be seeded.
-9. Load `references/documentation-policy.xml` when creating or changing documentation.
-10. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
-11. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
-12. Before implementation starts, run the Task Memory Gate. If long or risky work has at least two concrete slices after align-context, fit-design, or the approved design phase, inspect or create task memory using `references/task-memory.xml`. Report `created`, `resumed`, or `not-required` with the folder path or reason.
-13. If implementation is requested, continue only after all earlier gated phases have explicit developer approval, then verify with the task's completion evidence.
+2. Run the Session Update Gate once per Codex session before any project bootstrap, classification, planning, or implementation.
+3. Check missing seed docs and orientation lock. If docs are missing, offer preset choices before bootstrapping; do not auto-run bootstrap.
+4. If bootstrap just ran, adapt copied preset docs to the target language or stack before treating docs as ready.
+5. Build the project docs context from `docs/` using the Project Docs Integration rules.
+6. Classify the task using `references/classification.xml`.
+7. Load the matching task definition from `references/task-types.xml`.
+8. Load the matching workflow from project `docs/process/workflows.xml`. If it is missing, do not use a fallback workflow; seed or migrate Compass docs first.
+9. Load `references/bootstrap-rules.xml` when docs or orientation lock need to be seeded.
+10. Load `references/documentation-policy.xml` when creating or changing documentation.
+11. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
+12. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
+13. Before implementation starts, run the Task Memory Gate. If long or risky work has at least two concrete slices after align-context, fit-design, or the approved design phase, inspect or create task memory using `references/task-memory.xml`. Report `created`, `resumed`, or `not-required` with the folder path or reason.
+14. If implementation is requested, continue only after all earlier gated phases have explicit developer approval, then verify with the task's completion evidence.
 
 ## Hard Gates
 
@@ -183,12 +212,17 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 - Implementation may start only after the Task Memory Gate has been reported. For required task memory, `docs/.tasks/<task>/goal.md`, `diagram.md`, and `memories.md` must exist before the first implementation edit or command.
 - Missing task memory templates in the target project do not waive the gate; use the installed Compass templates or `references/task-memory.xml`, then report the project-doc gap.
 - Implementation must run as small manual checkpoints. Implement exactly one approved slice, run the relevant verification, stop, report what changed and what passed or failed, then ask the developer before continuing to the next slice.
+- Medium or high-risk `feature_update` work must protect the baseline before editing: identify current behavior, contracts, tests, owner, risk level, and unchanged behavior before delta design.
+- `feature_update` implementation may start only after the approved delta is explicit: old behavior, new behavior, unchanged behavior, regression evidence, slice plan, docs impact, and rollout or cleanup risk.
+- Feature flags, dark launches, compatibility paths, or rollback controls introduced by a `feature_update` must have cleanup or follow-up evidence before the update is called complete.
 - A general request such as "build feature Y" or "implement Z" is not approval to skip brainstorming and design. Treat it as the start of the `new_feature` workflow.
 - If the user explicitly says to skip a phase, state the skipped gate and risk before continuing.
 
 ## Routing Rules
 
 - Prefer the task type that controls risk, not the label the user used.
+- Treat an existing module, feature folder, screen, or component as placement evidence only. Adding a new use case or capability inside it is still `new_feature`, not `feature_update`.
+- Use `feature_update` only when an already-existing use case, rule, contract, or user flow is intentionally changed.
 - If a task touches architecture boundaries, classify it as `architecture_change` even when it also adds behavior.
 - If a task changes database schema, include `db_migration` as a secondary type even when the primary type is `new_feature`, `feature_update`, or `bug_fix`.
 - If production is broken or urgent, classify it as `hotfix_incident` first.

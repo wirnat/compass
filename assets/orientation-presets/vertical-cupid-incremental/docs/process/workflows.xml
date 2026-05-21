@@ -80,14 +80,80 @@
   </workflow>
 
   <workflow type="feature_update">
-    <steps>
-      <step order="1">Find the owning feature slice.</step>
-      <step order="2">Add or update the closest behavior test for that slice.</step>
-      <step order="3">Change code locally inside the slice first.</step>
-      <step order="4">Extract shared code only when current callers prove the need.</step>
-      <step order="5">Run slice tests, then broader tests only if boundaries changed.</step>
-    </steps>
-    <evidence>Slice-local tests and explicit shared-change justification.</evidence>
+    <description>Change an existing feature slice by controlling the delta from protected slice behavior.</description>
+    <enforcement>
+      <rule>Run phases sequentially: baseline-discovery, delta-design, implementation-checkpoints, and rollout-cleanup when rollout guards or compatibility paths are introduced.</rule>
+      <rule>Classify as architecture_change first when the update changes slice boundaries, shared platform ownership, or cross-slice contracts.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any long, risky, or multi-slice update.</rule>
+      <rule>Keep changes local to the owning slice unless current callers prove a shared extraction is needed.</rule>
+      <rule>High-risk updates must define rollback, feature-flag, dark-launch, compatibility, or cleanup evidence before implementation.</rule>
+    </enforcement>
+    <phase name="baseline-discovery" gate="developer_approval_required">
+      <purpose>Protect current slice behavior before deciding what may change.</purpose>
+      <actions>
+        <action>Find the owning feature slice, similar behavior, slice-local tests, shared callers, docs, commands, and composition points.</action>
+        <action>State current behavior, cross-slice contracts, shared dependencies, configuration, and user-visible expectations that must remain stable.</action>
+        <action>Classify update risk as minor, medium, or high based on blast radius, reversibility, data impact, user visibility, and slice-boundary impact.</action>
+        <action>Record ambiguity before designing the delta.</action>
+      </actions>
+      <phase-output>
+        <baseline>Owning slice, behavior, tests, shared callers, docs, and verification commands observed.</baseline>
+        <preserve-list>Behavior, cross-slice contracts, shared callers, and non-goals that must not drift.</preserve-list>
+        <risk-level>minor, medium, or high with reason.</risk-level>
+        <ambiguity>Conflicts or unknowns.</ambiguity>
+      </phase-output>
+    </phase>
+    <phase name="delta-design" gate="developer_approval_required">
+      <purpose>Define the exact slice behavior change and regression evidence before editing.</purpose>
+      <actions>
+        <action>State old behavior, new behavior, unchanged behavior, and intentionally removed behavior if any.</action>
+        <action>Define slice-local regression tests for preserved behavior and changed-behavior tests in the existing style.</action>
+        <action>Define the smallest owning slice files to change and justify any shared-code change with current caller evidence.</action>
+        <action>Decide whether the update needs a feature flag, dark launch, compatibility path, rollback plan, monitoring, docs update, or decision record.</action>
+        <action>Define the implementation slices and verification command for each slice.</action>
+      </actions>
+      <phase-output>
+        <delta>Approved behavior change and unchanged behavior.</delta>
+        <tests>Slice-local regression and changed-behavior test plan.</tests>
+        <slices>Ordered implementation checkpoints.</slices>
+        <shared-change>Shared extraction or shared edit justification, or none.</shared-change>
+        <rollout-risk>Flag, rollback, monitoring, compatibility, cleanup, or not needed.</rollout-risk>
+        <docs-impact>Docs or decisions to update, or none.</docs-impact>
+      </phase-output>
+    </phase>
+    <phase name="implementation-checkpoints" gate="manual_checkpoint_required">
+      <purpose>Apply one approved delta slice while keeping the change local first.</purpose>
+      <actions>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
+        <action>Add or update the approved slice-local tests for the current slice when practical.</action>
+        <action>Change code locally inside the owning slice first and avoid introducing competing shared patterns.</action>
+        <action>Run the current slice verification command, then broader tests only if boundaries or shared code changed.</action>
+        <action>Stop after each verified slice and ask before continuing.</action>
+      </actions>
+      <phase-output>
+        <current-slice>Delta slice implemented.</current-slice>
+        <baseline-protection>Regression evidence added or reused.</baseline-protection>
+        <changed-files>Files changed.</changed-files>
+        <verification>Commands run and results.</verification>
+        <shared-changes>Shared code changed and why, or none.</shared-changes>
+        <remaining-risk>Known gaps or follow-up work.</remaining-risk>
+      </phase-output>
+    </phase>
+    <phase name="rollout-cleanup" gate="manual_checkpoint_required">
+      <purpose>Close temporary risk controls introduced for the update.</purpose>
+      <actions>
+        <action>Record feature flag, dark launch, compatibility path, monitoring, rollback, or cleanup status when any were introduced.</action>
+        <action>Remove stale flags or inactive compatibility paths after the update is fully accepted.</action>
+        <action>Update docs, decisions, public contracts, or runbooks when behavior or rollout expectations changed.</action>
+        <action>Run final verification for the touched scope.</action>
+      </actions>
+      <phase-output>
+        <rollout-state>Flag, rollout, compatibility, rollback, or cleanup state.</rollout-state>
+        <docs-updated>Docs changed or intentionally unchanged.</docs-updated>
+        <verification>Commands run and results.</verification>
+      </phase-output>
+    </phase>
+    <evidence>Approved baseline, approved delta design, slice-local regression coverage for preserved behavior, changed-behavior verification, shared-change justification, slice checkpoints, and rollout or cleanup evidence when needed.</evidence>
   </workflow>
 
   <workflow type="bug_fix">

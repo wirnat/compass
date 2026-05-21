@@ -91,15 +91,16 @@ Presets are not just folder templates. They seed `docs/` with decisions, princip
 
 Compass follows this flow:
 
-1. Check whether the project already has orientation docs under `docs/`.
-2. If not, offer orientation presets and bootstrap only after the developer chooses.
-3. Seed project docs, including `docs/decisions/0001-orientation-lock.md`.
-4. Copy the selected preset workflow to `docs/process/workflows.xml`.
-5. Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.
-6. Classify the task by engineering risk, not by wording alone.
-7. Run the active workflow from `docs/process/workflows.xml`.
-8. Before implementation, run the Task Memory Gate: for long multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment and report `created`, `resumed`, or `not-required`.
-9. Allow implementation only through the workflow's gates and required evidence.
+1. On the first Compass-guided task in a Codex session, check the installed Compass skill against `https://github.com/wirnat/compass` and update it before continuing when the installed copy is stale.
+2. Check whether the project already has orientation docs under `docs/`.
+3. If not, offer orientation presets and bootstrap only after the developer chooses.
+4. Seed project docs, including `docs/decisions/0001-orientation-lock.md`.
+5. Copy the selected preset workflow to `docs/process/workflows.xml`.
+6. Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.
+7. Classify the task by engineering risk, not by wording alone.
+8. Run the active workflow from `docs/process/workflows.xml`.
+9. Before implementation, run the Task Memory Gate: for long multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment and report `created`, `resumed`, or `not-required`.
+10. Allow implementation only through the workflow's gates and required evidence.
 
 Important rule: **Compass does not use a root-skill workflow fallback.** If a project does not have `docs/process/workflows.xml`, Compass must seed or migrate the project docs first. One active workflow source. Two compasses on one desk is how people start arguing with furniture.
 
@@ -132,9 +133,16 @@ Overwrite existing docs only when that is intentional:
 When Compass is used as an installed skill, resolve the script relative to the loaded skill directory:
 
 ```bash
+/path/to/installed/compass/scripts/update-skill.sh --skill-dir /path/to/installed/compass
 /path/to/installed/compass/scripts/bootstrap-docs.sh --list-presets
 /path/to/installed/compass/scripts/bootstrap-docs.sh --target . --preset clean-solid-tdd
 ```
+
+The update check uses the GitHub repository as the source of truth. If the
+installed skill is stale or has no recorded source revision, the updater refreshes
+the skill directory first, then the agent must reload `SKILL.md` before
+continuing. Kalau peta baru sudah ada, jangan tetap jalan pakai peta fotokopi
+zaman lomba gerak jalan.
 
 ## Routing Output Example
 
@@ -169,6 +177,23 @@ For `new_feature`, Compass is intentionally strict:
 4. **Implementation**: build one small slice, verify it, then stop for validation.
 
 A request to "build feature X" is not permission to skip brainstorming and design. It is the starting bell, not the finish line.
+
+## Feature Update Workflow
+
+For `feature_update`, Compass protects the existing behavior before changing it.
+An update is not a smaller new feature; it is a controlled delta from a known
+baseline.
+
+1. **Baseline discovery**: find the owner, current behavior, tests, contracts, docs, commands, and behavior that must not drift.
+2. **Delta design**: define old behavior, new behavior, unchanged behavior, regression tests, slices, docs impact, and rollout risk.
+3. **Task Memory Gate**: before implementation, create or resume task memory for long, risky, or multi-slice updates, or state why it is not required.
+4. **Implementation checkpoints**: build one approved delta slice, verify preserved and changed behavior, then stop for validation.
+5. **Rollout cleanup**: close feature flags, dark-launch paths, compatibility paths, docs, runbooks, or rollback notes introduced by the update.
+
+Minor updates can pass through this quickly. Medium and high-risk updates should
+not skip baseline and delta approval, because changing old behavior without
+knowing what must stay still is how software becomes a cupboard full of cables:
+everything is connected, nobody knows why.
 
 ## Task Memory Gate
 
@@ -232,8 +257,8 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 
 | Type | When To Use |
 | --- | --- |
-| `new_feature` | Add a new capability |
-| `feature_update` | Change existing behavior |
+| `new_feature` | Add a new capability or use case, even inside an existing module |
+| `feature_update` | Change behavior of an already-existing use case or flow |
 | `bug_fix` | Fix a defect |
 | `hotfix_incident` | Restore urgent or production-impacting behavior |
 | `refactor` | Change structure without changing behavior |
@@ -314,10 +339,12 @@ Compass is unnecessary for casual Q&A, general writing, or one-line commands tha
 A Compass-guided task should leave an auditable trail:
 
 - clear task classification;
+- Session Update Gate result for the installed Compass skill;
 - locked orientation preset;
 - workflow source from `docs/process/workflows.xml`;
 - approval gates for risky work;
 - Task Memory Gate outcome for long or risky multi-slice work;
+- baseline and delta checkpoints for feature updates;
 - small implementation slices;
 - verification evidence;
 - docs updates when boundaries, contracts, or project decisions change.

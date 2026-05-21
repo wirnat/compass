@@ -21,6 +21,13 @@
     <question order="16" type-if-yes="release_deploy">Is it release, versioning, changelog, tagging, packaging, or deployment preparation?</question>
   </decision-tree>
 
+  <routing-clarifications>
+    <rule>Existing module, feature folder, screen, or component ownership is placement evidence only; it does not by itself make the task a feature_update.</rule>
+    <rule>Adding a new use case, capability, user action, endpoint, screen flow, integration path, or business workflow inside an existing module is new_feature unless the dominant risk is architecture_change, db_migration, security, or hotfix_incident.</rule>
+    <rule>Use feature_update only when the same use case or behavior already exists and the task intentionally changes its expected behavior, contract, rule, or output.</rule>
+    <example request="Add Google Sign-In to the existing login feature" type="new_feature">Google Sign-In is a new login use case and capability; the existing login module only tells Compass where the feature belongs.</example>
+  </routing-clarifications>
+
   <tie-breakers>
     <rule>Architecture beats feature: if a feature requires a new boundary, classify as architecture_change with new_feature secondary.</rule>
     <rule>Incident beats bug: if users or production are currently affected, classify as hotfix_incident.</rule>
