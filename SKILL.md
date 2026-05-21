@@ -35,6 +35,9 @@ At the start of a Compass-guided task, check whether the current project has the
 - `docs/reference/orientation-presets.md`
 - `docs/runbooks/README.md`
 - `docs/_templates/README.md`
+- `docs/_templates/task-goal.md`
+- `docs/_templates/task-diagram.md`
+- `docs/_templates/task-memories.md`
 
 If any seed document is missing and the user has not forbidden file changes, do not immediately run the bootstrap script. First run `scripts/bootstrap-docs.sh --list-presets` or present the preset choices below, then ask the user to choose a preset and wait for the answer.
 
@@ -100,11 +103,32 @@ At the start of every Compass-guided task, after the first-run bootstrap check, 
 - Read relevant `docs/decisions/` records before changing boundaries, dependencies, data ownership, contracts, build flow, or release flow.
 - Read `docs/reference/` when changing schemas, public contracts, naming rules, note structure, or orientation presets.
 
+For long or risky multi-slice work, inspect `docs/.tasks/` for an active relevant goal after reading the orientation and process docs. If one active relevant goal exists, read its `goal.md`, `diagram.md`, and `memories.md` before planning or implementation. If multiple active goals could match the request, ask one clarification question before selecting one. If an active goal conflicts with the user's request, treat that as a possible goal change rather than silently reusing or overwriting it.
+
 If a referenced doc is missing, continue with the best available docs and record the gap in the task output. Do not ask the user to add Compass docs to `AGENTS.md`. If `AGENTS.md` exists, read it as repository instruction context only; it is not the documentation integration mechanism.
 
 When planning or implementing, ground architecture, naming, test strategy, and documentation updates in the loaded project docs. If code and docs disagree, stop before broad changes and state the conflict.
 
 When implementation introduces or touches repeated or contract-sensitive values such as statuses, event names, routes, permissions, configuration keys, feature flags, error codes, provider names, or cross-boundary identifiers, avoid bare literal strings. Prefer named constants owned by the relevant module or boundary so the concept has one source of truth.
+
+## Task Memory For Long Multi-Slice Work
+
+Compass uses task memory to preserve context for long or risky work that has multiple implementation slices. Task memory is not created for every task.
+
+Load `references/task-memory.xml` when both conditions are true:
+
+- the task type or discovered risk suggests long-running work, such as `new_feature`, `architecture_change`, large refactor, or another task with meaningful checkpoint risk
+- after align-context or fit-design, Compass has at least two concrete slices that the developer and agent understand
+
+When task memory is required, create `docs/.tasks/<YYYYMMDD-HHMM>_<goal_slug>/` in the target project before the first implementation slice starts. The folder must contain `goal.md`, `diagram.md`, and `memories.md`, based on the task memory templates from `docs/_templates/`.
+
+Update task memory whenever a slice starts, completes, becomes blocked, changes, or whenever the goal changes. If slices change but the goal remains stable, update the same task folder. If the goal changes, create a new task folder, mark the old goal `superseded`, cross-link both goals, and record the reason in both memory histories.
+
+Use these goal statuses only: `active`, `completed`, `superseded`, and `cancelled`.
+
+Use these slice statuses only: `pending`, `active`, `done`, and `blocked`.
+
+The `memories.md` file may include a rationale snapshot for `LLM memikirkan`, but it must not expose private chain-of-thought. Record assumptions, trade-offs, risks, and reasons that help a future agent resume safely.
 
 ## Language And Stack Adaptation
 
@@ -127,14 +151,15 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 2. Check missing seed docs and orientation lock. If docs are missing, offer preset choices before bootstrapping; do not auto-run bootstrap.
 3. If bootstrap just ran, adapt copied preset docs to the target language or stack before treating docs as ready.
 4. Build the project docs context from `docs/` using the Project Docs Integration rules.
-5. Classify the task using `references/classification.xml`.
-6. Load the matching task definition from `references/task-types.xml`.
-7. Load the matching workflow from project `docs/process/workflows.xml`. If it is missing, do not use a fallback workflow; seed or migrate Compass docs first.
-8. Load `references/bootstrap-rules.xml` when docs or orientation lock need to be seeded.
-9. Load `references/documentation-policy.xml` when creating or changing documentation.
-10. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
-11. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
-12. If implementation is requested, continue only after all earlier gated phases have explicit developer approval, then verify with the task's completion evidence.
+5. For long or risky multi-slice work, inspect or create task memory using `references/task-memory.xml` after align-context or fit-design and before implementation starts.
+6. Classify the task using `references/classification.xml`.
+7. Load the matching task definition from `references/task-types.xml`.
+8. Load the matching workflow from project `docs/process/workflows.xml`. If it is missing, do not use a fallback workflow; seed or migrate Compass docs first.
+9. Load `references/bootstrap-rules.xml` when docs or orientation lock need to be seeded.
+10. Load `references/documentation-policy.xml` when creating or changing documentation.
+11. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
+12. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
+13. If implementation is requested, continue only after all earlier gated phases have explicit developer approval, then verify with the task's completion evidence.
 
 ## Hard Gates
 
