@@ -53,6 +53,7 @@ Compass gives a project the enforcement points needed to produce higher-quality 
 - **Engineering philosophy**: daily decisions are guided by maintainability, small scope, readable flow, useful comments, and behavior-focused tests.
 - **Ready-to-use presets**: Clean Architecture, Vertical Slice, DDD, existing architecture, or research-based orientation.
 - **Project-owned workflow**: the active workflow lives in one place, `docs/process/workflows.xml`.
+- **Task memory for long work**: multi-slice tasks can keep a durable `docs/.tasks/` goal, diagram, and memory artifact so future sessions resume from the same goal.
 - **Evidence-driven execution**: each task type defines the proof needed before work can be called complete.
 
 The result: the agent knows what quality means in this project before it writes code.
@@ -93,9 +94,10 @@ Compass follows this flow:
 3. Seed project docs, including `docs/decisions/0001-orientation-lock.md`.
 4. Copy the selected preset workflow to `docs/process/workflows.xml`.
 5. Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.
-6. Classify the task by engineering risk, not by wording alone.
-7. Run the active workflow from `docs/process/workflows.xml`.
-8. Allow implementation only through the workflow's gates and required evidence.
+6. For long multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment so context survives session changes.
+7. Classify the task by engineering risk, not by wording alone.
+8. Run the active workflow from `docs/process/workflows.xml`.
+9. Allow implementation only through the workflow's gates and required evidence.
 
 Important rule: **Compass does not use a root-skill workflow fallback.** If a project does not have `docs/process/workflows.xml`, Compass must seed or migrate the project docs first. One active workflow source. Two compasses on one desk is how people start arguing with furniture.
 

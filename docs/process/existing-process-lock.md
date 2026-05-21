@@ -27,7 +27,8 @@ repository.
 4. Classify the task by risk using `references/classification.xml`.
 5. Load the task type from `references/task-types.xml`.
 6. Load the active workflow from `docs/process/workflows.xml`.
-7. Stop at approval gates before implementation.
+7. For long or risky work with 2+ concrete slices, load `references/task-memory.xml` and create or resume task memory after goal alignment.
+8. Stop at approval gates before implementation.
 
 ## Implementation Workflow
 
@@ -42,6 +43,8 @@ Implementation must preserve the existing repository shape:
 
 Work should proceed one approved slice at a time, with verification after each
 slice.
+
+Long multi-slice work must keep task memory current. Before the first implementation slice, create or resume `docs/.tasks/<task>/`. At each slice boundary, update `goal.md`, `diagram.md`, and `memories.md` before reporting the checkpoint.
 
 ## Test And Verification Workflow
 

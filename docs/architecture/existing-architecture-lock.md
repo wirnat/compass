@@ -44,6 +44,7 @@ script.
 - Preset-specific docs belong in `assets/orientation-presets/<preset>/docs/`.
 - Bootstrap mechanics belong in `scripts/bootstrap-docs.sh`.
 - Repository context and decisions belong in `docs/`.
+- Task memory artifacts for target projects belong under target project `docs/.tasks/`; task memory templates belong in `assets/docs-seed/_templates/`.
 
 ## Lock Rules
 
@@ -62,6 +63,7 @@ script.
 - Add new preset files under `assets/orientation-presets/<preset>/docs/` only when the behavior belongs to that preset.
 - Add tests or fixtures under a dedicated test folder only after selecting a project test approach.
 - Add docs under the existing `docs/` taxonomy.
+- Add hidden `docs/.tasks/` folders inside target projects only for long or risky multi-slice work after goal alignment.
 
 ## Disallowed Competing Patterns
 
