@@ -151,14 +151,14 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 2. Check missing seed docs and orientation lock. If docs are missing, offer preset choices before bootstrapping; do not auto-run bootstrap.
 3. If bootstrap just ran, adapt copied preset docs to the target language or stack before treating docs as ready.
 4. Build the project docs context from `docs/` using the Project Docs Integration rules.
-5. For long or risky multi-slice work, inspect or create task memory using `references/task-memory.xml` after align-context or fit-design and before implementation starts.
-6. Classify the task using `references/classification.xml`.
-7. Load the matching task definition from `references/task-types.xml`.
-8. Load the matching workflow from project `docs/process/workflows.xml`. If it is missing, do not use a fallback workflow; seed or migrate Compass docs first.
-9. Load `references/bootstrap-rules.xml` when docs or orientation lock need to be seeded.
-10. Load `references/documentation-policy.xml` when creating or changing documentation.
-11. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
-12. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
+5. Classify the task using `references/classification.xml`.
+6. Load the matching task definition from `references/task-types.xml`.
+7. Load the matching workflow from project `docs/process/workflows.xml`. If it is missing, do not use a fallback workflow; seed or migrate Compass docs first.
+8. Load `references/bootstrap-rules.xml` when docs or orientation lock need to be seeded.
+9. Load `references/documentation-policy.xml` when creating or changing documentation.
+10. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
+11. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
+12. After the active workflow reaches align-context or fit-design for long or risky work, inspect or create task memory using `references/task-memory.xml` only when at least two concrete slices exist and before implementation starts.
 13. If implementation is requested, continue only after all earlier gated phases have explicit developer approval, then verify with the task's completion evidence.
 
 ## Hard Gates

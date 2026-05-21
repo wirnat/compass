@@ -93,6 +93,9 @@
     <doc>docs/_templates/README.md</doc>
     <doc>docs/_templates/decision-record.md</doc>
     <doc>docs/_templates/module-note.md</doc>
+    <doc>docs/_templates/task-goal.md</doc>
+    <doc>docs/_templates/task-diagram.md</doc>
+    <doc>docs/_templates/task-memories.md</doc>
   </seed-docs>
 
   <completion-evidence>
