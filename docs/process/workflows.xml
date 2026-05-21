@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workflows-reference preset="existing-architecture-lock">
+  <purpose>Provide workflows for preserving and extending an existing project architecture.</purpose>
+
+  <documentation-context>
+    <rule>Read docs/decisions/0001-orientation-lock.md first.</rule>
+    <rule>Read docs/architecture/existing-architecture-lock.md, docs/foundation/existing-principles-lock.md, and docs/process/existing-process-lock.md before planning.</rule>
+    <rule>Inspect existing code, docs, tests, package scripts, and CI before choosing an implementation shape.</rule>
+    <rule>When docs are still draft, fill them from observed evidence before broad implementation work.</rule>
+  </documentation-context>
+
+  <workflow type="new_feature">
+    <description>Add one capability by observing, preserving, and extending the existing architecture.</description>
+    <enforcement>
+      <rule>Run phases sequentially: evidence discovery, fit design, implementation.</rule>
+      <rule>Do not introduce competing architecture names or folders without a decision record.</rule>
+      <rule>Implementation must use the existing composition, testing, naming, and dependency style unless a change is approved.</rule>
+    </enforcement>
+    <phase name="evidence-discovery" gate="developer_approval_required">
+      <purpose>Discover how the current project already organizes similar behavior.</purpose>
+      <actions>
+        <action>Read existing lock docs and inspect similar modules, tests, commands, and composition points.</action>
+        <action>Summarize the current architecture, principles, workflow, and commands from evidence.</action>
+        <action>Identify the smallest existing place where the new behavior belongs.</action>
+        <action>Record ambiguity before designing.</action>
+      </actions>
+      <phase-output>
+        <existing-evidence>Files, docs, commands, and conventions observed.</existing-evidence>
+        <placement>Likely module, package, or component to extend.</placement>
+        <ambiguity>Conflicts or unknowns.</ambiguity>
+      </phase-output>
+    </phase>
+    <phase name="fit-design" gate="developer_approval_required">
+      <purpose>Design the feature to fit the current architecture instead of replacing it.</purpose>
+      <actions>
+        <action>Define behavior and tests in the project's existing style.</action>
+        <action>State how the design follows existing boundaries and naming.</action>
+        <action>List any architecture tension and whether it requires a decision record.</action>
+        <action>Define verification using existing scripts or commands.</action>
+      </actions>
+      <phase-output>
+        <fit-design>Behavior, placement, tests, and commands.</fit-design>
+        <architecture-tension>None, or documented tension.</architecture-tension>
+        <docs-impact>Existing lock docs to fill or update.</docs-impact>
+      </phase-output>
+    </phase>
+    <phase name="implementation" gate="manual_checkpoint_required">
+      <purpose>Implement one approved slice while preserving existing structure.</purpose>
+      <actions>
+        <action>Use existing patterns and commands.</action>
+        <action>Do not create new root architecture folders without approval.</action>
+        <action>Run the closest existing verification.</action>
+        <action>Stop after each verified slice.</action>
+      </actions>
+      <phase-output>
+        <current-slice>Slice implemented.</current-slice>
+        <changed-files>Files changed.</changed-files>
+        <verification>Commands run and results.</verification>
+        <architecture-fit>How the change fits existing structure.</architecture-fit>
+      </phase-output>
+    </phase>
+    <evidence>Observed architecture evidence, approved fit design, existing-style tests, and updated lock docs when needed.</evidence>
+  </workflow>
+
+  <workflow type="feature_update">
+    <steps>
+      <step order="1">Find the existing owner and similar behavior.</step>
+      <step order="2">Add or update tests in the existing style.</step>
+      <step order="3">Change the smallest existing module or component.</step>
+      <step order="4">Avoid introducing competing patterns.</step>
+      <step order="5">Run the existing verification command.</step>
+    </steps>
+    <evidence>Existing-style regression coverage and verification.</evidence>
+  </workflow>
+
+  <workflow type="architecture_change">
+    <steps>
+      <step order="1">State why existing architecture can no longer absorb the change.</step>
+      <step order="2">Compare preserving, adapting, and replacing the existing pattern.</step>
+      <step order="3">Update decision docs before implementation.</step>
+      <step order="4">Implement migration in small compatibility-preserving slices.</step>
+      <step order="5">Verify existing behavior and new boundary behavior.</step>
+    </steps>
+    <evidence>Decision record, compatibility evidence, and verification.</evidence>
+  </workflow>
+</workflows-reference>
