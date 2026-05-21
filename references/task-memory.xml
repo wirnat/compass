@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<task-memory-reference>
+  <purpose>Preserve aligned goal, slice, diagram, and memory context for long Compass-guided work when LLM context may be lost or compressed.</purpose>
+
+  <activation>
+    <rule>Do not create task memory for every task.</rule>
+    <rule>Create task memory only for long or risky multi-slice work.</rule>
+    <rule>The task type or discovered risk must suggest long-running work, such as new_feature, architecture_change, large refactor, or another task with meaningful checkpoint risk.</rule>
+    <rule>Compass must have at least two concrete implementation slices after align-context or fit-design.</rule>
+    <rule>Create task memory after the developer and agent have aligned on the goal and slices, and before the first implementation slice starts.</rule>
+    <rule>If the task has only one implementation slice, do not create task memory unless the developer explicitly asks for it.</rule>
+  </activation>
+
+  <location>
+    <root>docs/.tasks</root>
+    <folder-format>YYYYMMDD-HHMM_goal-slug</folder-format>
+    <required-file>goal.md</required-file>
+    <required-file>diagram.md</required-file>
+    <required-file>memories.md</required-file>
+  </location>
+
+  <goal-statuses>
+    <status name="active">The goal is currently in progress.</status>
+    <status name="completed">The goal is finished and verified.</status>
+    <status name="superseded">The goal was replaced by a new goal.</status>
+    <status name="cancelled">The goal stopped without a replacement.</status>
+  </goal-statuses>
+
+  <slice-statuses>
+    <status name="pending" color="gray">The slice is planned but not started.</status>
+    <status name="active" color="blue">The slice is currently being worked on.</status>
+    <status name="done" color="green">The slice is complete and verified.</status>
+    <status name="blocked" color="red">The slice cannot proceed until a blocker is resolved.</status>
+  </slice-statuses>
+
+  <files>
+    <file name="goal.md">
+      <purpose>Source of truth for goal identity, status, description, non-goals, success criteria, slice list, links to superseded or successor goals, and latest evidence.</purpose>
+      <rule>Update goal.md whenever the goal status, slice list, slice status, blocker, successor link, or latest evidence changes.</rule>
+    </file>
+    <file name="diagram.md">
+      <purpose>Human-readable checkpoint visualization using Mermaid plus text support.</purpose>
+      <rule>Include status legend and a text fallback so the checkpoint map remains readable when Mermaid is not rendered.</rule>
+      <rule>Update the Mermaid diagram whenever goal.md or memories.md changes slice or goal state.</rule>
+    </file>
+    <file name="memories.md">
+      <purpose>Summaries and reverse-chronological histories for context recovery.</purpose>
+      <rule>Keep SUMMARIES current with the latest compressed state.</rule>
+      <rule>Keep HISTORIES newest first.</rule>
+      <rule>The LLM memikirkan field must contain a rationale snapshot, not private chain-of-thought.</rule>
+    </file>
+  </files>
+
+  <lifecycle>
+    <event name="created">Create all required files after align-context or fit-design and before the first implementation slice.</event>
+    <event name="slice-started">Mark the slice active in goal.md, update diagram.md to blue, and add a memory history entry.</event>
+    <event name="slice-completed">Mark the slice done in goal.md, record evidence, update diagram.md to green, and add a memory history entry.</event>
+    <event name="slice-blocked">Mark the slice blocked in goal.md, record the blocker, update diagram.md to red, and add a memory history entry.</event>
+    <event name="slice-changed">If the goal remains stable, update the existing task folder instead of creating a new folder.</event>
+    <event name="goal-changed">Create a new task folder, mark the old goal superseded, cross-link both goals, and record the reason in both memories.md files.</event>
+    <event name="goal-completed">Mark the goal completed and record final evidence.</event>
+  </lifecycle>
+
+  <resume>
+    <rule>At the start of a long Compass-guided task, inspect docs/.tasks for active relevant goals before creating a new task memory folder.</rule>
+    <rule>If exactly one active relevant goal exists, load goal.md, diagram.md, and memories.md before planning or implementation.</rule>
+    <rule>If multiple active goals could match, ask one clarification question before choosing.</rule>
+    <rule>If an active goal conflicts with the user's new request, treat that as a potential goal change and ask before superseding it.</rule>
+  </resume>
+
+  <mermaid>
+    <rule>Use flowchart diagrams for checkpoint flow unless the user asks for another Mermaid type.</rule>
+    <rule>Use class definitions for pending, active, done, and blocked states.</rule>
+    <rule>Use short node labels and explain detail in surrounding text.</rule>
+    <class name="pending" fill="#3f3f46" stroke="#a1a1aa" color="#f4f4f5" />
+    <class name="active" fill="#0284c7" stroke="#7dd3fc" color="#ffffff" />
+    <class name="done" fill="#3f7d20" stroke="#86efac" color="#ffffff" />
+    <class name="blocked" fill="#b91c1c" stroke="#fca5a5" color="#ffffff" />
+  </mermaid>
+</task-memory-reference>
