@@ -22,6 +22,7 @@ Is this a new_feature, bug_fix, refactor, or architecture_change?
 Where does the active workflow come from?
 Which project docs must be read?
 Which behavior is approved?
+Is task memory required before implementation?
 What tests or evidence prove completion?
 What is the first safe implementation slice?
 ```
@@ -41,6 +42,7 @@ Compass prevents that drift by turning development philosophy into enforceable w
 | Project docs are ignored unless linked from `AGENTS.md` | `docs/` becomes the automatic project context pack |
 | Workflow source is unclear | Active workflow comes only from `docs/process/workflows.xml` |
 | Large features are built in one pass | Feature work goes through brainstorming, design, then one implementation slice |
+| Long work loses context between sessions | Multi-slice work gets a durable `docs/.tasks/` memory before implementation |
 | Completion is claimed by confidence | Completion requires evidence: tests, checks, docs, or a clear reason |
 
 Compass makes agents behave more like disciplined engineering partners. They still move quickly, but their speed is constrained by quality rules the project has already chosen.
@@ -53,7 +55,7 @@ Compass gives a project the enforcement points needed to produce higher-quality 
 - **Engineering philosophy**: daily decisions are guided by maintainability, small scope, readable flow, useful comments, and behavior-focused tests.
 - **Ready-to-use presets**: Clean Architecture, Vertical Slice, DDD, existing architecture, or research-based orientation.
 - **Project-owned workflow**: the active workflow lives in one place, `docs/process/workflows.xml`.
-- **Task memory for long work**: multi-slice tasks can keep a durable `docs/.tasks/` goal, diagram, and memory artifact so future sessions resume from the same goal.
+- **Task Memory Gate**: long or risky multi-slice work must create or resume a durable `docs/.tasks/` goal, diagram, and memory artifact before implementation starts.
 - **Evidence-driven execution**: each task type defines the proof needed before work can be called complete.
 
 The result: the agent knows what quality means in this project before it writes code.
@@ -168,6 +170,43 @@ For `new_feature`, Compass is intentionally strict:
 
 A request to "build feature X" is not permission to skip brainstorming and design. It is the starting bell, not the finish line.
 
+## Task Memory Gate
+
+Task memory exists so a long task can survive context loss, session changes, and the natural erosion of attention. Goal is the vision; slices are the missions. Missions may change while the goal remains stable. If the goal changes, Compass treats it as a new goal and supersedes the old task memory.
+
+Compass must run the Task Memory Gate before implementation starts. The gate has three allowed outcomes:
+
+| Outcome | Meaning |
+| --- | --- |
+| `created` | A new task memory folder was created for the aligned goal. |
+| `resumed` | One active relevant task memory folder was loaded and reused. |
+| `not-required` | The task is small, single-slice, or below the memory threshold. The agent must state why. |
+
+Task memory is required only when both conditions are true:
+
+1. The task is long or risky, such as `new_feature`, `architecture_change`, a large refactor, or work with meaningful checkpoint risk.
+2. After align-context, fit-design, or approved design, there are at least two concrete implementation slices.
+
+When required, Compass creates this structure in the target project before the first implementation edit or command:
+
+```text
+docs/.tasks/
+`-- <YYYYMMDD-HHMM>_<goal_slug>/
+    |-- goal.md
+    |-- diagram.md
+    `-- memories.md
+```
+
+The files have different jobs:
+
+- `goal.md`: goal name, status, description, non-goals, success criteria, slice list, evidence, and links to superseded or successor goals.
+- `diagram.md`: Mermaid checkpoint diagram plus text fallback. Pending slices are gray, active is blue, done is green, blocked is red.
+- `memories.md`: `SUMMARIES` plus newest-first `HISTORIES`, including user intent, agent rationale snapshot, and agreement. It must not expose private chain-of-thought.
+
+At every slice boundary, Compass updates task memory before reporting the checkpoint. If a slice starts, completes, blocks, or changes, update the same folder. If the goal changes, create a new task folder, mark the old goal `superseded`, cross-link both folders, and record the reason in both `memories.md` files.
+
+Missing task memory templates in the target project do not waive the gate. Compass must use the installed templates or `references/task-memory.xml`, then report the documentation gap. Anak boleh lupa bawa penggaris; tugas menggambar garis lurus tetap ada.
+
 ## Automatic Docs Context
 
 Compass treats `docs/` as the project's context pack.
@@ -219,6 +258,10 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   `-- openai.yaml
 |-- assets/
 |   |-- docs-seed/
+|   |   `-- _templates/
+|   |       |-- task-diagram.md
+|   |       |-- task-goal.md
+|   |       `-- task-memories.md
 |   `-- orientation-presets/
 |       `-- <preset>/
 |           `-- docs/
@@ -228,6 +271,7 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   |-- bootstrap-rules.xml
 |   |-- classification.xml
 |   |-- documentation-policy.xml
+|   |-- task-memory.xml
 |   `-- task-types.xml
 `-- scripts/
     `-- bootstrap-docs.sh
@@ -238,10 +282,11 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 - `SKILL.md`: skill entry point, hard gates, routing rules, and project-docs integration.
 - `scripts/bootstrap-docs.sh`: idempotent script for seeding Compass docs into a target project.
 - `references/classification.xml`: decision tree for task classification.
+- `references/task-memory.xml`: pre-implementation task memory gate, statuses, lifecycle, resume rules, and template fallback behavior.
 - `references/task-types.xml`: task taxonomy and commit hints.
 - `references/bootstrap-rules.xml`: bootstrap rules and completion evidence.
 - `references/documentation-policy.xml`: docs taxonomy and source-of-truth rules.
-- `assets/docs-seed/`: base docs always copied into `docs/`.
+- `assets/docs-seed/`: base docs and task memory templates copied into `docs/`.
 - `assets/orientation-presets/`: architecture, principle, process, and workflow presets.
 
 ## When To Use Compass
@@ -272,6 +317,7 @@ A Compass-guided task should leave an auditable trail:
 - locked orientation preset;
 - workflow source from `docs/process/workflows.xml`;
 - approval gates for risky work;
+- Task Memory Gate outcome for long or risky multi-slice work;
 - small implementation slices;
 - verification evidence;
 - docs updates when boundaries, contracts, or project decisions change.
