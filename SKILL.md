@@ -139,22 +139,36 @@ When planning or implementing, ground architecture, naming, test strategy, and d
 
 When implementation introduces or touches repeated or contract-sensitive values such as statuses, event names, routes, permissions, configuration keys, feature flags, error codes, provider names, or cross-boundary identifiers, avoid bare literal strings. Prefer named constants owned by the relevant module or boundary so the concept has one source of truth.
 
+## Question Capability Policy
+
+When Compass needs developer input during align-context, classification clarification, preset selection, approval gates, task-memory conflict selection, or stack clarification, prefer the active coding agent's structured question capability when one is available. Examples include an agent-native question tool, choice picker, or form-style prompt. If the active agent has no such capability, use a normal text question.
+
+Keep this policy generic across coding agents:
+
+- Do not require one vendor-specific tool name as the only valid mechanism.
+- Ask only the next workflow-allowed question; do not bundle unrelated decisions.
+- Include a recommended option when there is enough context to recommend one.
+- Explain the reason, trade-off, or consequence for each option so the developer can decide quickly.
+- Preserve hard gates: a structured question is still a request for explicit developer approval when the workflow requires approval.
+
 ## Task Memory For Long Multi-Slice Work
 
 Compass uses task memory to preserve context for long or risky work that has multiple implementation slices. Task memory is not created for every task.
 
-Task memory is a pre-implementation hard gate. After align-context, fit-design, or the last approved design phase has produced at least two concrete implementation slices, implementation must not start until Compass reports one of these outcomes:
+Task memory is a pre-implementation hard gate. After align-context, fit-design, or the last approved design phase, implementation must not start until Compass reports one of these outcomes:
 
 - `created`: new task memory folder was created for this goal
 - `resumed`: one active relevant task memory folder was loaded and updated if needed
-- `not-required`: the task is small, single-slice, or otherwise below the task memory threshold
+- `not-required`: the task has no gated design context to preserve and is below the long-work threshold
 
-Load `references/task-memory.xml` when both conditions are true:
+Load `references/task-memory.xml` when either condition is true:
 
-- the task type or discovered risk suggests long-running work, such as `new_feature`, `architecture_change`, large refactor, or another task with meaningful checkpoint risk
-- after align-context or fit-design, Compass has at least two concrete slices that the developer and agent understand
+- a Compass workflow with brainstorming, align-context, evidence-discovery, fit-design, design, baseline-discovery, or delta-design has reached developer-approved design context that must be preserved before implementation
+- the task type or discovered risk suggests long-running work, such as `new_feature`, `architecture_change`, large refactor, or another task with meaningful checkpoint risk, and Compass has at least two concrete slices that the developer and agent understand
 
-When task memory is required, create `docs/.tasks/<YYYYMMDD-HHMM>_<goal_slug>/` in the target project before the first implementation slice starts. The folder must contain `goal.md`, `diagram.md`, and `memories.md`, based on the task memory templates from `docs/_templates/`.
+For gated design work, task memory is required even when the approved implementation has only one slice. Create or resume `docs/.tasks/<YYYYMMDD-HHMM>_<goal_slug>/` after design approval and before the first implementation slice starts. The folder must contain `goal.md`, `diagram.md`, and `memories.md`, based on the task memory templates from `docs/_templates/`.
+
+When saving gated design context, preserve the approved brainstorming, align-context, and design outputs as resumable summaries: goal, selected slice, scope, non-goals, decisions, trade-offs, open questions, behavior or delta design, test matrix or verification plan, implementation slices, and approval evidence. Do not store private chain-of-thought.
 
 If the target project is missing `docs/_templates/task-goal.md`, `docs/_templates/task-diagram.md`, or `docs/_templates/task-memories.md`, that is a documentation gap, not permission to skip task memory. Use the installed Compass templates from `assets/docs-seed/_templates/` or the structure in `references/task-memory.xml`, create the required task files, and report the missing target templates.
 

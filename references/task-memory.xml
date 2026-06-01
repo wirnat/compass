@@ -4,19 +4,19 @@
 
   <activation>
     <rule>Do not create task memory for every task.</rule>
-    <rule>Create task memory only for long or risky multi-slice work.</rule>
-    <rule>The task type or discovered risk must suggest long-running work, such as new_feature, architecture_change, large refactor, or another task with meaningful checkpoint risk.</rule>
-    <rule>Compass must have at least two concrete implementation slices after align-context or fit-design.</rule>
-    <rule>Create task memory after the developer and agent have aligned on the goal and slices, and before the first implementation slice starts.</rule>
-    <rule>If the task has only one implementation slice, do not create task memory unless the developer explicitly asks for it.</rule>
+    <rule>Create task memory for Compass-guided work that has developer-approved gated design context before implementation, even when the approved implementation has only one slice.</rule>
+    <rule>Gated design context includes brainstorming, align-context, evidence-discovery, fit-design, design, baseline-discovery, or delta-design outputs that the developer approved or selected.</rule>
+    <rule>Create task memory for long or risky work when the task type or discovered risk suggests meaningful checkpoint risk, such as new_feature, architecture_change, large refactor, or another task with at least two concrete slices.</rule>
+    <rule>Create or resume task memory after the developer and agent have aligned on the goal and design context, and before the first implementation slice starts.</rule>
+    <rule>If a task has no gated design context and only one implementation slice, do not create task memory unless the developer explicitly asks for it.</rule>
   </activation>
 
   <pre-implementation-gate>
-    <purpose>Make task memory impossible to forget once a long multi-slice goal is aligned.</purpose>
-    <rule>Evaluate this gate after align-context, fit-design, or the approved design phase has produced implementation slices.</rule>
+    <purpose>Make task memory impossible to forget once gated design context or long multi-slice work is aligned.</purpose>
+    <rule>Evaluate this gate after align-context, fit-design, or the approved design phase has produced approved context or implementation slices.</rule>
     <rule>Implementation must not start until Compass reports one outcome: created, resumed, or not-required.</rule>
-    <rule>For created or resumed, report the task memory folder path and current active slice.</rule>
-    <rule>For not-required, report the reason and the concrete slice count.</rule>
+    <rule>For created or resumed, report the task memory folder path and current active or first pending slice.</rule>
+    <rule>For not-required, report why there is no gated design context to preserve and why the work is below the long-work threshold.</rule>
     <rule>If task memory is required but cannot be created or loaded, stop before implementation and report the blocker unless the developer explicitly overrides the gate.</rule>
     <rule>If the target project is missing docs/_templates task memory files, use the installed Compass templates or this reference structure. Missing templates are a documentation gap, not a reason to skip the gate.</rule>
   </pre-implementation-gate>
@@ -52,8 +52,8 @@
 
   <files>
     <file name="goal.md">
-      <purpose>Source of truth for goal identity, status, description, non-goals, success criteria, slice list, links to superseded or successor goals, and latest evidence.</purpose>
-      <rule>Update goal.md whenever the goal status, slice list, slice status, blocker, successor link, or latest evidence changes.</rule>
+      <purpose>Source of truth for goal identity, status, description, approved scope, non-goals, success criteria, slice list, links to superseded or successor goals, and latest evidence.</purpose>
+      <rule>Update goal.md whenever the goal status, approved scope, slice list, slice status, blocker, successor link, or latest evidence changes.</rule>
     </file>
     <file name="diagram.md">
       <purpose>Human-readable checkpoint visualization using Mermaid plus text support.</purpose>
@@ -63,13 +63,15 @@
     <file name="memories.md">
       <purpose>Summaries and reverse-chronological histories for context recovery.</purpose>
       <rule>Keep SUMMARIES current with the latest compressed state.</rule>
+      <rule>For gated design work, SUMMARIES must include approved brainstorming, align-context, and design outputs: selected slice, scope, non-goals, decisions, trade-offs, open questions, behavior or delta design, test matrix or verification plan, implementation slices, and approval evidence.</rule>
       <rule>Keep HISTORIES newest first.</rule>
       <rule>The LLM memikirkan field must contain a rationale snapshot, not private chain-of-thought.</rule>
     </file>
   </files>
 
   <lifecycle>
-    <event name="created">Create all required files after align-context or fit-design and before the first implementation slice.</event>
+    <event name="created">Create all required files after align-context, fit-design, or approved design and before the first implementation slice.</event>
+    <event name="design-approved">Create or update task memory with the approved brainstorming, align-context, and design summaries before implementation starts.</event>
     <event name="slice-started">Mark the slice active in goal.md, update diagram.md to blue, and add a memory history entry.</event>
     <event name="slice-completed">Mark the slice done in goal.md, record evidence, update diagram.md to green, and add a memory history entry.</event>
     <event name="slice-blocked">Mark the slice blocked in goal.md, record the blocker, update diagram.md to red, and add a memory history entry.</event>

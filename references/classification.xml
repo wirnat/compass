@@ -38,6 +38,7 @@
   </tie-breakers>
 
   <clarifying-questions max-per-turn="1">
+    <policy>Use the Compass Question Capability Policy: prefer the active coding agent's structured question capability when available, fall back to text when unavailable, and include a recommended option with reasons or trade-offs.</policy>
     <question>Is production currently impacted, or is this normal backlog work?</question>
     <question>Should this change user-visible behavior, or only internal structure?</question>
     <question>Does this require database schema or migration changes?</question>
