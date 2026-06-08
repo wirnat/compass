@@ -25,7 +25,7 @@ Compass must inspect:
 - documented commands
 - CI configuration
 - package scripts or make targets
-- installed skill update source and Session Update Gate command
+- installed skill update source, `npx skills update` availability, and Session Update Gate fallback command
 - test naming and placement
 - migration and generation workflows
 - release or review conventions

@@ -63,7 +63,7 @@ script.
 - Add new preset files under `assets/orientation-presets/<preset>/docs/` only when the behavior belongs to that preset.
 - Add tests or fixtures under a dedicated test folder only after selecting a project test approach.
 - Add docs under the existing `docs/` taxonomy.
-- Add hidden `docs/.tasks/` folders inside target projects only for long or risky multi-slice work after goal alignment.
+- Add hidden `docs/.tasks/` folders inside target projects only for approved gated design context or long/risky multi-slice work after goal alignment.
 
 ## Disallowed Competing Patterns
 
@@ -77,5 +77,6 @@ script.
 - `./scripts/bootstrap-docs.sh --list-presets`
 - `./scripts/bootstrap-docs.sh --target <project> --preset <preset> --dry-run`
 - `./scripts/bootstrap-docs.sh --target <project> --preset <preset>`
+- `./scripts/smoke-test.sh`
 
-No dedicated build, lint, or test command exists yet.
+No dedicated build or lint command exists yet.

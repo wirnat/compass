@@ -1,13 +1,13 @@
 ---
 type: design
-status: active
+status: archived
 owner: engineering
 created: 2026-05-21
-updated: 2026-05-21
+updated: 2026-06-08
 parent: "[[docs/process/README]]"
 tags:
   - docs/process
-  - status/active
+  - status/archived
   - compass/task-memory
 related:
   - "[[docs/decisions/0001-orientation-lock]]"
@@ -16,6 +16,8 @@ related:
 ---
 
 # Compass Task Memory Design
+
+Archived note: this file records the historical design discussion. Current task memory policy lives in `SKILL.md`, `references/task-memory.xml`, `README.md`, and `docs/process/existing-process-lock.md`.
 
 ## Purpose
 
@@ -30,16 +32,18 @@ future agent can resume without changing the goal by accident.
 
 ## Scope
 
-Task memory is only for long or risky multi-slice work. It must not slow normal
-developer flow for small bug fixes, docs-only updates, or one-slice changes.
+Task memory is for approved gated design context or long/risky multi-slice work.
+It must not slow normal developer flow for small bug fixes, docs-only updates,
+or one-slice changes with no gated design context to preserve.
 
-Compass creates task memory only when both conditions are true:
+Compass creates task memory when either condition is true:
 
-1. The task type or discovered risk suggests long-running work, such as
+1. A Compass workflow has developer-approved gated design context to preserve
+   before implementation, even when the approved implementation has one slice.
+2. The task type or discovered risk suggests long-running work, such as
    `new_feature`, `architecture_change`, large refactor, or another task with
-   meaningful checkpoint risk.
-2. After align-context or fit-design, Compass has at least two concrete slices
-   that both developer and agent understand.
+   meaningful checkpoint risk, and Compass has at least two concrete slices that
+   both developer and agent understand.
 
 Task memory is created after the goal is aligned and before the first
 implementation slice begins.
@@ -196,8 +200,8 @@ the available project evidence:
 
 None. The agreed design choices are:
 
-- Task memory applies only to long or risky multi-slice work.
-- Activation uses both task-risk signal and 2+ concrete slices.
+- Task memory applies to approved gated design context or long/risky multi-slice work.
+- Activation uses either approved gated design context or both task-risk signal and 2+ concrete slices.
 - Creation happens after align-context or fit-design.
 - `diagram.md` stores the Mermaid diagram plus text support.
 - Goal status values are `active`, `completed`, `superseded`, and `cancelled`.

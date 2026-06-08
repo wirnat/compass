@@ -11,7 +11,8 @@
   </documentation-context>
 
   <task-memory-gate>
-    <rule>For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule>Load Compass references/task-memory.xml when developer-approved gated design context must be preserved before implementation, even if the approved implementation has one slice.</rule>
+    <rule>Also load Compass references/task-memory.xml for long or risky work with at least two concrete implementation slices after alignment or design.</rule>
     <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
     <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
     <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
@@ -25,7 +26,7 @@
       <rule>BDD examples must clarify behavior before technical TDD begins.</rule>
       <rule>Do not place behavior in a context until ownership and language are explicit.</rule>
       <rule>Implementation must stop after each verified domain/application/adapter checkpoint.</rule>
-      <rule>Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any feature with gated design context or long/risky multi-slice risk.</rule>
     </enforcement>
     <phase name="language-discovery" gate="developer_approval_required">
       <purpose>Align ubiquitous language and behavior examples before designing code.</purpose>

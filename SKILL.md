@@ -19,23 +19,37 @@ At the first Compass-guided task in each Codex session, before project bootstrap
 classification, planning, or implementation, verify that the installed Compass
 skill matches the latest `main` revision from `https://github.com/wirnat/compass`.
 
-Resolve paths relative to this `SKILL.md` file's directory, not relative to the
-target workspace. Run:
+When Compass was installed and is managed by the `skills` CLI, prefer the CLI
+update path:
+
+```bash
+npx skills update
+```
+
+If the CLI update succeeds and updates Compass, re-open and follow the updated
+`SKILL.md` before continuing. Do not continue from stale instructions after an
+update.
+
+If `npx` or the `skills` CLI is unavailable, the installed skill is not managed
+by that CLI, or the CLI update cannot update Compass, use the bundled updater as
+the fallback. Resolve paths relative to this `SKILL.md` file's directory, not
+relative to the target workspace. Run:
 
 ```bash
 scripts/update-skill.sh --skill-dir <installed-compass-skill-dir>
 ```
 
-If the script reports that Compass is already up to date, continue normally.
+If either update path reports that Compass is already up to date, continue
+normally.
 
-If the script updates the skill, re-open and follow the updated
-`<installed-compass-skill-dir>/SKILL.md` before continuing. Do not continue from
-stale instructions after an update.
+If the bundled script updates the skill, re-open and follow the updated
+`<installed-compass-skill-dir>/SKILL.md` before continuing.
 
-If the script is missing, `git` is unavailable, the network check fails, or the
-update fails, stop before implementation or docs bootstrap work. Report the
-reason and ask whether the developer wants to continue with the installed
-version for this session. Do not silently skip this gate.
+If the CLI update is unavailable or fails and the fallback script is missing,
+`git` is unavailable, the network check fails, or the fallback update fails,
+stop before implementation or docs bootstrap work. Report the reason and ask
+whether the developer wants to continue with the installed version for this
+session. Do not silently skip this gate.
 
 If the developer explicitly forbids updating or network checks for the session,
 state that the Session Update Gate was skipped by request and continue only with
@@ -118,6 +132,8 @@ Each orientation preset provides its active task workflow as `docs/process/workf
 
 When a project has `docs/process/workflows.xml`, read it after classification and use it as the active workflow. Compass must not use a root-skill workflow fallback and must not use `docs/reference/workflows.xml` as the active workflow source. If `docs/process/workflows.xml` is missing, stop before planning implementation work and seed or migrate the project's Compass docs first.
 
+If the selected task type has no matching `<workflow type="...">` in the active `docs/process/workflows.xml`, stop before planning implementation work. Report the unsupported workflow gap and ask whether to adapt the project's workflow file for this task type or reclassify the request. Do not silently borrow a workflow from another preset.
+
 ## Project Docs Integration
 
 Compass must treat the target project's `docs/` directory as the automatic project context pack. A project that uses this skill does not need to duplicate or link Compass docs from `AGENTS.md`.
@@ -131,7 +147,7 @@ At the start of every Compass-guided task, after the first-run bootstrap check, 
 - Read relevant `docs/decisions/` records before changing boundaries, dependencies, data ownership, contracts, build flow, or release flow.
 - Read `docs/reference/` when changing schemas, public contracts, naming rules, note structure, or orientation presets.
 
-For long or risky multi-slice work, inspect `docs/.tasks/` for an active relevant goal after reading the orientation and process docs. If one active relevant goal exists, read its `goal.md`, `diagram.md`, and `memories.md` before planning or implementation. If multiple active goals could match the request, ask one clarification question before selecting one. If an active goal conflicts with the user's request, treat that as a possible goal change rather than silently reusing or overwriting it.
+For work with gated design context or long/risky multi-slice risk, inspect `docs/.tasks/` for an active relevant goal after reading the orientation and process docs. If one active relevant goal exists, read its `goal.md`, `diagram.md`, and `memories.md` before planning or implementation. If multiple active goals could match the request, ask one clarification question before selecting one. If an active goal conflicts with the user's request, treat that as a possible goal change rather than silently reusing or overwriting it.
 
 If a referenced doc is missing, continue with the best available docs and record the gap in the task output. Do not ask the user to add Compass docs to `AGENTS.md`. If `AGENTS.md` exists, read it as repository instruction context only; it is not the documentation integration mechanism.
 
@@ -204,12 +220,12 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 5. Build the project docs context from `docs/` using the Project Docs Integration rules.
 6. Classify the task using `references/classification.xml`.
 7. Load the matching task definition from `references/task-types.xml`.
-8. Load the matching workflow from project `docs/process/workflows.xml`. If it is missing, do not use a fallback workflow; seed or migrate Compass docs first.
+8. Load the matching workflow from project `docs/process/workflows.xml`. If the file or matching workflow type is missing, do not use a fallback workflow; seed, migrate, or adapt Compass docs first.
 9. Load `references/bootstrap-rules.xml` when docs or orientation lock need to be seeded.
 10. Load `references/documentation-policy.xml` when creating or changing documentation.
 11. Tell the user the task type, why it fits, and the workflow you will follow using the XML response shape below.
 12. Execute only the next allowed phase. If a phase has an approval gate, stop at that gate and wait for explicit approval before continuing.
-13. Before implementation starts, run the Task Memory Gate. If long or risky work has at least two concrete slices after align-context, fit-design, or the approved design phase, inspect or create task memory using `references/task-memory.xml`. Report `created`, `resumed`, or `not-required` with the folder path or reason.
+13. Before implementation starts, run the Task Memory Gate. If gated design context must be preserved, or long/risky work has at least two concrete slices after align-context, fit-design, or the approved design phase, inspect or create task memory using `references/task-memory.xml`. Report `created`, `resumed`, or `not-required` with the folder path or reason.
 14. If implementation is requested, continue only after all earlier gated phases have explicit developer approval, then verify with the task's completion evidence.
 
 ## Hard Gates

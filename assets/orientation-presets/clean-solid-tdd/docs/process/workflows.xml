@@ -26,7 +26,9 @@
 
   <task-memory-gate>
     <rule
-        >For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+        >Load Compass references/task-memory.xml when developer-approved gated design context must be preserved before implementation, even if the approved implementation has one slice.</rule>
+    <rule
+        >Also load Compass references/task-memory.xml for long or risky work with at least two concrete implementation slices after alignment or design.</rule>
     <rule
         >Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
     <rule
@@ -52,7 +54,7 @@
       <rule
             >Implementation must run one small approved slice at a time, then stop for developer validation before the next slice.</rule>
       <rule
-            >Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
+            >Before implementation starts, satisfy the task-memory-gate for any feature with gated design context or long/risky multi-slice risk.</rule>
       <rule
             >Stop after each developer_approval_required phase and wait for explicit developer approval before loading or executing the next phase.</rule>
       <rule

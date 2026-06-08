@@ -1,8 +1,10 @@
 # Task Memory Implementation Plan
 
+Archived note: this file records the original implementation plan. Current task memory policy lives in `SKILL.md`, `references/task-memory.xml`, `README.md`, and `docs/process/existing-process-lock.md`.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add Compass task memory rules and templates so long multi-slice work can preserve goal, slice, diagram, and memory context under a target project's `docs/.tasks/` directory.
+**Goal:** Add Compass task memory rules and templates so approved gated design context or long/risky multi-slice work can preserve goal, slice, diagram, and memory context under a target project's `docs/.tasks/` directory.
 
 **Architecture:** Keep the existing reference-driven Compass skill shape. Put structured behavior rules in `references/task-memory.xml`, reusable markdown shapes in `assets/docs-seed/_templates/`, and skill-facing load rules in `SKILL.md`. Update repository docs to explain where task memory belongs and how it is verified.
 
@@ -40,11 +42,10 @@ Create `references/task-memory.xml` with this exact content:
 
   <activation>
     <rule>Do not create task memory for every task.</rule>
-    <rule>Create task memory only for long or risky multi-slice work.</rule>
-    <rule>The task type or discovered risk must suggest long-running work, such as new_feature, architecture_change, large refactor, or another task with meaningful checkpoint risk.</rule>
-    <rule>Compass must have at least two concrete implementation slices after align-context or fit-design.</rule>
+    <rule>Create task memory when developer-approved gated design context must be preserved before implementation, even if the approved implementation has one slice.</rule>
+    <rule>Also create task memory when the task type or discovered risk suggests long-running work, such as new_feature, architecture_change, large refactor, or another task with meaningful checkpoint risk, and Compass has at least two concrete implementation slices after align-context or fit-design.</rule>
     <rule>Create task memory after the developer and agent have aligned on the goal and slices, and before the first implementation slice starts.</rule>
-    <rule>If the task has only one implementation slice, do not create task memory unless the developer explicitly asks for it.</rule>
+    <rule>If the task has only one implementation slice and no gated design context, do not create task memory unless the developer explicitly asks for it.</rule>
   </activation>
 
   <location>
@@ -408,7 +409,7 @@ Expected: commit succeeds and includes only `SKILL.md`.
 In `README.md`, under `## What Compass Provides`, add this bullet after the project-owned workflow bullet:
 
 ```markdown
-- **Task memory for long work**: multi-slice tasks can keep a durable `docs/.tasks/` goal, diagram, and memory artifact so future sessions resume from the same goal.
+- **Task memory for gated or long work**: approved gated design context or long/risky multi-slice tasks can keep a durable `docs/.tasks/` goal, diagram, and memory artifact so future sessions resume from the same goal.
 ```
 
 - [ ] **Step 2: Update README How It Works flow**
@@ -416,7 +417,7 @@ In `README.md`, under `## What Compass Provides`, add this bullet after the proj
 In `README.md`, under `## How It Works`, add this step after the step that reads `Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.`:
 
 ```markdown
-7. For long multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment so context survives session changes.
+7. For approved gated design context or long/risky multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment so context survives session changes.
 ```
 
 Renumber the following steps so the list remains sequential.
@@ -432,7 +433,7 @@ In `docs/architecture/existing-architecture-lock.md`, under `## Protected Bounda
 Under `## Allowed Folder Growth`, add this bullet:
 
 ```markdown
-- Add hidden `docs/.tasks/` folders inside target projects only for long or risky multi-slice work after goal alignment.
+- Add hidden `docs/.tasks/` folders inside target projects only for approved gated design context or long/risky multi-slice work after goal alignment.
 ```
 
 - [ ] **Step 4: Update process lock**
@@ -440,7 +441,7 @@ Under `## Allowed Folder Growth`, add this bullet:
 In `docs/process/existing-process-lock.md`, under `## Design Workflow`, add this item after reading the active workflow:
 
 ```markdown
-8. For long or risky work with 2+ concrete slices, load `references/task-memory.xml` and create or resume task memory after goal alignment.
+8. For approved gated design context, or for long/risky work with 2+ concrete slices, load `references/task-memory.xml` and create or resume task memory after goal alignment.
 ```
 
 Renumber or adjust the surrounding list so it reads cleanly.
@@ -448,7 +449,7 @@ Renumber or adjust the surrounding list so it reads cleanly.
 Under `## Implementation Workflow`, add this paragraph:
 
 ```markdown
-Long multi-slice work must keep task memory current. Before the first implementation slice, create or resume `docs/.tasks/<task>/`. At each slice boundary, update `goal.md`, `diagram.md`, and `memories.md` before reporting the checkpoint.
+Approved gated design context or long/risky multi-slice work must keep task memory current. Before the first implementation slice, create or resume `docs/.tasks/<task>/`. At each slice boundary, update `goal.md`, `diagram.md`, and `memories.md` before reporting the checkpoint.
 ```
 
 - [ ] **Step 5: Update reference README**
@@ -561,7 +562,7 @@ Expected: commit succeeds only if verification corrections changed files. If no 
 
 ## Spec Coverage Map
 
-- Activation only for long or risky multi-slice work: Task 1 and Task 3.
+- Activation for approved gated design context or long/risky multi-slice work: Task 1 and Task 3.
 - Creation after align-context or fit-design: Task 1 and Task 3.
 - `docs/.tasks/<datetime>_<goal_slug>/` folder with three files: Task 1, Task 2, and Task 3.
 - Goal statuses and slice statuses: Task 1, Task 2, and Task 3.

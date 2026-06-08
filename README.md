@@ -55,7 +55,7 @@ Compass gives a project the enforcement points needed to produce higher-quality 
 - **Engineering philosophy**: daily decisions are guided by maintainability, small scope, readable flow, useful comments, and behavior-focused tests.
 - **Ready-to-use presets**: Clean Architecture, Vertical Slice, DDD, existing architecture, or research-based orientation.
 - **Project-owned workflow**: the active workflow lives in one place, `docs/process/workflows.xml`.
-- **Task Memory Gate**: long or risky multi-slice work must create or resume a durable `docs/.tasks/` goal, diagram, and memory artifact before implementation starts.
+- **Task Memory Gate**: approved gated design context or long/risky multi-slice work must create or resume a durable `docs/.tasks/` goal, diagram, and memory artifact before implementation starts.
 - **Evidence-driven execution**: each task type defines the proof needed before work can be called complete.
 
 The result: the agent knows what quality means in this project before it writes code.
@@ -99,7 +99,7 @@ Compass follows this flow:
 6. Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.
 7. Classify the task by engineering risk, not by wording alone.
 8. Run the active workflow from `docs/process/workflows.xml`.
-9. Before implementation, run the Task Memory Gate: for long multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment and report `created`, `resumed`, or `not-required`.
+9. Before implementation, run the Task Memory Gate: for approved gated design context or long/risky multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment and report `created`, `resumed`, or `not-required`.
 10. Allow implementation only through the workflow's gates and required evidence.
 
 Important rule: **Compass does not use a root-skill workflow fallback.** If a project does not have `docs/process/workflows.xml`, Compass must seed or migrate the project docs first. One active workflow source. Two compasses on one desk is how people start arguing with furniture.
@@ -130,7 +130,13 @@ Overwrite existing docs only when that is intentional:
 ./scripts/bootstrap-docs.sh --target /path/to/project --preset clean-solid-tdd --force
 ```
 
-When Compass is used as an installed skill, resolve the script relative to the loaded skill directory:
+When Compass is installed through the `skills` CLI, prefer the CLI-managed update path:
+
+```bash
+npx skills update
+```
+
+For git-backed, manual, or non-CLI installations, resolve the fallback scripts relative to the loaded skill directory:
 
 ```bash
 /path/to/installed/compass/scripts/update-skill.sh --skill-dir /path/to/installed/compass
@@ -139,10 +145,24 @@ When Compass is used as an installed skill, resolve the script relative to the l
 ```
 
 The update check uses the GitHub repository as the source of truth. If the
-installed skill is stale or has no recorded source revision, the updater refreshes
-the skill directory first, then the agent must reload `SKILL.md` before
-continuing. Kalau peta baru sudah ada, jangan tetap jalan pakai peta fotokopi
-zaman lomba gerak jalan.
+installed skill is stale or has no recorded source revision, the selected updater
+refreshes the skill directory first, then the agent must reload `SKILL.md`
+before continuing. Kalau peta baru sudah ada, jangan tetap jalan pakai peta
+fotokopi zaman lomba gerak jalan.
+
+## Testing
+
+Run the deterministic test suite before completing changes to Compass policy,
+presets, workflows, scripts, or tests:
+
+```bash
+./tests/run-tests.sh
+```
+
+The wrapper checks shell syntax, XML validity, bootstrap smoke behavior, docs
+links, workflow coverage, policy consistency, update-skill fallback behavior,
+and all preset bootstrap outputs. Slow headless agent tests are not part of the
+default suite.
 
 ## Routing Output Example
 
@@ -173,7 +193,7 @@ For `new_feature`, Compass is intentionally strict:
 
 1. **Brainstorming**: understand the problem, users, success criteria, scope, and non-goals.
 2. **Design**: define the contract, domain shape, behavior-test matrix, and behavior decisions.
-3. **Task Memory Gate**: before implementation, create or resume `docs/.tasks/<task>/` for long multi-slice work, or state why it is not required.
+3. **Task Memory Gate**: before implementation, create or resume `docs/.tasks/<task>/` for approved gated design context or long/risky multi-slice work, or state why it is not required.
 4. **Implementation**: build one small slice, verify it, then stop for validation.
 
 A request to "build feature X" is not permission to skip brainstorming and design. It is the starting bell, not the finish line.
@@ -186,7 +206,7 @@ baseline.
 
 1. **Baseline discovery**: find the owner, current behavior, tests, contracts, docs, commands, and behavior that must not drift.
 2. **Delta design**: define old behavior, new behavior, unchanged behavior, regression tests, slices, docs impact, and rollout risk.
-3. **Task Memory Gate**: before implementation, create or resume task memory for long, risky, or multi-slice updates, or state why it is not required.
+3. **Task Memory Gate**: before implementation, create or resume task memory for approved delta design context or long/risky multi-slice updates, or state why it is not required.
 4. **Implementation checkpoints**: build one approved delta slice, verify preserved and changed behavior, then stop for validation.
 5. **Rollout cleanup**: close feature flags, dark-launch paths, compatibility paths, docs, runbooks, or rollback notes introduced by the update.
 
@@ -207,10 +227,12 @@ Compass must run the Task Memory Gate before implementation starts. The gate has
 | `resumed` | One active relevant task memory folder was loaded and reused. |
 | `not-required` | The task is small, single-slice, or below the memory threshold. The agent must state why. |
 
-Task memory is required only when both conditions are true:
+Task memory is required when either condition is true:
 
-1. The task is long or risky, such as `new_feature`, `architecture_change`, a large refactor, or work with meaningful checkpoint risk.
-2. After align-context, fit-design, or approved design, there are at least two concrete implementation slices.
+1. A Compass workflow has developer-approved gated design context to preserve before implementation, such as brainstorming, align-context, evidence-discovery, fit-design, design, baseline-discovery, or delta-design, even when the approved implementation has one slice.
+2. The task is long or risky, such as `new_feature`, `architecture_change`, a large refactor, or work with meaningful checkpoint risk, and there are at least two concrete implementation slices after alignment or design.
+
+If neither condition applies, Compass reports `not-required` with the reason before implementation starts.
 
 When required, Compass creates this structure in the target project before the first implementation edit or command:
 
@@ -298,14 +320,18 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   |-- documentation-policy.xml
 |   |-- task-memory.xml
 |   `-- task-types.xml
-`-- scripts/
-    `-- bootstrap-docs.sh
+|-- scripts/
+|   `-- bootstrap-docs.sh
+`-- tests/
+    `-- run-tests.sh
 ```
 
 ## Important Files
 
 - `SKILL.md`: skill entry point, hard gates, routing rules, and project-docs integration.
 - `scripts/bootstrap-docs.sh`: idempotent script for seeding Compass docs into a target project.
+- `scripts/smoke-test.sh`: minimal script verification for preset listing, dry-run, failure paths, and no-overwrite behavior.
+- `tests/run-tests.sh`: deterministic test wrapper for shell syntax, XML validity, smoke tests, docs links, workflow coverage, policy consistency, update-skill fallback checks, and preset bootstrap checks.
 - `references/classification.xml`: decision tree for task classification.
 - `references/task-memory.xml`: pre-implementation task memory gate, statuses, lifecycle, resume rules, and template fallback behavior.
 - `references/task-types.xml`: task taxonomy and commit hints.
@@ -343,7 +369,7 @@ A Compass-guided task should leave an auditable trail:
 - locked orientation preset;
 - workflow source from `docs/process/workflows.xml`;
 - approval gates for risky work;
-- Task Memory Gate outcome for long or risky multi-slice work;
+- Task Memory Gate outcome for approved gated design context or long/risky multi-slice work;
 - baseline and delta checkpoints for feature updates;
 - small implementation slices;
 - verification evidence;

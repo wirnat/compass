@@ -10,7 +10,8 @@
   </documentation-context>
 
   <task-memory-gate>
-    <rule>For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule>Load Compass references/task-memory.xml when developer-approved gated design context must be preserved before implementation, even if the approved implementation has one slice.</rule>
+    <rule>Also load Compass references/task-memory.xml for long or risky work with at least two concrete implementation slices after alignment or design.</rule>
     <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
     <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
     <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
@@ -22,7 +23,7 @@
       <rule>Run phases sequentially: evidence discovery, fit design, implementation.</rule>
       <rule>Do not introduce competing architecture names or folders without a decision record.</rule>
       <rule>Implementation must use the existing composition, testing, naming, and dependency style unless a change is approved.</rule>
-      <rule>Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any feature with gated design context or long/risky multi-slice risk.</rule>
     </enforcement>
     <phase name="evidence-discovery" gate="developer_approval_required">
       <purpose>Discover how the current project already organizes similar behavior.</purpose>

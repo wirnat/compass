@@ -4,13 +4,14 @@
 
   <documentation-context>
     <rule>Read docs/decisions/0001-orientation-lock.md first.</rule>
-    <rule>Read docs/architecture/research-based-architecture.md, docs/foundation/researched-principles.md, and docs/process/researched-workflow.md before planning.</rule>
+    <rule>Read docs/architecture/research-based-architecture.md, docs/foundation/research-based-principles.md, and docs/process/research-based-development-workflow.md before planning.</rule>
     <rule>Use current primary or authoritative sources when the selected direction is not yet locked.</rule>
     <rule>Cite sources in decision docs before implementation depends on the researched choice.</rule>
   </documentation-context>
 
   <task-memory-gate>
-    <rule>For long or risky work with at least two concrete implementation slices after alignment or design, load Compass references/task-memory.xml.</rule>
+    <rule>Load Compass references/task-memory.xml when developer-approved gated design context must be preserved before implementation, even if the approved implementation has one slice.</rule>
+    <rule>Also load Compass references/task-memory.xml for long or risky work with at least two concrete implementation slices after alignment or design.</rule>
     <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
     <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
     <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
@@ -23,7 +24,7 @@
       <rule>Do not implement feature code until the researched orientation is selected and recorded.</rule>
       <rule>Research must compare at least three viable combinations when the direction is unknown.</rule>
       <rule>Implementation follows the workflow recorded by the research decision.</rule>
-      <rule>Before implementation starts, satisfy the task-memory-gate for any long or risky multi-slice feature.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any feature with gated design context or long/risky multi-slice risk.</rule>
     </enforcement>
     <phase name="research-lock" gate="developer_approval_required">
       <purpose>Select the orientation from current evidence before feature design.</purpose>

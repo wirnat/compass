@@ -33,6 +33,7 @@ docs/
   process/
   runbooks/
   reference/
+  superpowers/
   _templates/
 ```
 
@@ -45,6 +46,7 @@ docs/
 - `process/`: how the team builds, reviews, tests, and ships work.
 - `runbooks/`: concrete operational procedures.
 - `reference/`: lookup-oriented schemas, glossary, contracts, and naming rules.
+- `superpowers/`: archived implementation planning notes imported from the older Superpowers workflow. These files are historical context only; active Compass policy lives in `SKILL.md`, `references/`, and `docs/process/`.
 - `_templates/`: reusable note shapes.
 
 ## Placement Rules
