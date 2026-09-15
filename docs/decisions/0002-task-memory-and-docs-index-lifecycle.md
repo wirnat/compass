@@ -5,7 +5,7 @@ owner: architecture
 created: 2026-09-15
 updated: 2026-09-15
 parent: "[[docs/decisions/README]]"
-summary: Decisions and rejected options behind the docs index, task memory lint, infra_change, local runtime policy, supporting files, and task close-out.
+summary: Decisions and rejected options behind the docs index, task memory lint, infra_change, local runtime policy, supporting files, task close-out, and recommended skills.
 tags:
   - docs/decisions
   - status/active
@@ -49,6 +49,7 @@ Several decisions followed. Each one lists the options that were rejected, so th
 | Supporting files | Allowed with no line limit when `goal.md` links them; durable ones move to permanent docs at close-out | Raising the `goal.md` limits: resume cost grows with every task |
 | Task memory tracking | Committed by default; ignored only with a recorded reason | Ignored by default: loses team review and resume on another machine |
 | Closed goals | Close-out: harvest into permanent docs, remove links into the task, delete the folder | Keeping closed goals as history: git history already keeps them, and live folders turn into stale sources of truth |
+| Recommended skills | A manifest, an offline check, and install commands that run only with developer approval | Automatic install: third-party skills are instructions an agent follows, so an unreviewed change is a supply-chain risk. Vendored copies in the Compass repository: duplication, licensing, and stale copies. Version pins: the skills CLI lock already records hashes, and every install needs approval |
 
 ## Consequences
 
