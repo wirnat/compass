@@ -47,6 +47,10 @@ existing-architecture-lock
 research-based
   Short: Research current sources, compare options, cite evidence, then lock the selected architecture, principles, and workflow.
   Best fit: unknown domains, unfamiliar teams, or cases where the user explicitly asks Compass to research alternatives.
+
+infra-ops
+  Short: Declared-state infrastructure operations with risk-tiered live-change gates, plan or dry-run before apply, and live verification.
+  Best fit: infrastructure, platform, and operations repositories: IaC, configuration management, cluster manifests, and server fleets.
 PRESETS
 }
 

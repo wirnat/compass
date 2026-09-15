@@ -26,7 +26,7 @@ trap cleanup EXIT
 cd "$ROOT_DIR"
 
 presets="$($BOOTSTRAP --list-presets)"
-for preset in clean-solid-tdd vertical-cupid-incremental ddd-solid-bdd existing-architecture-lock research-based; do
+for preset in clean-solid-tdd vertical-cupid-incremental ddd-solid-bdd existing-architecture-lock research-based infra-ops; do
   case "$presets" in
     *"$preset"*) ;;
     *) fail "preset list missing $preset" ;;

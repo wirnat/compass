@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<workflows-reference preset="infra-ops">
+  <purpose>Provide risk-tiered workflows for changing live infrastructure through declared state.</purpose>
+
+  <documentation-context>
+    <rule>Read docs/decisions/0001-orientation-lock.md first, including the recorded toolchain.</rule>
+    <rule>Read docs/architecture/infrastructure-layout.md before choosing where a change belongs.</rule>
+    <rule>Read docs/foundation/operations-principles.md before designing a change.</rule>
+    <rule>Read docs/process/change-workflow.md before planning a rollout.</rule>
+    <rule>Read relevant docs/modules notes and runbooks for the touched environment or component.</rule>
+  </documentation-context>
+
+  <task-memory-gate>
+    <rule>Load Compass references/task-memory.xml when developer-approved gated design context must be preserved before implementation, even if the approved implementation has one slice.</rule>
+    <rule>Also load Compass references/task-memory.xml for long or risky work with at least two concrete implementation slices after alignment or design.</rule>
+    <rule>Implementation may not start until the task memory outcome is reported as created, resumed, or not-required.</rule>
+    <rule>When task memory is required, docs/.tasks/&lt;task&gt;/goal.md, diagram.md, and memories.md must exist before the first implementation edit or command.</rule>
+    <rule>Missing docs/_templates task memory files are a documentation gap, not permission to skip this gate.</rule>
+  </task-memory-gate>
+
+  <risk-tiering>
+    <purpose>Every infra_change, hotfix_incident, and architecture_change slice gets exactly one tier. The tier decides approval, rehearsal, and rollback depth. This block is the source of truth for the tiers; the project may adapt them.</purpose>
+    <tier id="A" name="no runtime effect">
+      <covers>Lint, formatting, tags, comments, or defaults that do not change what runs.</covers>
+      <gate>Static validation and normal review. No live command is needed.</gate>
+    </tier>
+    <tier id="B" name="reversible configuration">
+      <covers>Configuration or variable contract changes with limited scope that revert cleanly.</covers>
+      <gate>Plan or dry-run evidence, explicit approval before apply, and live verification after apply.</gate>
+    </tier>
+    <tier id="C" name="service-affecting">
+      <covers>Changes that restart, reload, reconfigure, or scale a service, or change network or firewall rules, and can still be reverted.</covers>
+      <gate>Tier B gates, plus per-slice approval and a structured rollback plan with revert method, verification, and time estimate.</gate>
+    </tier>
+    <tier id="D" name="destructive or hard to reverse">
+      <covers>Data deletion, resource destroy or replace, reboot of stateful nodes, secret destruction, or changes that can lock operators out.</covers>
+      <gate>Tier C gates, plus double approval, a written runbook before apply, and backup or snapshot evidence.</gate>
+    </tier>
+    <rule>Assign the tier during change-discovery and state it in the change record.</rule>
+    <rule>If a plan or dry-run shows a destroy or replace, the tier is at least C, whatever was assigned earlier.</rule>
+    <rule>There is no emergency tier. Incidents use hotfix_incident, and approval before each mutating command still applies.</rule>
+    <rule>When no environment exists to rehearse a Tier B or higher change, mark the slice not-staged and treat the first live run with extra care.</rule>
+  </risk-tiering>
+
+  <workflow type="infra_change">
+    <description>Change one live environment concern through declared state, with tiered gates.</description>
+    <enforcement>
+      <rule>Run phases sequentially: change-discovery, change-design, declared-state-implementation, live-rollout.</rule>
+      <rule>Execute one change slice per workflow; split unrelated environments or components into pending slices.</rule>
+      <rule>Before implementation starts, satisfy the task-memory-gate for any change with gated design context or long/risky multi-slice risk.</rule>
+      <rule>Apply the Compass Live Environment Gate to every command that mutates a live environment.</rule>
+    </enforcement>
+    <phase name="change-discovery" gate="developer_approval_required">
+      <purpose>Know the current live state and the blast radius before deciding the change.</purpose>
+      <actions>
+        <action>Read the layout, principles, and change workflow docs.</action>
+        <action>Compare declared state with live state for the touched scope, and record drift as a finding before planning.</action>
+        <action>Name the environments, hosts, resources, and state in scope, and what depends on them.</action>
+        <action>Assign one risk tier and draft the rollback plan in the format for that tier.</action>
+        <action>State non-goals and the environments that must not change.</action>
+      </actions>
+      <phase-output>
+        <scope>Environments, resources, and state in scope.</scope>
+        <live-state>Observed live state and drift findings.</live-state>
+        <risk-tier>A, B, C, or D with reason.</risk-tier>
+        <rollback-plan>Draft in the tier format.</rollback-plan>
+        <non-goals>What must not change.</non-goals>
+      </phase-output>
+    </phase>
+    <phase name="change-design" gate="developer_approval_required">
+      <purpose>Design the declared-state change and its verification before editing.</purpose>
+      <actions>
+        <action>Choose the files to change from docs/architecture/infrastructure-layout.md.</action>
+        <action>Define the apply order when the change spans several states or environments.</action>
+        <action>Define the verification matrix: static checks, plan or dry-run expectations, and live checks after apply.</action>
+        <action>List the secrets and credentials the change reads or writes.</action>
+      </actions>
+      <phase-output>
+        <declared-change>Files and resources to change.</declared-change>
+        <apply-order>Order across states or environments, or a single step.</apply-order>
+        <verification-matrix>Static, plan, and live checks.</verification-matrix>
+        <secrets-touched>Secrets read or written, or none.</secrets-touched>
+        <docs-impact>Docs, runbooks, or decisions to update.</docs-impact>
+      </phase-output>
+    </phase>
+    <phase name="declared-state-implementation" gate="manual_checkpoint_required">
+      <purpose>Change the declared state without touching live environments.</purpose>
+      <actions>
+        <action>Before the first implementation edit or command, report the task memory outcome: created, resumed, or not-required.</action>
+        <action>Edit only the declared state approved in change-design.</action>
+        <action>Run static validation for the toolchain: formatting, linting, syntax, and policy checks.</action>
+        <action>Stop and report before running any command that contacts a live environment.</action>
+      </actions>
+      <phase-output>
+        <changed-files>Files changed.</changed-files>
+        <static-validation>Commands run and results.</static-validation>
+      </phase-output>
+    </phase>
+    <phase name="live-rollout" gate="developer_approval_required">
+      <purpose>Apply the change to live environments through the tier gates.</purpose>
+      <actions>
+        <action>Run the plan or dry-run for the exact change and show its summary, including destroy or replace counts.</action>
+        <action>Confirm or raise the risk tier from the plan, and restate the rollback plan.</action>
+        <action>Get approval for each mutating command as the tier requires, then apply in the approved order.</action>
+        <action>Verify the resulting live state against the verification matrix; re-reading command output is not verification.</action>
+        <action>Record what changed, the approvals, and the verification evidence, and update runbooks or docs when operations changed.</action>
+      </actions>
+      <phase-output>
+        <plan-summary>Plan or dry-run summary.</plan-summary>
+        <approvals>Approvals given and for which commands.</approvals>
+        <live-verification>Checks run against the live environment and their results.</live-verification>
+        <remaining-risk>Drift, follow-up, or cleanup still open.</remaining-risk>
+      </phase-output>
+    </phase>
+    <evidence>Risk tier, rollback plan, static validation, plan or dry-run summary, approvals, and live verification.</evidence>
+  </workflow>
+
+  <workflow type="hotfix_incident">
+    <description>Restore a live service quickly while keeping every mutation approved and recorded.</description>
+    <enforcement>
+      <rule>Phase order may be shortened, but approval before each mutating command still applies.</rule>
+      <rule>Break-glass console or CLI changes are recorded immediately: what, when, who, and why.</rule>
+      <rule>The incident is not closed until declared state matches live state again.</rule>
+    </enforcement>
+    <phase name="stabilize" gate="manual_checkpoint_required">
+      <purpose>Restore service with the smallest safe action.</purpose>
+      <actions>
+        <action>State the symptom, the affected environments, and the smallest safe action.</action>
+        <action>Show the dry-run or expected effect of the action when the tool supports it, and get approval before running it.</action>
+        <action>Verify from the live environment that the service is restored.</action>
+      </actions>
+      <phase-output>
+        <symptom>What was broken and where.</symptom>
+        <action-taken>Commands run, approvals, and break-glass records.</action-taken>
+        <verification>Live checks and results.</verification>
+      </phase-output>
+    </phase>
+    <phase name="reconcile" gate="developer_approval_required">
+      <purpose>Bring declared state and live state back together.</purpose>
+      <actions>
+        <action>Compare live state with declared state and list every break-glass change.</action>
+        <action>Open an infra_change to write the fix into declared state, or to revert the live change.</action>
+        <action>Record the root cause and follow-up work.</action>
+      </actions>
+      <phase-output>
+        <drift>Differences between live and declared state.</drift>
+        <follow-up>The infra_change and other follow-up work.</follow-up>
+      </phase-output>
+    </phase>
+    <evidence>Symptom, approved actions, break-glass record, live verification, and the reconciling infra_change.</evidence>
+  </workflow>
+
+  <workflow type="architecture_change">
+    <description>Change environment topology, state boundaries, or platform shape.</description>
+    <enforcement>
+      <rule>Record the decision in docs/decisions before implementation.</rule>
+      <rule>Assign a tier to each migration slice; moves across state boundaries are usually Tier C or D.</rule>
+      <rule>Run each migration slice through the infra_change phases.</rule>
+    </enforcement>
+    <phase name="topology-design" gate="developer_approval_required">
+      <purpose>Agree on the target shape and a safe migration path.</purpose>
+      <actions>
+        <action>Describe the current and target topology, including state ownership.</action>
+        <action>Split the migration into slices with apply order and a rollback plan per slice.</action>
+        <action>Draft the decision record with options, rationale, and consequences.</action>
+      </actions>
+      <phase-output>
+        <target-topology>Target environments, state, and boundaries.</target-topology>
+        <migration-slices>Ordered slices with tiers and rollback plans.</migration-slices>
+        <decision-record>Draft decision record.</decision-record>
+      </phase-output>
+    </phase>
+    <phase name="migration-slices" gate="manual_checkpoint_required">
+      <purpose>Execute one approved migration slice at a time.</purpose>
+      <actions>
+        <action>Run the current slice through the infra_change phases.</action>
+        <action>Stop after each verified slice and ask before continuing.</action>
+      </actions>
+      <phase-output>
+        <current-slice>Slice executed and its verification.</current-slice>
+        <remaining-slices>Slices still pending.</remaining-slices>
+      </phase-output>
+    </phase>
+    <evidence>Decision record, slice plan, and per-slice infra_change evidence.</evidence>
+  </workflow>
+
+  <workflow type="research_spike">
+    <description>Evaluate tools, providers, or approaches without changing live environments.</description>
+    <enforcement>
+      <rule>Do not run commands that mutate a live environment.</rule>
+      <rule>Read-only inspection with production credentials needs developer approval first.</rule>
+    </enforcement>
+    <phase name="investigate" gate="developer_approval_required">
+      <purpose>Answer one question with evidence and a recommendation.</purpose>
+      <actions>
+        <action>State the question and the constraints.</action>
+        <action>Compare at least two options with sources or measurements.</action>
+        <action>Recommend one option and name the follow-up change type.</action>
+      </actions>
+      <phase-output>
+        <findings>Options compared and evidence.</findings>
+        <recommendation>Recommended option and follow-up.</recommendation>
+      </phase-output>
+    </phase>
+    <evidence>Question, compared options, evidence, and recommendation.</evidence>
+  </workflow>
+</workflows-reference>

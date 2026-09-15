@@ -63,6 +63,15 @@ check_preset_files() {
       require_file "$target/docs/foundation/research-based-principles.md"
       require_file "$target/docs/process/research-based-development-workflow.md"
       ;;
+    infra-ops)
+      require_file "$target/docs/architecture/infrastructure-layout.md"
+      require_file "$target/docs/foundation/operations-principles.md"
+      require_file "$target/docs/process/change-workflow.md"
+      grep -Fq '<workflow type="infra_change"' "$target/docs/process/workflows.xml" \
+        || fail 'infra-ops workflows.xml lacks the infra_change workflow'
+      grep -Fq '<risk-tiering>' "$target/docs/process/workflows.xml" \
+        || fail 'infra-ops workflows.xml lacks risk-tiering'
+      ;;
     *)
       fail "unknown preset in test: $preset"
       ;;
@@ -71,7 +80,7 @@ check_preset_files() {
 
 trap cleanup EXIT
 
-for preset in clean-solid-tdd vertical-cupid-incremental ddd-solid-bdd existing-architecture-lock research-based; do
+for preset in clean-solid-tdd vertical-cupid-incremental ddd-solid-bdd existing-architecture-lock research-based infra-ops; do
   target="$TMP_ROOT/$preset"
   "$BOOTSTRAP" --target "$target" --preset "$preset" >/dev/null
   check_preset_files "$preset" "$target"
