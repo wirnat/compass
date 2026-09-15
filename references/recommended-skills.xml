@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<recommended-skills>
+  <purpose>Optional skills that strengthen Compass phases. Compass works without any of them. scripts/skills-check.sh reports which ones are installed; install a missing skill only with developer approval.</purpose>
+  <rule>Keep one skill element per line with name, source, and phase attributes. The element text says what the skill adds.</rule>
+  <rule>A project can add its own recommended skills in docs/process/recommended-skills.xml using the same format.</rule>
+  <skill name="brainstorming" source="obra/superpowers" phase="brainstorming, align-context">Explores intent and options before design.</skill>
+  <skill name="writing-plans" source="obra/superpowers" phase="design, fit-design">Turns an approved design into a written slice plan.</skill>
+  <skill name="test-driven-development" source="obra/superpowers" phase="implementation">Keeps each slice test-first.</skill>
+  <skill name="systematic-debugging" source="obra/superpowers" phase="bug_fix, hotfix_incident">Finds the root cause before a fix.</skill>
+  <skill name="verification-before-completion" source="obra/superpowers" phase="completion evidence">Requires evidence before work is called done.</skill>
+  <skill name="dont-repeat-yourself" source="yanko-belov/code-craft" phase="implementation, refactor">Keeps one source of truth for repeated logic.</skill>
+</recommended-skills>

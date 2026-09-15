@@ -5,6 +5,8 @@ target_dir="$(pwd)"
 include_all=0
 tasks_mode=0
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/yaml.sh
+source "$script_dir/lib/yaml.sh"
 
 # Task memory stops being cheap to resume beyond these sizes.
 goal_line_limit=120
@@ -63,22 +65,13 @@ fi
 
 cd "$target_dir"
 
-# Shared awk helpers. YAML quoting lives only in q().
-awk_lib='
+# Shared awk helpers; YAML quoting q() comes from lib/yaml.sh.
+awk_lib="$yaml_awk_lib"'
 function trim(s) { sub(/^[ \t]+/, "", s); sub(/[ \t]+$/, "", s); return s }
 function unquote(s,   f) {
   f = substr(s, 1, 1)
   if (length(s) >= 2 && (f == "\"" || f == "\047") && substr(s, length(s), 1) == f) return substr(s, 2, length(s) - 2)
   return s
-}
-function q(s,   out, i, c) {
-  out = ""
-  for (i = 1; i <= length(s); i++) {
-    c = substr(s, i, 1)
-    if (c == "\\" || c == "\"") out = out "\\"
-    out = out c
-  }
-  return "\"" out "\""
 }
 '
 
@@ -147,10 +140,6 @@ END {
   if ("code" in list) print "Y\t    code: [" list["code"] "]"
 }
 '
-
-yaml_quote() {
-  YAML_VALUE="$1" awk "$awk_lib"' BEGIN { print q(ENVIRON["YAML_VALUE"]) }'
-}
 
 # A code glob is relative to the project root; ** is treated like * because
 # find -path lets * match across directories.
