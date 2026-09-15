@@ -46,7 +46,7 @@ architecture would add ceremony without solving the current problem.
 - Existing principles: documentation-first workflow, project-owned `docs/` context, explicit gates, idempotent bootstrap, and preset adaptation before use.
 - Existing development workflow: classify by risk, load project docs, follow `docs/process/workflows.xml`, update docs when boundaries or workflows change, and implement only approved slices.
 - Commands verified: `./scripts/bootstrap-docs.sh --target . --preset existing-architecture-lock`.
-- Build/test status: no package manager, language runtime, or automated test suite is currently present; shell-script verification is the available project command.
+- Build/test status: no package manager or language runtime is present; `./tests/run-tests.sh` runs the deterministic shell and XML test suite.
 
 ## Consequences
 
