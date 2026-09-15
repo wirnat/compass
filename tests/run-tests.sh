@@ -29,9 +29,9 @@ done
 
 cd "$ROOT_DIR"
 
-bash -n scripts/bootstrap-docs.sh scripts/update-skill.sh scripts/smoke-test.sh \
-  tests/bootstrap-all-presets.sh tests/check-doc-links.sh tests/check-policy-consistency.sh \
-  tests/check-update-skill.sh tests/check-workflows.sh tests/run-tests.sh
+bash -n scripts/bootstrap-docs.sh scripts/docs-index.sh scripts/update-skill.sh scripts/smoke-test.sh \
+  tests/bootstrap-all-presets.sh tests/check-doc-links.sh tests/check-docs-index.sh \
+  tests/check-policy-consistency.sh tests/check-update-skill.sh tests/check-workflows.sh tests/run-tests.sh
 
 xmllint --noout references/*.xml docs/process/workflows.xml assets/orientation-presets/*/docs/process/workflows.xml
 
@@ -41,6 +41,7 @@ xmllint --noout references/*.xml docs/process/workflows.xml assets/orientation-p
 ./tests/check-policy-consistency.sh
 ./tests/check-update-skill.sh
 ./tests/bootstrap-all-presets.sh
+./tests/check-docs-index.sh
 
 if command -v git >/dev/null 2>&1; then
   git diff --check
