@@ -96,12 +96,28 @@
     <event name="slice-blocked">Mark the slice blocked in goal.md, record the blocker, update diagram.md to red, and add a memory history entry.</event>
     <event name="slice-changed">If the goal remains stable, update the existing task folder instead of creating a new folder.</event>
     <event name="goal-changed">Create a new task folder, mark the old goal superseded, cross-link both goals, and record the reason in both memories.md files.</event>
-    <event name="goal-completed">Mark the goal completed, record final evidence, and move supporting files that stay the source of truth to their durable project location.</event>
+    <event name="goal-completed">Mark the goal completed, record final evidence, and move supporting files that stay the source of truth to their durable project location, then run close-out.</event>
   </lifecycle>
+
+  <closeout>
+    <purpose>Remove a closed goal's task memory once its durable knowledge lives in permanent docs. Task memory is temporary: knowledge flows from task memory into docs, never the other way.</purpose>
+    <rule>Run close-out for every completed, superseded, or cancelled goal, ideally in the same merge request as its last slice.</rule>
+    <rule>Harvest first. Map durable knowledge from goal.md, memories.md, and supporting files to its permanent home: module behavior to docs/modules, long-lived decisions to docs/decisions, contracts and schemas to docs/reference or code, operational procedures to docs/runbooks, working conventions to docs/process, and project-wide Don'ts to a module note or foundation doc. Get developer approval for the harvest list.</rule>
+    <rule>Replace or remove every link from permanent docs into the goal's folder; permanent docs must not link into docs/.tasks.</rule>
+    <rule>Record the close-out summary in the commit message or merge request, because the folder is removed.</rule>
+    <rule>Delete the folder only with developer approval. When task memory is committed, git history keeps it. When docs/.tasks is ignored, deletion cannot be undone, so finish the harvest first and say so when asking.</rule>
+  </closeout>
+
+  <tracking>
+    <rule>Task memory is committed by default, so the team can review it and resume on another machine; close-out keeps it from piling up.</rule>
+    <rule>Ignore docs/.tasks only for a stated reason, such as a repository that ships its docs to others, a public repository, or tasks that must hold sensitive operational notes, and record the reason in the project docs. Secrets never belong in task memory.</rule>
+    <rule>Keep one mode per repository. scripts/docs-index.sh --tasks reports the mode and warns about untracked task folders in committed mode or tracked task files in ignored mode.</rule>
+  </tracking>
 
   <resume>
     <rule>At the start of a long Compass-guided task, run scripts/docs-index.sh --tasks to list open goals before creating a new task memory folder, instead of opening every goal.md.</rule>
     <rule>If an active goal's updated date is more than 14 days old, offer to mark it completed or cancelled before selecting a goal.</rule>
+    <rule>When closed goals are still present, offer close-out before starting new work.</rule>
     <rule>Report docs-index.sh --tasks warnings as documentation gaps; do not rewrite existing task memory without developer approval.</rule>
     <rule>If exactly one active relevant goal exists, load goal.md in full and the SUMMARIES section plus the newest HISTORIES entry of memories.md before planning or implementation.</rule>
     <rule>Read older HISTORIES entries or diagram.md only when the summaries are not enough; diagram.md is the human-facing view of the slice state already recorded in goal.md.</rule>

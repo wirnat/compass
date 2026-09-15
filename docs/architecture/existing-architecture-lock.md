@@ -45,6 +45,7 @@ under `scripts/`.
 - Preset-specific docs belong in `assets/orientation-presets/<preset>/docs/`.
 - Bootstrap mechanics belong in `scripts/bootstrap-docs.sh`.
 - Docs index generation belongs in `scripts/docs-index.sh`.
+- This repository ignores its own `docs/.tasks/` because `scripts/update-skill.sh` copies `docs/` into every installed skill; task memory here stays local.
 - Repository context and decisions belong in `docs/`.
 - Task memory artifacts for target projects belong under target project `docs/.tasks/`; task memory templates belong in `assets/docs-seed/_templates/`.
 

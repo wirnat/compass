@@ -295,6 +295,8 @@ Compass finds open goals with `scripts/docs-index.sh --tasks`, which lists `docs
 
 Longer material, such as API contracts, schemas, fixtures, or detailed notes, can live in supporting files inside the task folder with no line limit. `goal.md` lists each supporting file under References with when to read it, `docs-index.sh --tasks` warns about files nobody links, and files that remain the source of truth after the task move to the project's durable location when the goal completes.
 
+Closed goals do not stay: their close-out harvests each goal's durable knowledge into modules, decisions, reference, runbooks, or process docs with approval, removes every link from permanent docs into the task folder, records the summary in the commit or merge request, and then deletes the folder with approval. Knowledge flows from task memory into docs, never the other way. Task memory is committed by default so the team can review and resume it; a project that ignores `docs/.tasks` records why, and `docs-index.sh --tasks` reports which mode is in use and flags folders that break it.
+
 At every slice boundary, Compass updates task memory before reporting the checkpoint. If a slice starts, completes, blocks, or changes, update the same folder. If the goal changes, create a new task folder, mark the old goal `superseded`, cross-link both folders, and record the reason in both `memories.md` files.
 
 Missing task memory templates in the target project do not waive the gate. Compass must use the installed templates or `references/task-memory.xml`, then report the documentation gap. Anak boleh lupa bawa penggaris; tugas menggambar garis lurus tetap ada.

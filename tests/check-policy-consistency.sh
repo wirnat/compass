@@ -91,6 +91,16 @@ for path in SKILL.md README.md references/task-memory.xml; do
   require_contains "$path" 'supporting file' 'task supporting files rule'
 done
 
+for path in SKILL.md README.md references/task-memory.xml; do
+  require_contains "$path" 'close-out' 'task close-out'
+done
+for path in SKILL.md references/documentation-policy.xml; do
+  require_contains "$path" 'must not link into docs/.tasks' 'no permanent links into task memory'
+done
+for path in SKILL.md references/task-memory.xml; do
+  require_contains "$path" 'committed by default' 'task memory tracking default'
+done
+
 # The seed sample templates must carry every Compass-required task memory heading.
 required_count=0
 while IFS=$'\t' read -r file heading; do

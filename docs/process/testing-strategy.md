@@ -175,6 +175,11 @@ Minimum checks:
 - `--tasks` warns about supporting files in a task folder that `goal.md` or
   `memories.md` does not mention by file name or top folder; hidden files are
   ignored.
+- The docs index warns when a permanent doc links into `docs/.tasks`, outside
+  code blocks.
+- `--tasks` reports the tracking mode from git, warns about untracked task
+  folders in committed mode or tracked task files in ignored mode, and counts
+  closed goals awaiting close-out.
 
 ## Agent Integration Tests
 
