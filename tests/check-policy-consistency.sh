@@ -71,6 +71,10 @@ for path in SKILL.md README.md; do
   require_contains "$path" 'Live Environment Gate' 'Live Environment Gate'
 done
 
+for path in SKILL.md README.md references/bootstrap-rules.xml docs/reference/orientation-presets.md; do
+  require_contains "$path" 'infra-ops' 'infra-ops preset'
+done
+
 # The seed sample templates must carry every Compass-required task memory heading.
 required_count=0
 while IFS=$'\t' read -r file heading; do

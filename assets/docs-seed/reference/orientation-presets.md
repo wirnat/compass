@@ -27,6 +27,8 @@ Preset docs are reference material. When the selected preset contains examples f
 
 For `clean-solid-tdd`, Compass must review `docs/architecture/folder-file-structure.md`, `docs/architecture/clean-architecture.md`, `docs/process/tdd-workflow.md`, and `docs/process/workflows.xml` for stack-specific wording before reporting bootstrap complete.
 
+For `infra-ops`, Compass must record the detected toolchain in the orientation lock and rewrite `docs/architecture/infrastructure-layout.md` and `docs/process/workflows.xml` to the project's commands before reporting bootstrap complete.
+
 ## Presets
 
 | Preset | Short description | When it fits |
@@ -36,6 +38,7 @@ For `clean-solid-tdd`, Compass must review `docs/architecture/folder-file-struct
 | `ddd-solid-bdd` | Domain-Driven Design, explicit bounded-context structure, domain modeling, SOLID, and BDD plus TDD | Complex business domains that need ubiquitous language, bounded contexts, aggregates, and executable behavior examples |
 | `existing-architecture-lock` | Preserve and document the architecture, principles, and workflow already present in the project | Mature projects with a coherent existing structure that should be extended instead of replaced |
 | `research-based` | Research current sources, compare options, cite evidence, then lock the selected direction | Unknown domains, unfamiliar teams, or explicit requests to research architecture alternatives |
+| `infra-ops` | Declared-state infrastructure operations with risk-tiered live-change gates, plan or dry-run before apply, and live verification | Infrastructure, platform, and operations repositories: IaC, configuration management, cluster manifests, and server fleets |
 
 ## Selection Rules
 
@@ -45,6 +48,7 @@ For `clean-solid-tdd`, Compass must review `docs/architecture/folder-file-struct
 - Use `ddd-solid-bdd` when domain complexity, bounded context, ubiquitous language, aggregates, or business modeling is central.
 - Use `existing-architecture-lock` without asking only when the project already has code, docs, or conventions that clearly should be preserved.
 - Use `research-based` when the user asks Compass to search, compare, or choose from current external architecture references.
+- Use `infra-ops` when the repository mainly changes infrastructure: IaC, configuration management, cluster manifests, or server fleets.
 
 ## Research-Based Preset Rule
 

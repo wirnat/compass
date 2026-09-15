@@ -84,6 +84,7 @@ On first run, if a project does not yet have orientation docs, Compass does not 
 | `ddd-solid-bdd` | Domain-Driven Design, bounded contexts, domain modeling, SOLID, BDD plus TDD | Complex business domains that need ubiquitous language, aggregates, bounded contexts, and executable behavior examples |
 | `existing-architecture-lock` | The architecture, principles, and workflow already present in the project | Mature projects with coherent conventions that should be extended, not replaced |
 | `research-based` | A researched architecture, principle set, and workflow selected from current sources | Unknown domains, uncertain teams, or projects where the developer wants Compass to research alternatives |
+| `infra-ops` | Declared-state infrastructure layout, operations principles, A-D risk tiers, and a gated `infra_change` workflow | Infrastructure, platform, and operations repositories: IaC, configuration management, cluster manifests, and server fleets |
 
 Presets are not just folder templates. They seed `docs/` with decisions, principles, structure, and workflows that become the agent's operating context.
 
@@ -232,7 +233,9 @@ still holds, and break-glass changes are recorded right after.
 
 Risk tiers, approval depth, and tool-specific commands belong to the project's
 workflow or preset. The Live Environment Gate is only the minimum Compass
-enforces everywhere.
+enforces everywhere. Infrastructure repositories can choose the `infra-ops`
+preset, which ships A-D risk tiers and a full `infra_change` workflow. Projects
+on other presets can copy that workflow into their own `docs/process/workflows.xml`.
 
 ## Task Memory Gate
 

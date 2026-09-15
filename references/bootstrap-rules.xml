@@ -58,6 +58,13 @@
       <best-fit>Unknown domains, unfamiliar teams, or explicit requests to research architecture alternatives.</best-fit>
       <rule>Browse current sources, compare at least three options, prefer primary or authoritative sources, and cite links before finalizing the lock.</rule>
     </preset>
+    <preset id="infra-ops">
+      <architecture>Declared-state infrastructure layout per environment</architecture>
+      <principles>Operations principles: declared state as source of truth, plan before apply, verify the live result</principles>
+      <workflow>Risk-tiered infra_change workflow with live-change gates</workflow>
+      <short>Declared-state infrastructure operations with risk-tiered live-change gates, plan or dry-run before apply, and live verification.</short>
+      <best-fit>Infrastructure, platform, and operations repositories: IaC, configuration management, cluster manifests, and server fleets.</best-fit>
+    </preset>
   </orientation-lock>
 
   <language-adaptation>
@@ -70,6 +77,7 @@
     <rule>Do not create static stack profiles in the Compass skill; the LLM performs the adaptation at bootstrap time.</rule>
     <rule>For clean-solid-tdd, do not leave Go-only examples such as cmd, internal, .go files, module.go, or adapters/postgres in non-Go projects unless the target project actually uses those conventions.</rule>
     <rule>For clean-solid-tdd, review and adapt docs/architecture/folder-file-structure.md, docs/architecture/clean-architecture.md, docs/process/tdd-workflow.md, and docs/process/workflows.xml when stack-specific wording appears.</rule>
+    <rule>For infra-ops, detect the toolchain, record it in the orientation lock, and rewrite docs/architecture/infrastructure-layout.md and the plan, dry-run, and apply wording in docs/process/workflows.xml to the project's commands. Ask when the toolchain is unknown.</rule>
   </language-adaptation>
 
   <seed-docs>

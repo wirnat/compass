@@ -100,6 +100,8 @@ For `clean-solid-tdd`, review and adapt at minimum:
 - `docs/process/tdd-workflow.md`
 - `docs/process/workflows.xml` when workflow wording mentions stack-specific files or folders
 
+For `infra-ops`, detect the toolchain, such as Terraform, Ansible, Helm, Kubernetes manifests, or Pulumi, and record it in `docs/decisions/0001-orientation-lock.md`. Rewrite the toolchain mapping in `docs/architecture/infrastructure-layout.md` and the generic plan, dry-run, and apply wording in `docs/process/workflows.xml` to the project's commands. If the toolchain is unknown, ask before adapting.
+
 Detect the stack from existing project files when possible. If the project is empty or ambiguous, ask the developer which language or stack to target before adapting the docs. Do not create static stack profiles inside the Compass skill; the LLM adapts the generated docs from the selected preset references.
 
 Exception: if the target project already has a coherent existing architecture, docs, conventions, and workflow that should be preserved, Compass may select `existing-architecture-lock` from observed evidence and run bootstrap with that preset. State the evidence before running it.
@@ -119,6 +121,7 @@ Available orientation presets:
 - `ddd-solid-bdd`: Domain-Driven Design, explicit bounded-context structure, domain modeling principles, and BDD plus TDD. Best for complex business domains that need ubiquitous language, bounded contexts, aggregates, and executable behavior examples.
 - `existing-architecture-lock`: preserve and document the existing project structure, principles, and workflow. Best for mature projects with coherent existing conventions that should be extended instead of replaced.
 - `research-based`: search current sources, compare options, cite evidence, then lock the selected architecture, principles, and workflow. Best for unknown domains or when the user asks Compass to research alternatives.
+- `infra-ops`: declared-state infrastructure operations with risk-tiered live-change gates, plan or dry-run before apply, and live verification. Best for infrastructure, platform, and operations repositories such as IaC, configuration management, cluster manifests, and server fleets.
 
 When offering presets, include each preset name, short description, and when it fits. Ask the user to choose one before running `bootstrap-docs.sh`, unless selecting `existing-architecture-lock` from observed existing-project evidence.
 
@@ -132,7 +135,7 @@ Each orientation preset provides its active task workflow as `docs/process/workf
 
 When a project has `docs/process/workflows.xml`, read it after classification and use it as the active workflow. Compass must not use a root-skill workflow fallback and must not use `docs/reference/workflows.xml` as the active workflow source. If `docs/process/workflows.xml` is missing, stop before planning implementation work and seed or migrate the project's Compass docs first.
 
-If the selected task type has no matching `<workflow type="...">` in the active `docs/process/workflows.xml`, stop before planning implementation work. Report the unsupported workflow gap and ask whether to adapt the project's workflow file for this task type or reclassify the request. Do not silently borrow a workflow from another preset.
+If the selected task type has no matching `<workflow type="...">` in the active `docs/process/workflows.xml`, stop before planning implementation work. Report the unsupported workflow gap and ask whether to adapt the project's workflow file for this task type or reclassify the request. Do not silently borrow a workflow from another preset. When the developer chooses to adapt the workflow for `infra_change`, copy the `infra_change` workflow and the `<risk-tiering>` block from the Compass `infra-ops` preset (`assets/orientation-presets/infra-ops/docs/process/workflows.xml`) into the project's `docs/process/workflows.xml`, then adapt them.
 
 ## Project Docs Integration
 

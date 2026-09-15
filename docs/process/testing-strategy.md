@@ -134,6 +134,8 @@ Minimum checks:
 - Verify preset-specific orientation docs exist.
 - Verify `docs/process/workflows.xml` exists and is valid XML.
 - Verify task memory templates exist.
+- Verify the `infra-ops` preset ships the `infra_change` workflow and the
+  `<risk-tiering>` block.
 
 This stays separate from `scripts/smoke-test.sh` so the smoke test remains a
 small bootstrap-focused check.
