@@ -42,6 +42,14 @@ scripts/update-skill.sh --skill-dir <installed-compass-skill-dir>
 If either update path reports that Compass is already up to date, continue
 normally.
 
+After the update check, run `scripts/skills-check.sh --target <project-dir>`,
+resolved relative to this `SKILL.md` file's directory. It reports, without
+network access, which skills from `references/recommended-skills.xml` and the
+project's `docs/process/recommended-skills.xml` are installed. Mention missing
+skills once per session with their install commands, and run an install command
+only with developer approval. Compass works without any recommended skill, so a
+declined install never blocks the task.
+
 If the bundled script updates the skill, re-open and follow the updated
 `<installed-compass-skill-dir>/SKILL.md` before continuing.
 

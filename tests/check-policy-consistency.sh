@@ -113,6 +113,13 @@ for path in SKILL.md README.md; do
 done
 require_contains 'SKILL.md' 'indexed commit' 'code index freshness check'
 
+for path in SKILL.md README.md references/bootstrap-rules.xml; do
+  require_contains "$path" 'skills-check.sh' 'recommended skills check'
+done
+for path in SKILL.md README.md; do
+  require_contains "$path" 'only with developer approval' 'approval-gated skill install'
+done
+
 # Compass ships English artifacts; asides in another language confuse models
 # that do not read it.
 indonesian="$(grep -RniwE --include='*.md' --include='*.xml' \

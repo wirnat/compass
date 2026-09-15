@@ -162,8 +162,8 @@ presets, workflows, scripts, or tests:
 
 The wrapper checks shell syntax, XML validity, bootstrap smoke behavior, docs
 links, workflow coverage, policy consistency, update-skill fallback behavior,
-all preset bootstrap outputs, and docs index output. Slow headless agent tests
-are not part of the default suite.
+all preset bootstrap outputs, docs index output, and the recommended skills
+check. Slow headless agent tests are not part of the default suite.
 
 ## Routing Output Example
 
@@ -265,6 +265,18 @@ Code Intelligence tools, such as GitNexus or other code graphs, are recommended,
 not required. When a project uses one, the agent checks that the index matches
 `HEAD` before trusting it, uses it for impact analysis before refactors and
 architecture changes, and confirms its answers in the code.
+
+## Recommended Skills
+
+`references/recommended-skills.xml` lists optional skills that strengthen
+Compass phases, such as brainstorming, plan writing, test-driven development,
+systematic debugging, and verification. Projects can add their own in
+`docs/process/recommended-skills.xml`. After the Session Update Gate,
+`scripts/skills-check.sh` reports which ones are installed, without network
+access, and prints `npx skills add` commands for the missing ones. Compass runs
+an install command only with developer approval: skills are instructions an
+agent follows, so each one is reviewed before it lands. Compass works without
+any of them.
 
 ## Task Memory Gate
 
@@ -386,7 +398,10 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   `-- task-types.xml
 |-- scripts/
 |   |-- bootstrap-docs.sh
-|   `-- docs-index.sh
+|   |-- docs-index.sh
+|   |-- lib/
+|   |   `-- yaml.sh
+|   `-- skills-check.sh
 `-- tests/
     `-- run-tests.sh
 ```
@@ -396,6 +411,8 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 - `SKILL.md`: skill entry point, hard gates, routing rules, and project-docs integration.
 - `scripts/bootstrap-docs.sh`: idempotent script for seeding Compass docs into a target project.
 - `scripts/docs-index.sh`: prints an on-demand YAML index of a project's docs from note frontmatter so agents load only relevant notes.
+- `scripts/skills-check.sh`: reports, without network access, which recommended skills are installed and prints install commands for missing ones.
+- `scripts/lib/yaml.sh`: shared YAML quoting for Compass scripts.
 - `scripts/smoke-test.sh`: minimal script verification for preset listing, dry-run, failure paths, and no-overwrite behavior.
 - `tests/run-tests.sh`: deterministic test wrapper for shell syntax, XML validity, smoke tests, docs links, workflow coverage, policy consistency, update-skill fallback checks, preset bootstrap checks, and docs index checks.
 - `references/classification.xml`: decision tree for task classification.
@@ -403,6 +420,7 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 - `references/task-types.xml`: task taxonomy and commit hints.
 - `references/bootstrap-rules.xml`: bootstrap rules and completion evidence.
 - `references/documentation-policy.xml`: docs taxonomy and source-of-truth rules.
+- `references/recommended-skills.xml`: optional skills that strengthen Compass phases.
 - `assets/docs-seed/`: base docs and task memory templates copied into `docs/`.
 - `assets/orientation-presets/`: architecture, principle, process, and workflow presets.
 

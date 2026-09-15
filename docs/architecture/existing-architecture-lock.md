@@ -30,6 +30,7 @@ Compass is a reference-driven Codex skill package.
 - `assets/orientation-presets/<preset>/docs/` stores preset-specific docs and workflows.
 - `scripts/bootstrap-docs.sh` copies seed and preset docs into a target project.
 - `scripts/docs-index.sh` prints an on-demand YAML index of a project's docs from note frontmatter.
+- `scripts/skills-check.sh` reports which recommended skills are installed; `scripts/lib/yaml.sh` holds the shared YAML quoting.
 - `agents/openai.yaml` stores OpenAI plugin metadata.
 - `docs/` stores this repository's own Compass context.
 
@@ -45,6 +46,7 @@ under `scripts/`.
 - Preset-specific docs belong in `assets/orientation-presets/<preset>/docs/`.
 - Bootstrap mechanics belong in `scripts/bootstrap-docs.sh`.
 - Docs index generation belongs in `scripts/docs-index.sh`.
+- Recommended skill checks belong in `scripts/skills-check.sh`, and shared script helpers belong in `scripts/lib/`.
 - This repository ignores its own `docs/.tasks/` because `scripts/update-skill.sh` copies `docs/` into every installed skill; task memory here stays local.
 - Repository context and decisions belong in `docs/`.
 - Task memory artifacts for target projects belong under target project `docs/.tasks/`; task memory templates belong in `assets/docs-seed/_templates/`.

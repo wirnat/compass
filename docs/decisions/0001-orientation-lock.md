@@ -35,6 +35,7 @@ architecture decision changes it.
 - `assets/orientation-presets/<preset>/docs/` owns preset-specific documentation and workflow material.
 - `scripts/bootstrap-docs.sh` owns idempotent docs bootstrap behavior.
 - `scripts/docs-index.sh` owns the on-demand docs index generated from note frontmatter.
+- `scripts/skills-check.sh` owns the recommended skills check.
 - `agents/openai.yaml` owns the OpenAI plugin metadata.
 
 This shape is small, explicit, and already documented in the public README. A new

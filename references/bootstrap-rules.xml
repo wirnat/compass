@@ -116,6 +116,7 @@
     <item>Report detected or selected language/framework.</item>
     <item>Report the documentation language recorded in the orientation lock.</item>
     <item>Report the static check commands found, or the gap.</item>
+    <item>Report missing recommended skills from scripts/skills-check.sh with their install commands; install only with developer approval.</item>
     <item>Report which copied docs were adapted from preset references.</item>
     <item>Report whether docs/process/workflows.xml came from the selected preset.</item>
     <item>Report whether force mode was used.</item>

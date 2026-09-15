@@ -35,6 +35,7 @@ that cannot be verified by scripts or static checks.
 | Policy consistency | Ensure core gates do not drift across `SKILL.md`, `README.md`, references, and presets. | Fast | `./tests/check-policy-consistency.sh` |
 | Update gate | Ensure the fallback updater handles local fixtures without network. | Fast | `./tests/check-update-skill.sh` |
 | Docs index | Ensure the docs index covers every preset doc and handles frontmatter edge cases. | Fast | `./tests/check-docs-index.sh` |
+| Skills check | Ensure recommended skills are reported without network access and install commands are correct. | Fast | `./tests/check-skills-check.sh` |
 | Agent integration | Run a real headless agent session and verify transcript behavior. | Slow | Future `tests/agent/test-compass-routing.sh` |
 
 ## Current Baseline
@@ -183,6 +184,21 @@ Minimum checks:
 - `--tasks` reports the tracking mode from git, warns about untracked task
   folders in committed mode or tracked task files in ignored mode, and counts
   closed goals awaiting close-out.
+
+### `tests/check-skills-check.sh`
+
+Purpose: keep `scripts/skills-check.sh` accurate without network access.
+
+Minimum checks:
+
+- Installed skills are found in any given skill folder, and managed skills are
+  found in the skills CLI lock file.
+- Missing skills get an `npx skills add <source> --skill <name> -g` command.
+- Project skills from `docs/process/recommended-skills.xml` are added, and the
+  first entry for a name wins.
+- Entries without a name or source become warnings.
+- A missing lock file marks every skill as unmanaged.
+- The Compass manifest lists complete entries.
 
 ## Agent Integration Tests
 
