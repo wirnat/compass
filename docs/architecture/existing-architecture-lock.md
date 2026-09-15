@@ -58,6 +58,7 @@ under `scripts/`.
 - Do not create another active workflow source outside `docs/process/workflows.xml`.
 - Do not duplicate Compass policy across multiple root markdown files.
 - Keep script paths relative and portable; do not introduce user-specific absolute paths.
+- Scripts target macOS bash 3.2 and POSIX awk: no associative arrays, globstar, or empty arrays under `set -u`, and no large here-strings, which crashed bash 3.2 on a real project. Do text processing in awk.
 
 ## Allowed Folder Growth
 
