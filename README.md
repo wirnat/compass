@@ -237,6 +237,23 @@ enforces everywhere. Infrastructure repositories can choose the `infra-ops`
 preset, which ships A-D risk tiers and a full `infra_change` workflow. Projects
 on other presets can copy that workflow into their own `docs/process/workflows.xml`.
 
+## Local Runtime Policy
+
+A developer machine runs many projects, and it is easy to start the same
+database, cache, or observability stack once per project without noticing.
+When Compass runs the application or its tests locally, it reads the project's
+`docs/process/local-environment.md`, checks what is already running, reuses
+shared services, starts only what the task needs, and stops what it started
+when the task ends. It never stops or removes containers, volumes, images, or
+networks it did not start without approval, and never points local runs at
+remote databases.
+
+`docs/_templates/local-environment.md` is a sample: each project records which
+services come from the team's shared dev infrastructure, which it owns and why,
+its test commands, and how to clean up. Stack-specific advice, such as a file
+watcher for compiled services or a package manager with a shared store, is
+adapted to the project during bootstrap.
+
 ## Task Memory Gate
 
 Task memory exists so a long task can survive context loss, session changes, and the natural erosion of attention. Goal is the vision; slices are the missions. Missions may change while the goal remains stable. If the goal changes, Compass treats it as a new goal and supersedes the old task memory.

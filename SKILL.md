@@ -171,6 +171,17 @@ Keep this policy generic across coding agents:
 - Explain the reason, trade-off, or consequence for each option so the developer can decide quickly.
 - Preserve hard gates: a structured question is still a request for explicit developer approval when the workflow requires approval.
 
+## Local Runtime Policy
+
+When a task needs to run the application, its dependencies, or integration or end-to-end tests on the developer's machine, treat machine resources as shared with every other project on it. Many developers do not notice duplicate containers, so the agent keeps the machine tidy:
+
+- Read `docs/process/local-environment.md` first. If it is missing, record the gap and ask before creating it from `docs/_templates/local-environment.md` or the installed Compass template.
+- Before starting containers, list what is already running with the project's container runtime, such as Docker or Podman. Reuse a running shared service, such as a database, cache, broker, or observability stack, instead of starting a duplicate.
+- Start only the services the task needs, through compose profiles or named services, not a whole compose file for one test.
+- Prefer the shared dev infrastructure named in `local-environment.md`. Start a project-owned copy only when that file says the project needs a different version or extension.
+- When the task ends, stop what the agent started unless the developer wants it kept, and report anything left running.
+- Never point local runs or tests at remote databases or shared staging services without explicit developer approval.
+
 ## Task Memory For Long Multi-Slice Work
 
 Compass uses task memory to preserve context for long or risky work that has multiple implementation slices. Task memory is not created for every task.
@@ -256,6 +267,7 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 - Live Environment Gate: before any command that mutates a live environment, such as apply, deploy, restart, delete, scale, a secret write, or a console change, show plan or dry-run evidence for that exact change, state the rollback plan, and get explicit developer approval for that command.
 - After a live change, verify the resulting live state; re-reading command output is not verification. Record what changed and how it was verified.
 - During `hotfix_incident`, phase order may be shortened, but approval before each mutating command still applies, and any break-glass change is recorded immediately after. Risk tiers, approval depth, and tool commands come from the project's workflow or preset; the Live Environment Gate is the Compass minimum.
+- Do not stop, remove, or prune containers, volumes, images, or networks that the agent did not start in this task without explicit developer approval; they may belong to other projects.
 - A general request such as "build feature Y" or "implement Z" is not approval to skip brainstorming and design. Treat it as the start of the `new_feature` workflow.
 - If the user explicitly says to skip a phase, state the skipped gate and risk before continuing.
 

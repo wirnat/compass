@@ -111,6 +111,9 @@ Minimum checks:
   shipped templates cannot fall behind this repository's own copy.
 - The seed task templates contain every heading listed under
   `required-headings` in `references/task-memory.xml`.
+- `SKILL.md` and `README.md` keep the Live Environment Gate and Local Runtime
+  Policy wording, and `SKILL.md` keeps the rule against stopping resources the
+  agent did not start.
 
 ### `tests/check-update-skill.sh`
 
@@ -136,6 +139,7 @@ Minimum checks:
 - Verify task memory templates exist.
 - Verify the `infra-ops` preset ships the `infra_change` workflow and the
   `<risk-tiering>` block.
+- Verify the `local-environment.md` template is seeded.
 
 This stays separate from `scripts/smoke-test.sh` so the smoke test remains a
 small bootstrap-focused check.
