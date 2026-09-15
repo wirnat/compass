@@ -80,8 +80,8 @@ Purpose: make workflow support explicit.
 
 Minimum checks:
 
-- Read task types from `references/classification.xml` or
-  `references/task-types.xml`.
+- Read task types from `references/task-types.xml`, and fail unless the
+  `references/classification.xml` decision tree lists exactly the same types.
 - Read workflow types from each `assets/orientation-presets/*/docs/process/workflows.xml`.
 - Report which task types each preset supports when run with `--verbose`.
 - Pass when a preset either defines the task workflow or the global policy in

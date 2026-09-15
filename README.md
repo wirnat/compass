@@ -215,6 +215,25 @@ not skip baseline and delta approval, because changing old behavior without
 knowing what must stay still is how software becomes a cupboard full of cables:
 everything is connected, nobody knows why.
 
+## Live Environment Gate
+
+Compass treats a change to a running environment differently from a change to
+code. Work that changes a live environment, or the declared infrastructure state
+applied to one, is classified as `infra_change`, either as the primary type or
+as a secondary type next to a feature, fix, release, or incident.
+
+Before any command that mutates a live environment (apply, deploy, restart,
+delete, scale, a secret write, or a console change), Compass shows plan or
+dry-run evidence for that exact change, states the rollback plan, and asks for
+explicit approval of that command. After the change it verifies the live result
+instead of re-reading command output, and records what changed. During an
+incident the phases may be shortened, but approval before each mutating command
+still holds, and break-glass changes are recorded right after.
+
+Risk tiers, approval depth, and tool-specific commands belong to the project's
+workflow or preset. The Live Environment Gate is only the minimum Compass
+enforces everywhere.
+
 ## Task Memory Gate
 
 Task memory exists so a long task can survive context loss, session changes, and the natural erosion of attention. Goal is the vision; slices are the missions. Missions may change while the goal remains stable. If the goal changes, Compass treats it as a new goal and supersedes the old task memory.
@@ -292,6 +311,7 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 | `refactor` | Change structure without changing behavior |
 | `architecture_change` | Change boundaries, dependency direction, or architecture pattern |
 | `db_migration` | Change schema, data ownership, migrations, or persistence assumptions |
+| `infra_change` | Change a live environment or the infrastructure state applied to it |
 | `performance` | Improve performance using baseline and evidence |
 | `security` | Close a vulnerability or sensitive-data risk |
 | `dependency_update` | Update dependencies and compatibility expectations |

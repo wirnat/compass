@@ -63,6 +63,14 @@ for path in SKILL.md README.md references/task-memory.xml; do
   require_contains "$path" 'docs-index.sh --tasks' 'task memory index'
 done
 
+for path in SKILL.md README.md references/classification.xml references/task-types.xml; do
+  require_contains "$path" 'infra_change' 'infra_change task type'
+done
+
+for path in SKILL.md README.md; do
+  require_contains "$path" 'Live Environment Gate' 'Live Environment Gate'
+done
+
 # The seed sample templates must carry every Compass-required task memory heading.
 required_count=0
 while IFS=$'\t' read -r file heading; do

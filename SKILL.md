@@ -250,6 +250,9 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 - Medium or high-risk `feature_update` work must protect the baseline before editing: identify current behavior, contracts, tests, owner, risk level, and unchanged behavior before delta design.
 - `feature_update` implementation may start only after the approved delta is explicit: old behavior, new behavior, unchanged behavior, regression evidence, slice plan, docs impact, and rollout or cleanup risk.
 - Feature flags, dark launches, compatibility paths, or rollback controls introduced by a `feature_update` must have cleanup or follow-up evidence before the update is called complete.
+- Live Environment Gate: before any command that mutates a live environment, such as apply, deploy, restart, delete, scale, a secret write, or a console change, show plan or dry-run evidence for that exact change, state the rollback plan, and get explicit developer approval for that command.
+- After a live change, verify the resulting live state; re-reading command output is not verification. Record what changed and how it was verified.
+- During `hotfix_incident`, phase order may be shortened, but approval before each mutating command still applies, and any break-glass change is recorded immediately after. Risk tiers, approval depth, and tool commands come from the project's workflow or preset; the Live Environment Gate is the Compass minimum.
 - A general request such as "build feature Y" or "implement Z" is not approval to skip brainstorming and design. Treat it as the start of the `new_feature` workflow.
 - If the user explicitly says to skip a phase, state the skipped gate and risk before continuing.
 
@@ -260,6 +263,7 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 - Use `feature_update` only when an already-existing use case, rule, contract, or user flow is intentionally changed.
 - If a task touches architecture boundaries, classify it as `architecture_change` even when it also adds behavior.
 - If a task changes database schema, include `db_migration` as a secondary type even when the primary type is `new_feature`, `feature_update`, or `bug_fix`.
+- If a task mutates a live environment, include `infra_change` as a secondary type even when the primary type is `new_feature`, `bug_fix`, `release_deploy`, or `hotfix_incident`.
 - If production is broken or urgent, classify it as `hotfix_incident` first.
 - If the request is unclear, ask one classification question before planning.
 - Do not create abstractions, files, or commits until the selected workflow calls for them, except an approved first-run docs bootstrap.
