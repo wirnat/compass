@@ -281,12 +281,13 @@ require_line "$no_tasks" 'skipped: 0' 'project without docs/.tasks skips nothing
 
 # Projects own their task templates: only Compass-required headings are enforced,
 # and project template headings only end the SUMMARIES region.
-# Args: project dir, task folder name; memories.md content comes from stdin.
+# Args: project dir, task folder name, optional goal_status (default active);
+# memories.md content comes from stdin.
 write_task_files() {
   local dir="$1/docs/.tasks/$2"
 
   mkdir -p "$dir"
-  printf -- '---\ngoal_status: active\n---\n\n# Goal %s\n' "$2" > "$dir/goal.md"
+  printf -- '---\ngoal_status: %s\n---\n\n# Goal %s\n' "${3:-active}" "$2" > "$dir/goal.md"
   printf "$goal_body" >> "$dir/goal.md"
   printf "$diagram_body" > "$dir/diagram.md"
   cat > "$dir/memories.md"
@@ -329,5 +330,71 @@ printf '## Decision Log\n\n## Session Snapshot\n' | write_file "$no_summary/docs
 no_summary_output="$("$INDEX" --target "$no_summary" --tasks)"
 require_line "$no_summary_output" '  - "docs/.tasks/20260904-1000_long-log: memories.md lacks required headings: ## SUMMARIES, ## HISTORIES"' 'only Compass-required headings are enforced'
 reject_text "$no_summary_output" 'SUMMARIES has' 'no summaries limit when the template has no SUMMARIES heading'
+
+# Permanent docs must not link into temporary task memory.
+links_project="$TMP_ROOT/doc-links"
+write_file "$links_project/docs/modules/orders.md" <<'EOF'
+---
+type: module
+status: active
+related:
+  - "[[docs/.tasks/20260101-0000_orders/goal]]"
+---
+
+# Orders
+EOF
+
+write_file "$links_project/docs/process/task-memory.md" <<'EOF'
+# Task Memory Convention
+
+Task folders live at `docs/.tasks/<YYYYMMDD-HHMM>_<slug>/`.
+
+```text
+docs/.tasks/20260101-0000_example/goal.md
+```
+EOF
+
+links_output="$("$INDEX" --target "$links_project")"
+require_line "$links_output" '  - "docs/modules/orders.md: links to temporary task memory in docs/.tasks"' 'permanent doc linking into a task'
+reject_text "$links_output" 'docs/process/task-memory.md:' 'placeholders and code blocks are not task links'
+
+# Task memory tracking mode comes from git.
+git_commit() {
+  git -C "$1" -c user.name=compass -c user.email=compass@example.invalid commit -q -m "$2"
+}
+
+task_memories='## SUMMARIES\n## HISTORIES\n'
+
+committed="$TMP_ROOT/committed"
+printf "$task_memories" | write_task_files "$committed" 20260901-1000_tracked-active
+printf "$task_memories" | write_task_files "$committed" 20260902-1000_done completed
+git -C "$committed" init -q
+git -C "$committed" add docs
+git_commit "$committed" init
+printf "$task_memories" | write_task_files "$committed" 20260903-1000_untracked-active
+
+committed_output="$("$INDEX" --target "$committed" --tasks)"
+require_line "$committed_output" 'tracking: "committed"' 'committed tracking mode'
+require_line "$committed_output" '  - "docs/.tasks/20260903-1000_untracked-active: not committed while docs/.tasks is committed"' 'untracked task folder'
+reject_text "$committed_output" '20260901-1000_tracked-active: not committed' 'tracked task folder'
+require_line "$committed_output" '  - "docs/.tasks: closed goals awaiting close-out: 1"' 'closed goals summary'
+
+committed_all="$("$INDEX" --target "$committed" --tasks --all)"
+require_line "$committed_all" '  - "docs/.tasks/20260902-1000_done: closed goal awaits close-out"' 'closed goal listed with --all'
+
+ignored="$TMP_ROOT/ignored"
+printf "$task_memories" | write_task_files "$ignored" 20260901-1000_local
+git -C "$ignored" init -q
+printf 'docs/.tasks/\n' > "$ignored/.gitignore"
+git -C "$ignored" add .gitignore
+git -C "$ignored" add -f docs/.tasks/20260901-1000_local/goal.md
+git_commit "$ignored" init
+
+ignored_output="$("$INDEX" --target "$ignored" --tasks)"
+require_line "$ignored_output" 'tracking: "ignored"' 'ignored tracking mode'
+require_line "$ignored_output" '  - "docs/.tasks: tracked files although docs/.tasks is ignored: 1"' 'tracked files despite ignore'
+reject_text "$ignored_output" 'not committed while' 'ignored mode does not require commits'
+
+require_line "$tasks_output" 'tracking: "no-git"' 'project outside git'
 
 printf 'Docs index checks passed.\n'

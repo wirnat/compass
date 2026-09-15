@@ -102,6 +102,7 @@ function add(key, val) {
   if (key == "code") codes[++ncode] = val
   list[key] = ((key in list) ? list[key] ", " : "") q(val)
 }
+!fence && /docs\/\.tasks\/[A-Za-z0-9]/ { tasklink = 1 }
 NR == 1 && $0 == "---" { fm = 1; next }
 fm && $0 == "---" { fm = 0; next }
 fm {
@@ -135,6 +136,7 @@ END {
   status = ("status" in scalar) ? scalar["status"] : ""
   if (summary == "") { summary = path; sub(/.*\//, "", summary); sub(/\.md$/, "", summary) }
   print "S\t" status
+  if (tasklink) print "W\t  - " q(path ": links to temporary task memory in docs/.tasks")
   for (i = 1; i <= ncode; i++) print "C\t" codes[i] "\t" q(path ": code glob matches no files: " codes[i])
   print "Y\t  - path: " q(path)
   if ("type" in scalar) print "Y\t    type: " q(scalar["type"])
@@ -163,18 +165,21 @@ glob_matches() {
 entries=""
 warnings=""
 skipped=0
+tracking="no-git"
 
 index_docs() {
-  local file status entry globs kind value line
+  local file status entry globs kind value line linkwarn
 
   while IFS= read -r file; do
     status=""
     entry=""
     globs=""
+    linkwarn=""
     while IFS=$'\t' read -r kind value; do
       case "$kind" in
         S) status="$value" ;;
         C) globs+="$value"$'\n' ;;
+        W) linkwarn="$value" ;;
         Y) entry+="$value"$'\n' ;;
       esac
     done < <(awk -v path="$file" "$awk_prog" "$file")
@@ -185,6 +190,8 @@ index_docs() {
     fi
 
     entries+="$entry"
+    # Task memory is temporary; permanent docs must not point into it.
+    [[ -z "$linkwarn" ]] || warnings+="$linkwarn"$'\n'
     while IFS= read -r line; do
       [[ -n "$line" ]] || continue
       glob_matches "${line%%$'\t'*}" || warnings+="  - ${line#*$'\t'}"$'\n'
@@ -252,6 +259,18 @@ index_tasks() {
 
   [[ -d docs/.tasks ]] || return 0
 
+  # Task memory is committed by default; an ignored docs/.tasks must hold no
+  # tracked files, and a committed one must not leave task folders untracked.
+  if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if git check-ignore -q --no-index docs/.tasks/; then
+      tracking=ignored
+      lines=$(( $(git ls-files -- docs/.tasks | wc -l) ))
+      (( lines == 0 )) || task_warning "docs/.tasks" "tracked files although docs/.tasks is ignored: $lines"
+    else
+      tracking=committed
+    fi
+  fi
+
   if [[ ! -f "$references" ]]; then
     echo "Compass references not found: $references" >&2
     exit 1
@@ -283,10 +302,15 @@ index_tasks() {
           skipped=$((skipped + 1))
           continue
         fi
+        task_warning "$dir" "closed goal awaits close-out"
         ;;
     esac
 
     entries+="  - folder: $(yaml_quote "$dir")"$'\n'"$entry"
+
+    if [[ "$tracking" == committed && -z "$(git ls-files -- "$dir" | head -n 1)" ]]; then
+      task_warning "$dir" "not committed while docs/.tasks is committed"
+    fi
 
     missing=""
     for file in goal.md diagram.md memories.md; do
@@ -322,6 +346,10 @@ index_tasks() {
       | LC_ALL=C sort | TASK_DIR="$dir" awk "$awk_lib$link_prog")"
     [[ -z "$unlinked" ]] || warnings+="$unlinked"$'\n'
   done < <(find docs/.tasks -mindepth 1 -maxdepth 1 -type d | LC_ALL=C sort)
+
+  if [[ "$include_all" -eq 0 ]] && (( skipped > 0 )); then
+    task_warning "docs/.tasks" "closed goals awaiting close-out: $skipped"
+  fi
 }
 
 if [[ "$tasks_mode" -eq 1 ]]; then
@@ -339,6 +367,7 @@ else
   printf '%s: []\n' "$list_key"
 fi
 printf 'skipped: %d\n' "$skipped"
+[[ "$tasks_mode" -eq 0 ]] || printf 'tracking: "%s"\n' "$tracking"
 if [[ -n "$warnings" ]]; then
   printf 'warnings:\n%s' "$warnings"
 fi
