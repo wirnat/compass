@@ -161,4 +161,94 @@ code=0
 "$INDEX" --target >/dev/null 2>&1 || code=$?
 [ "$code" -eq 2 ] || fail "--target without value should exit 2, got $code"
 
+# --tasks lists open task memory goals and warns about structure drift.
+tasks="$TMP_ROOT/tasks"
+
+# Args: folder name, goal_status ("" omits it), goal.md line count (0 keeps the
+# natural size), SUMMARIES body line count.
+make_task() {
+  local dir="$tasks/docs/.tasks/$1"
+  local i
+
+  mkdir -p "$dir"
+  {
+    printf -- '---\ntype: task-goal\nupdated: "2026-09-10 10:00 +08:00"\n'
+    if [ -n "$2" ]; then
+      printf 'goal_status: %s\n' "$2"
+    fi
+    printf -- '---\n\n# Goal %s\n' "$1"
+  } > "$dir/goal.md"
+  i=$(( $(wc -l < "$dir/goal.md") ))
+  while [ "$i" -lt "$3" ]; do
+    printf 'filler\n' >> "$dir/goal.md"
+    i=$((i + 1))
+  done
+  printf '# Diagram\n' > "$dir/diagram.md"
+  {
+    printf '# Memories\n\n## SUMMARIES\n'
+    i=0
+    while [ "$i" -lt "$4" ]; do
+      printf 'summary line\n'
+      i=$((i + 1))
+    done
+    printf '## HISTORIES\n\n[2026-09-10 10:00 +08:00]\n'
+  } > "$dir/memories.md"
+}
+
+make_task 20260901-1000_valid-active active 0 5
+make_task 20260801-1000_done-goal completed 0 5
+make_task 20260802-1000_superseded-goal superseded 0 5
+make_task 20260803-1000_cancelled-goal cancelled 0 5
+make_task 20260804-1000_memories-only active 0 5
+rm "$tasks/docs/.tasks/20260804-1000_memories-only/goal.md" "$tasks/docs/.tasks/20260804-1000_memories-only/diagram.md"
+make_task 20260805-1000_open-status open 0 5
+make_task 20260806-1000_no-status '' 0 5
+make_task 20260807-1000_freeform-memories active 0 5
+printf '# Memories\n\n## History\n' > "$tasks/docs/.tasks/20260807-1000_freeform-memories/memories.md"
+make_task 20260808-1000_big-goal active 121 5
+make_task 20260809-1000_at-limit active 120 60
+make_task 20260810-1000_long-summaries active 0 61
+make_task ai-receptionist-g0 active 0 5
+make_task 20260811-1000_extra-sections active 0 5
+{
+  printf '# Memories\n\n## SUMMARIES\nshort summary\n## Extra Detail\n'
+  i=0
+  while [ "$i" -lt 60 ]; do
+    printf 'detail line\n'
+    i=$((i + 1))
+  done
+  printf '## HISTORIES\n'
+} > "$tasks/docs/.tasks/20260811-1000_extra-sections/memories.md"
+
+tasks_output="$("$INDEX" --target "$tasks" --tasks)"
+
+require_line "$tasks_output" '  - folder: "docs/.tasks/20260901-1000_valid-active"' 'tasks listing'
+require_line "$tasks_output" '    goal_status: "active"' 'tasks goal_status'
+require_line "$tasks_output" '    updated: "2026-09-10 10:00 +08:00"' 'tasks updated'
+require_line "$tasks_output" '    title: "Goal 20260901-1000_valid-active"' 'tasks title'
+require_line "$tasks_output" 'skipped: 3' 'closed goals skipped'
+require_line "$tasks_output" '  - folder: "docs/.tasks/20260804-1000_memories-only"' 'folder without goal.md stays visible'
+require_line "$tasks_output" '  - "docs/.tasks/20260804-1000_memories-only: missing goal.md, diagram.md"' 'missing files warning'
+require_line "$tasks_output" '  - "docs/.tasks/20260805-1000_open-status: invalid goal_status: open"' 'invalid status warning'
+require_line "$tasks_output" '  - "docs/.tasks/20260806-1000_no-status: missing goal_status"' 'missing status warning'
+require_line "$tasks_output" '  - "docs/.tasks/20260807-1000_freeform-memories: memories.md lacks ## SUMMARIES or ## HISTORIES"' 'memories heading warning'
+require_line "$tasks_output" '  - "docs/.tasks/20260808-1000_big-goal: goal.md has 121 lines (limit 120)"' 'goal size warning'
+require_line "$tasks_output" '  - "docs/.tasks/20260810-1000_long-summaries: memories.md SUMMARIES has 61 lines (limit 60)"' 'summaries size warning'
+require_line "$tasks_output" '  - "docs/.tasks/20260811-1000_extra-sections: memories.md SUMMARIES has 62 lines (limit 60)"' 'extra sections before HISTORIES count toward SUMMARIES'
+require_line "$tasks_output" '  - "docs/.tasks/ai-receptionist-g0: folder name is not YYYYMMDD-HHMM_slug"' 'folder name warning'
+reject_text "$tasks_output" '20260801-1000_done-goal' 'completed goal hidden by default'
+reject_text "$tasks_output" '20260802-1000_superseded-goal' 'superseded goal hidden by default'
+reject_text "$tasks_output" '20260803-1000_cancelled-goal' 'cancelled goal hidden by default'
+reject_text "$tasks_output" '20260809-1000_at-limit:' 'size limits are inclusive'
+reject_text "$tasks_output" '20260901-1000_valid-active:' 'valid goal has no warnings'
+reject_text "$tasks_output" 'docs:' 'tasks mode lists no docs'
+
+all_tasks="$("$INDEX" --target "$tasks" --tasks --all)"
+require_line "$all_tasks" '  - folder: "docs/.tasks/20260801-1000_done-goal"' '--tasks --all includes closed goals'
+require_line "$all_tasks" 'skipped: 0' '--tasks --all skips nothing'
+
+no_tasks="$("$INDEX" --target "$TMP_ROOT/clean-solid-tdd" --tasks)"
+require_line "$no_tasks" 'tasks: []' 'project without docs/.tasks'
+require_line "$no_tasks" 'skipped: 0' 'project without docs/.tasks skips nothing'
+
 printf 'Docs index checks passed.\n'
