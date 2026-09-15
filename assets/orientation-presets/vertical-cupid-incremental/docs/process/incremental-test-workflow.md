@@ -22,7 +22,7 @@ related:
 
 This project uses incremental tests to keep feature slices small and verifiable.
 
-The workflow is test-conscious, not ceremony-first. Test first when the behavior is clear. Test immediately after when discovery is needed. Never finish a slice with only hope as verification. Hope is not a test runner, Nak.
+The workflow is test-conscious, not ceremony-first. Test first when the behavior is clear. Test immediately after when discovery is needed. Never finish a slice with only hope as verification. Hope is not a test runner.
 
 ## Goal
 
@@ -182,7 +182,7 @@ Avoid during a slice:
 - Converting multiple slices to a new style because one slice changed.
 - Adding abstractions that tests do not need.
 
-One slice at a time. Kalau semua kamar dibereskan sekaligus, biasanya yang hilang duluan adalah gunting.
+One slice at a time. Tidy every room at once and the first thing you lose is the scissors.
 
 ## Bug Fix Workflow
 

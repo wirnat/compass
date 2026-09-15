@@ -133,7 +133,7 @@ Avoid aggregates when:
 
 Use a domain service only when behavior is truly domain logic but does not naturally belong to one entity or value object.
 
-Do not create `SomethingService` because naming is hard. Naming is hard, yes; but calling everything service is like naming every child "Nak" and hoping attendance works.
+Do not create `SomethingService` because naming is hard. Naming is hard, yes; but calling everything service is like naming every child "Kid" and hoping attendance works.
 
 ### Domain Event
 

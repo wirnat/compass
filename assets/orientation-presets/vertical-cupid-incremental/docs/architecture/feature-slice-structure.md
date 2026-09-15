@@ -209,7 +209,7 @@ common.go
 - External service clients
 - Clock, ID generator, and other infrastructure primitives
 
-Platform code must not know feature rules. Platform is the road; features are the destinations. Jangan sampai aspal ikut menentukan mau makan bakso atau soto.
+Platform code must not know feature rules. Platform is the road; features are the destinations. The road should not decide what you eat when you arrive.
 
 ## Shared Code Rules
 
@@ -333,4 +333,4 @@ A completed vertical slice should leave this evidence:
 - Broader test command is run when shared/platform/public contract changed.
 - Any new architecture decision is linked from `docs/decisions/`.
 
-This is how Compass keeps freedom without becoming "bebas tapi nyasar."
+This is how Compass keeps freedom without getting lost.

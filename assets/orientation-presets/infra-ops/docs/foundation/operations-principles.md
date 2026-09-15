@@ -41,4 +41,4 @@ These principles decide how this repository changes live environments. When a sh
 - Reconciling drift silently, so nobody learns why it happened.
 - Bundling unrelated environments into one apply.
 
-Kalau server diubah lewat console tanpa dicatat, repo ini berubah jadi dongeng: semua percaya, tidak ada yang bisa membuktikan.
+A server changed from the console without a record turns this repository into folklore: everyone believes it, nobody can prove it.

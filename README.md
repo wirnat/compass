@@ -148,8 +148,8 @@ For git-backed, manual, or non-CLI installations, resolve the fallback scripts r
 The update check uses the GitHub repository as the source of truth. If the
 installed skill is stale or has no recorded source revision, the selected updater
 refreshes the skill directory first, then the agent must reload `SKILL.md`
-before continuing. Kalau peta baru sudah ada, jangan tetap jalan pakai peta
-fotokopi zaman lomba gerak jalan.
+before continuing. Once a newer map exists, do not keep walking with a photocopy
+of the old one.
 
 ## Testing
 
@@ -299,7 +299,7 @@ Closed goals do not stay: their close-out harvests each goal's durable knowledge
 
 At every slice boundary, Compass updates task memory before reporting the checkpoint. If a slice starts, completes, blocks, or changes, update the same folder. If the goal changes, create a new task folder, mark the old goal `superseded`, cross-link both folders, and record the reason in both `memories.md` files.
 
-Missing task memory templates in the target project do not waive the gate. Compass must use the installed templates or `references/task-memory.xml`, then report the documentation gap. Anak boleh lupa bawa penggaris; tugas menggambar garis lurus tetap ada.
+Missing task memory templates in the target project do not waive the gate. Compass must use the installed templates or `references/task-memory.xml`, then report the documentation gap.
 
 ## Automatic Docs Context
 
@@ -321,6 +321,8 @@ Key docs used by Compass:
 Compass does not load all of these. After the orientation lock and `docs/process/workflows.xml`, it runs `scripts/docs-index.sh`, which prints a YAML index built from each note's frontmatter: path, type, status, `summary`, `aliases`, `related`, and `code` globs. The agent loads only the notes whose summary or aliases match the task, or whose `code` globs match files it will touch. The index is generated on every run and never stored, so it cannot drift from the notes. Adding `summary` and `code` to frontmatter makes the selection sharper; see `docs/reference/note-schema.md`.
 
 If code and docs disagree, Compass should stop before broad changes and call out the conflict. Quietly choosing a side is how architecture turns into folklore.
+
+Documentation language: Compass files, project docs, and task memory are written in English by default so every coding agent can follow them. A project can lock another language in its orientation lock; domain terms stay in their original language, and chat follows the developer's preference.
 
 ## Task Types
 

@@ -232,7 +232,9 @@ Adaptation rules:
 - Remove or rewrite examples that are only true for the reference language.
 - Record the detected or selected stack in the adapted docs or bootstrap summary.
 
-If the target stack is unknown, do not guess by copying Go-shaped examples. Ask the developer first. Menebak bahasa proyek itu seperti menebak isi rantang; bisa benar, tapi kalau salah satu keluarga makan sambal semua.
+If the target stack is unknown, do not guess by copying Go-shaped examples. Ask the developer first; a wrong guess spreads into every generated doc.
+
+Documentation language: write Compass artifacts, project docs, and task memory in English by default, because many coding agents and models follow English instructions most reliably. A project may lock another documentation language in `docs/decisions/0001-orientation-lock.md`. Keep domain and business terms in their original language as part of the ubiquitous language. Chat with the developer follows the developer's own language preference.
 
 ## Quick Start
 

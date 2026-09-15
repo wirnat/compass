@@ -101,6 +101,18 @@ for path in SKILL.md references/task-memory.xml; do
   require_contains "$path" 'committed by default' 'task memory tracking default'
 done
 
+for path in SKILL.md README.md references/documentation-policy.xml references/bootstrap-rules.xml; do
+  require_contains "$path" 'Documentation language' 'documentation language rule'
+done
+
+# Compass ships English artifacts; asides in another language confuse models
+# that do not read it.
+indonesian="$(grep -RniwE --include='*.md' --include='*.xml' \
+  'yang|kalau|jangan|tapi|biasanya|sekaligus|nak|anak|boleh|bisa|sudah|supaya|semua|dongeng|rantang|penggaris' \
+  "$ROOT_DIR/SKILL.md" "$ROOT_DIR/README.md" "$ROOT_DIR/references" "$ROOT_DIR/assets" || true)"
+[ -z "$indonesian" ] || fail "non-English asides in shipped Compass files:
+${indonesian#$ROOT_DIR/}"
+
 # The seed sample templates must carry every Compass-required task memory heading.
 required_count=0
 while IFS=$'\t' read -r file heading; do

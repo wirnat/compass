@@ -42,7 +42,7 @@ A slice may be:
 - A workflow step: `VerifyPayment`, `SendReminder`, `RecalculateSchedule`
 - A public endpoint or message handler when that endpoint/message is the natural unit of change
 
-Keep coupling high inside the slice and low between slices. Anak SD version: teman sebangku boleh bisik-bisik, tapi jangan satu kelas jadi rantai gosip.
+Keep coupling high inside the slice and low between slices. Deskmates may whisper; the whole class should not become a rumor chain.
 
 ## What Belongs Inside A Slice
 
@@ -94,7 +94,7 @@ Vertical slices still need discipline:
 - Shared platform concerns stay outside slices.
 - Tests define the behavior contract.
 
-If a handler becomes a 400-line jungle, the answer is not "Vertical Slice is bad." The answer is "the slice is hiding too many concepts." Like lemari mainan anak: bukan berarti lemari salah, isinya saja perlu dirapikan.
+If a handler becomes a 400-line jungle, the answer is not "Vertical Slice is bad." The answer is "the slice is hiding too many concepts." Like a toy cupboard: the cupboard is fine; its contents need sorting.
 
 ## Relationship To Domain Models
 
