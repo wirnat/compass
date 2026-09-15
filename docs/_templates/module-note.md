@@ -9,6 +9,8 @@ tags:
   - docs/modules
   - status/draft
 module:
+summary:
+code:
 aliases:
 related:
 ---

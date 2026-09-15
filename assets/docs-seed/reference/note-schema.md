@@ -79,6 +79,24 @@ Optional abbreviations, alternate names, or equivalent terms.
 
 Optional meaningful links to other notes.
 
+## Optional Fields
+
+Add these only when they help a reader or agent choose the right note.
+
+### `summary`
+
+One line saying what question the note answers. The Compass docs index (`scripts/docs-index.sh` in the Compass skill) shows it so agents can pick notes without opening them. When it is missing, the index falls back to the first `#` heading, which is often too generic for hub notes.
+
+### `code`
+
+Globs, relative to the project root, for the code area this note owns. Use it on module and architecture notes so an agent can go from a file it is about to change to the notes that govern it. The docs index warns when a glob matches no files.
+
+```yaml
+summary: Billing rules for invoices, refunds, and payment retries.
+code:
+  - src/billing/**
+```
+
 ## Avoid
 
 - large metadata blocks that are rarely maintained
@@ -86,3 +104,4 @@ Optional meaningful links to other notes.
 - lifecycle statuses that are too specific
 - tags that replace folder structure and hub notes
 - many custom fields for only one note
+- hand-maintained index or manifest files that repeat frontmatter

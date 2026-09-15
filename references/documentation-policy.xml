@@ -39,5 +39,8 @@
     <rule>New non-root notes should include a parent relationship.</rule>
     <rule>If a document replaces another, mark the older document superseded and link the replacement.</rule>
     <rule>Do not duplicate long source-of-truth content into another document.</rule>
+    <rule>Give a note a one-line summary in frontmatter when its first heading does not say what question it answers.</rule>
+    <rule>Use the optional code field only on notes that own a code area, with globs relative to the project root.</rule>
+    <rule>The docs index is generated on demand from frontmatter by scripts/docs-index.sh; do not store or hand-edit an index or manifest file.</rule>
   </rules>
 </documentation-policy>

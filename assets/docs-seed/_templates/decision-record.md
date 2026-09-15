@@ -9,6 +9,7 @@ tags:
   - docs/decisions
   - status/draft
 decision_id:
+summary:
 aliases:
 related:
 ---
