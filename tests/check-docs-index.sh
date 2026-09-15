@@ -228,6 +228,16 @@ make_task 20260813-1000_title-case active 0 5
   repeat_lines 61 'summary line'
   printf '## Histories\n'
 } > "$tasks/docs/.tasks/20260813-1000_title-case/memories.md"
+make_task 20260814-1000_supporting-files active 0 5
+supporting="$tasks/docs/.tasks/20260814-1000_supporting-files"
+mkdir -p "$supporting/fixtures"
+printf '{}\n' > "$supporting/linked-contract.json"
+printf '{}\n' > "$supporting/fixtures/sample.json"
+printf '# Notes\n' > "$supporting/unlinked-notes.md"
+printf '# Memo\n' > "$supporting/memo-only.md"
+printf 'hidden\n' > "$supporting/.DS_Store"
+printf '\n## References\n\n- `linked-contract.json`: read when implementing handlers\n- `fixtures/`: read when running contract tests\n' >> "$supporting/goal.md"
+printf 'See memo-only.md for the rejected options.\n' >> "$supporting/memories.md"
 
 tasks_output="$("$INDEX" --target "$tasks" --tasks)"
 
@@ -248,6 +258,11 @@ require_line "$tasks_output" '  - "docs/.tasks/20260812-1000_goal-without-core: 
 require_line "$tasks_output" '  - "docs/.tasks/20260812-1000_goal-without-core: diagram.md lacks required headings: ## Text Checkpoints"' 'Compass-required diagram headings'
 require_line "$tasks_output" '  - "docs/.tasks/20260813-1000_title-case: memories.md SUMMARIES has 61 lines (limit 60)"' 'SUMMARIES heading matches case-insensitively'
 reject_text "$tasks_output" '20260813-1000_title-case: memories.md lacks' 'title-case headings satisfy the standard'
+require_line "$tasks_output" '  - "docs/.tasks/20260814-1000_supporting-files: supporting file not linked from goal.md or memories.md: unlinked-notes.md"' 'unlinked supporting file'
+reject_text "$tasks_output" 'not linked from goal.md or memories.md: linked-contract.json' 'file linked from goal.md'
+reject_text "$tasks_output" 'not linked from goal.md or memories.md: fixtures/sample.json' 'folder linked from goal.md'
+reject_text "$tasks_output" 'not linked from goal.md or memories.md: memo-only.md' 'file linked from memories.md'
+reject_text "$tasks_output" '.DS_Store' 'hidden files are ignored'
 require_line "$tasks_output" '  - "docs/.tasks/ai-receptionist-g0: folder name is not YYYYMMDD-HHMM_slug"' 'folder name warning'
 reject_text "$tasks_output" '20260801-1000_done-goal' 'completed goal hidden by default'
 reject_text "$tasks_output" '20260802-1000_superseded-goal' 'superseded goal hidden by default'

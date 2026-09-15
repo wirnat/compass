@@ -223,6 +223,23 @@ END {
 }
 '
 
+# Reads supporting file paths on stdin and prints a quoted YAML warning line for
+# each one that goal.md or memories.md does not mention by name or top folder.
+link_prog='
+BEGIN {
+  dir = ENVIRON["TASK_DIR"]
+  while ((getline line < (dir "/goal.md")) > 0) text = text "\n" line
+  while ((getline line < (dir "/memories.md")) > 0) text = text "\n" line
+}
+{
+  rel = substr($0, length(dir) + 2)
+  base = rel; sub(/.*\//, "", base)
+  if (index(text, base)) next
+  if (index(rel, "/")) { top = rel; sub(/\/.*/, "", top); if (index(text, top "/")) next }
+  print "  - " q(dir ": supporting file not linked from goal.md or memories.md: " rel)
+}
+'
+
 # Compass-required headings for a task file, from references/task-memory.xml.
 core_for() {
   printf '%s\n' "$core_headings" | awk -F'\t' -v f="$1" '$1 == f { print $2 }'
@@ -231,7 +248,7 @@ core_for() {
 index_tasks() {
   local name_re='^[0-9]{8}-[0-9]{4}_[A-Za-z0-9._-]+$'
   local references="$script_dir/../references/task-memory.xml"
-  local dir status entry kind value missing file lines
+  local dir status entry kind value missing file lines unlinked
 
   [[ -d docs/.tasks ]] || return 0
 
@@ -297,6 +314,13 @@ index_tasks() {
         task_warning "$dir" "memories.md SUMMARIES has $lines lines (limit $summaries_line_limit)"
       fi
     done
+
+    # Supporting files are read on demand, so goal.md or memories.md must link
+    # them by file name or by their top folder. awk reads both files itself;
+    # grep over bash here-strings crashed bash 3.2 (SIGBUS) on a real project.
+    unlinked="$(find "$dir" -type f ! -name '.*' ! -path "$dir/goal.md" ! -path "$dir/diagram.md" ! -path "$dir/memories.md" \
+      | LC_ALL=C sort | TASK_DIR="$dir" awk "$awk_lib$link_prog")"
+    [[ -z "$unlinked" ]] || warnings+="$unlinked"$'\n'
   done < <(find docs/.tasks -mindepth 1 -maxdepth 1 -type d | LC_ALL=C sort)
 }
 
