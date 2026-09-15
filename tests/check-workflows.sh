@@ -42,6 +42,10 @@ extract_task_types() {
   grep -Eo '<task-type id="[^"]+"' "$ROOT_DIR/references/task-types.xml" | sed -E 's/.*id="([^"]+)"/\1/'
 }
 
+extract_classified_types() {
+  grep -Eo 'type-if-yes="[^"]+"' "$ROOT_DIR/references/classification.xml" | sed -E 's/.*="([^"]+)"/\1/'
+}
+
 extract_workflow_types() {
   local file="$1"
 
@@ -55,6 +59,15 @@ check_unsupported_policy() {
 
 task_types="$(extract_task_types)"
 [ -n "$task_types" ] || fail 'no task types found in references/task-types.xml'
+
+# The taxonomy and the classification decision tree must list the same types.
+classified_types="$(extract_classified_types)"
+while IFS= read -r type; do
+  contains_line "$classified_types" "$type" || fail "task type missing from references/classification.xml decision tree: $type"
+done <<< "$task_types"
+while IFS= read -r type; do
+  contains_line "$task_types" "$type" || fail "classification type not listed in references/task-types.xml: $type"
+done <<< "$classified_types"
 
 policy_allows_limited_presets=false
 if check_unsupported_policy; then

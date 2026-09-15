@@ -7,30 +7,42 @@
     <question order="2" type-if-yes="research_spike">Is the main goal to discover feasibility, compare options, or investigate without a committed implementation?</question>
     <question order="3" type-if-yes="architecture_change">Does the task alter architecture boundaries, dependency direction, module structure, shared kernel concepts, platform categories, or cross-module contracts?</question>
     <question order="4" type-if-yes="db_migration">Does it change database schema, migrations, indexes, constraints, seed data, or persistence ownership?</question>
-    <question order="5" type-if-yes="new_feature">Does it add user-visible or business behavior that did not exist?</question>
-    <question order="6" type-if-yes="feature_update">Does it intentionally change existing behavior?</question>
-    <question order="7" type-if-yes="bug_fix">Does it restore expected behavior after a defect?</question>
-    <question order="8" type-if-yes="refactor">Does it change internal structure without intended behavior change?</question>
-    <question order="9" type-if-yes="performance">Does it improve latency, throughput, memory, query cost, or resource usage?</question>
-    <question order="10" type-if-yes="security">Does it address auth, authorization, secrets, injection, data exposure, crypto, dependency vulnerability, or abuse prevention?</question>
-    <question order="11" type-if-yes="dependency_update">Does it update libraries, runtimes, generated clients, or lockfiles?</question>
-    <question order="12" type-if-yes="build_ci_tooling">Does it change build scripts, CI, local tooling, codegen commands, linters, or developer automation?</question>
-    <question order="13" type-if-yes="docs_only">Is it only documentation, comments, diagrams, onboarding, or specifications?</question>
-    <question order="14" type-if-yes="test_only">Is it only tests or test infrastructure without production behavior change?</question>
-    <question order="15" type-if-yes="cleanup_chore">Is it small maintenance with no behavior or architecture intent?</question>
-    <question order="16" type-if-yes="release_deploy">Is it release, versioning, changelog, tagging, packaging, or deployment preparation?</question>
+    <question order="5" type-if-yes="infra_change">Does it change a live environment, or declared infrastructure state that is applied to one: servers, clusters, cloud resources, network, DNS, secrets, or runtime configuration?</question>
+    <question order="6" type-if-yes="new_feature">Does it add user-visible or business behavior that did not exist?</question>
+    <question order="7" type-if-yes="feature_update">Does it intentionally change existing behavior?</question>
+    <question order="8" type-if-yes="bug_fix">Does it restore expected behavior after a defect?</question>
+    <question order="9" type-if-yes="refactor">Does it change internal structure without intended behavior change?</question>
+    <question order="10" type-if-yes="performance">Does it improve latency, throughput, memory, query cost, or resource usage?</question>
+    <question order="11" type-if-yes="security">Does it address auth, authorization, secrets, injection, data exposure, crypto, dependency vulnerability, or abuse prevention?</question>
+    <question order="12" type-if-yes="dependency_update">Does it update libraries, runtimes, generated clients, or lockfiles?</question>
+    <question order="13" type-if-yes="build_ci_tooling">Does it change build scripts, CI, local tooling, codegen commands, linters, or developer automation?</question>
+    <question order="14" type-if-yes="docs_only">Is it only documentation, comments, diagrams, onboarding, or specifications?</question>
+    <question order="15" type-if-yes="test_only">Is it only tests or test infrastructure without production behavior change?</question>
+    <question order="16" type-if-yes="cleanup_chore">Is it small maintenance with no behavior or architecture intent?</question>
+    <question order="17" type-if-yes="release_deploy">Is it release, versioning, changelog, tagging, packaging, or deployment preparation?</question>
   </decision-tree>
 
   <routing-clarifications>
     <rule>Existing module, feature folder, screen, or component ownership is placement evidence only; it does not by itself make the task a feature_update.</rule>
-    <rule>Adding a new use case, capability, user action, endpoint, screen flow, integration path, or business workflow inside an existing module is new_feature unless the dominant risk is architecture_change, db_migration, security, or hotfix_incident.</rule>
+    <rule>Adding a new use case, capability, user action, endpoint, screen flow, integration path, or business workflow inside an existing module is new_feature unless the dominant risk is architecture_change, db_migration, infra_change, security, or hotfix_incident.</rule>
     <rule>Use feature_update only when the same use case or behavior already exists and the task intentionally changes its expected behavior, contract, rule, or output.</rule>
+    <rule>Editing declared infrastructure state is infra_change even before anything is applied; the Live Environment Gate applies when a command would mutate a live environment.</rule>
     <example request="Add Google Sign-In to the existing login feature" type="new_feature">Google Sign-In is a new login use case and capability; the existing login module only tells Compass where the feature belongs.</example>
+    <example request="Run terraform apply to add a node pool" type="infra_change">It changes live cloud resources.</example>
+    <example request="Edit an Ansible playbook without running it" type="infra_change">It changes declared state; the Live Environment Gate starts when the playbook is applied.</example>
+    <example request="Deploy v1.4 to production" type="infra_change" secondary="release_deploy">Running the deployment mutates a live environment; preparing the release is the secondary work.</example>
+    <example request="Prepare the changelog and tag for v1.4" type="release_deploy">Release preparation only; nothing is applied to a live environment.</example>
+    <example request="Make the GitLab CI lint stage faster" type="build_ci_tooling">The pipeline changes, but it does not apply anything to a live environment.</example>
+    <example request="Add a feature that needs a new GCS bucket" type="new_feature" secondary="infra_change">The behavior is new; creating the bucket is live infrastructure work.</example>
+    <example request="Production is down; restart the service" type="hotfix_incident" secondary="infra_change">Users are affected now; the restart still needs approval under the Live Environment Gate.</example>
   </routing-clarifications>
 
   <tie-breakers>
     <rule>Architecture beats feature: if a feature requires a new boundary, classify as architecture_change with new_feature secondary.</rule>
     <rule>Incident beats bug: if users or production are currently affected, classify as hotfix_incident.</rule>
+    <rule>Incident beats infra: if production is currently affected, classify as hotfix_incident with infra_change secondary when the fix mutates a live environment.</rule>
+    <rule>Live environment beats preparation: preparing a release stays release_deploy and editing a pipeline stays build_ci_tooling, but applying anything to a live environment is infra_change, as primary or secondary type.</rule>
+    <rule>Topology boundaries are architecture: splitting or merging environments, clusters, or infrastructure state ownership is architecture_change with infra_change secondary.</rule>
     <rule>Security beats normal fix: if exploitability or data exposure is involved, classify as security.</rule>
     <rule>Migration is often secondary: pair db_migration with the behavior task unless schema work is the whole request.</rule>
     <rule>Refactor must not change behavior. If behavior changes, it is not only refactor.</rule>
@@ -42,6 +54,7 @@
     <question>Is production currently impacted, or is this normal backlog work?</question>
     <question>Should this change user-visible behavior, or only internal structure?</question>
     <question>Does this require database schema or migration changes?</question>
+    <question>Will this change or apply anything to a live environment?</question>
     <question>Is the goal to implement, or only investigate and recommend?</question>
     <question>Does this touch module boundaries or dependency direction?</question>
   </clarifying-questions>
