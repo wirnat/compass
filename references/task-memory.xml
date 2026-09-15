@@ -69,6 +69,7 @@
       <purpose>Source of truth for goal identity, status, description, approved scope, non-goals, success criteria, slice list, links to superseded or successor goals, and latest evidence.</purpose>
       <rule>Update goal.md whenever the goal status, approved scope, slice list, slice status, blocker, successor link, or latest evidence changes.</rule>
       <rule>Keep goal.md as current state only: replace Latest Evidence at each slice instead of appending, record per-slice evidence in memories.md HISTORIES, and move durable research findings to docs/modules or a decision record.</rule>
+      <rule>goal.md may carry optional Do and Don't sections. When the developer rejects an approach at a gate, record it as a Don't with the reason. Before acting against a Don't, ask the developer first.</rule>
     </file>
     <file name="diagram.md">
       <purpose>Human-readable checkpoint visualization using Mermaid plus text support.</purpose>

@@ -285,7 +285,7 @@ docs/.tasks/
 
 The files have different jobs:
 
-- `goal.md`: goal name, status, description, non-goals, success criteria, slice list, evidence, and links to superseded or successor goals.
+- `goal.md`: goal name, status, description, non-goals, optional Do and Don't guardrails, success criteria, slice list, evidence, and links to superseded or successor goals. A Don't records an approach the developer rejected, with its reason, so a later session does not take that shortcut again.
 - `diagram.md`: Mermaid checkpoint diagram plus text fallback. Pending slices are gray, active is blue, done is green, blocked is red.
 - `memories.md`: `SUMMARIES` plus newest-first `HISTORIES`, including user intent, agent rationale snapshot, and agreement. It must not expose private chain-of-thought.
 

@@ -34,6 +34,19 @@ related:
 
 - {{non_goal}}
 
+<!-- Optional. Remove Do and Don't when the goal has no guardrails. -->
+## Do
+
+Rules that must hold while working on this goal. Keep them concrete and checkable, about five at most.
+
+- {{goal_specific_rule}}
+
+## Don't
+
+Things that must not happen, each with its reason. Record an approach the developer rejected here, so a future session does not take it again.
+
+- {{forbidden_action_and_reason}}
+
 ## Success Criteria
 
 - {{success_criterion}}
