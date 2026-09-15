@@ -114,6 +114,9 @@ Minimum checks:
 - `SKILL.md` and `README.md` keep the Live Environment Gate and Local Runtime
   Policy wording, and `SKILL.md` keeps the rule against stopping resources the
   agent did not start.
+- The Static checks and Code Intelligence rules stay in `SKILL.md`, `README.md`,
+  the seed testing principles, the local environment template, and the
+  bootstrap rules.
 
 ### `tests/check-update-skill.sh`
 

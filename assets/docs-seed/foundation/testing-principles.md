@@ -40,6 +40,15 @@ Integration and end-to-end tests run on the developer's machine, next to every o
 - Start only the dependencies the tests need, and reuse shared local services when they already run.
 - Write down the command that starts the environment and the command that runs the tests.
 
+## Static Checks
+
+Static checks catch style and correctness drift before tests run, and they are part of verification, not an optional extra:
+
+- Every project records its formatter, linter, and type check commands, ideally behind one entry command, in `docs/process/local-environment.md`.
+- Run them for the touched scope together with the tests.
+- The tools follow the project's stack and existing config; Compass does not require a specific tool.
+- When a project has no static checks, report the gap and propose adding them as separate work.
+
 ## TDD Use
 
 Use TDD when behavior is being added or changed:
@@ -65,6 +74,7 @@ Before claiming work is complete, state:
 
 - which behavior was protected
 - which command was run
+- which static checks ran and their result
 - whether the test failed first when that matters
 - what verification could not be run and why
 - which local environment integration or end-to-end tests ran against, when they were used

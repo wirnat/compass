@@ -70,6 +70,7 @@
   <language-adaptation>
     <purpose>Prevent preset reference docs from being copied as language-specific boilerplate into projects using a different stack.</purpose>
     <rule>Documentation language: record it in docs/decisions/0001-orientation-lock.md. Default to English; use another language only when the developer asks for it.</rule>
+    <rule>Static checks: detect the formatter, linter, and type check commands from existing config, scripts, and CI. When none exist, report the gap and name stack-standard examples, such as gofmt, go vet, and golangci-lint for Go; eslint with prettier, or biome, for JavaScript and TypeScript; ruff for Python; dart format and dart analyze for Dart; terraform fmt, validate, and tflint for Terraform; ansible-lint for Ansible.</rule>
     <rule>Detect the target language and framework from existing files when possible.</rule>
     <rule>If the project is empty or ambiguous, ask the developer which language or stack to target before adapting docs.</rule>
     <rule>Use preset docs as detailed references, not immutable text.</rule>
@@ -114,6 +115,7 @@
     <item>Report selected orientation preset.</item>
     <item>Report detected or selected language/framework.</item>
     <item>Report the documentation language recorded in the orientation lock.</item>
+    <item>Report the static check commands found, or the gap.</item>
     <item>Report which copied docs were adapted from preset references.</item>
     <item>Report whether docs/process/workflows.xml came from the selected preset.</item>
     <item>Report whether force mode was used.</item>

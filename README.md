@@ -254,6 +254,18 @@ its test commands, and how to clean up. Stack-specific advice, such as a file
 watcher for compiled services or a package manager with a shared store, is
 adapted to the project during bootstrap.
 
+## Static Checks And Code Intelligence
+
+Static checks are required evidence: every project records its formatter,
+linter, and type check commands, runs them with the tests for each slice, and
+reports a missing setup as a gap instead of adding tooling silently. Compass does
+not pick the tools; it adapts to the stack.
+
+Code Intelligence tools, such as GitNexus or other code graphs, are recommended,
+not required. When a project uses one, the agent checks that the index matches
+`HEAD` before trusting it, uses it for impact analysis before refactors and
+architecture changes, and confirms its answers in the code.
+
 ## Task Memory Gate
 
 Task memory exists so a long task can survive context loss, session changes, and the natural erosion of attention. Goal is the vision; slices are the missions. Missions may change while the goal remains stable. If the goal changes, Compass treats it as a new goal and supersedes the old task memory.

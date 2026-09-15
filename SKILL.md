@@ -149,7 +149,7 @@ At the start of every Compass-guided task, after the first-run bootstrap check, 
 - The selection must still cover the architecture, foundation, and process docs linked by the orientation lock; relevant `docs/modules/` notes before touching a module, domain, package, feature area, bounded context, or slice; relevant `docs/decisions/` records before changing boundaries, dependencies, data ownership, contracts, build flow, or release flow; and `docs/reference/` when changing schemas, public contracts, naming rules, note structure, or orientation presets.
 - If the script is missing or fails, fall back to reading `docs/README.md` and the relevant category README files, and record the fallback in the documentation context.
 - Report index warnings, such as a `code` glob that matches no files, as documentation gaps.
-- For symbol-level code lookup, use a code intelligence tool such as GitNexus when the agent has one. Compass does not require it.
+- For symbol-level lookup and impact analysis, follow the Code Intelligence policy below.
 
 For work with gated design context or long/risky multi-slice risk, run `scripts/docs-index.sh --tasks --target <project-dir>` after reading the orientation and process docs; it lists open goals from `goal.md` frontmatter so you do not open every task folder. If an active goal's `updated` date is more than 14 days old, offer to mark it `completed` or `cancelled` before selecting a goal. When closed goals are still present, offer close-out before starting new work. Report `--tasks` warnings as documentation gaps, and do not rewrite existing task memory without developer approval. If one active relevant goal exists, read its `goal.md` in full and the `SUMMARIES` section plus the newest `HISTORIES` entry of `memories.md` before planning or implementation. Read older histories or `diagram.md` only when the summaries are not enough; keep updating all three files. If multiple active goals could match the request, ask one clarification question before selecting one. If an active goal conflicts with the user's request, treat that as a possible goal change rather than silently reusing or overwriting it.
 
@@ -181,6 +181,15 @@ When a task needs to run the application, its dependencies, or integration or en
 - Prefer the shared dev infrastructure named in `local-environment.md`. Start a project-owned copy only when that file says the project needs a different version or extension.
 - When the task ends, stop what the agent started unless the developer wants it kept, and report anything left running.
 - Never point local runs or tests at remote databases or shared staging services without explicit developer approval.
+
+## Code Intelligence
+
+Code indexing tools, such as GitNexus or other code graphs, are recommended, not required. Compass must work with plain search when none is available.
+
+- Use one only when the project names it in `docs/process/local-environment.md`, its process docs, or its agent instructions.
+- Before relying on an index, compare its indexed commit with `HEAD`. When the index is behind, re-index it if the tool allows, or fall back to plain search and say so.
+- Use it for impact analysis before `refactor`, `architecture_change`, cross-module renames, and `feature_update` work on shared code.
+- Treat its answers as leads, and confirm them by reading the code before editing.
 
 ## Task Memory For Long Multi-Slice Work
 
@@ -267,6 +276,7 @@ Documentation language: write Compass artifacts, project docs, and task memory i
 - Implementation may start only after the Task Memory Gate has been reported. For required task memory, `docs/.tasks/<task>/goal.md`, `diagram.md`, and `memories.md` must exist before the first implementation edit or command.
 - Missing task memory templates in the target project do not waive the gate; use the installed Compass templates or `references/task-memory.xml`, then report the project-doc gap.
 - Implementation must run as small manual checkpoints. Implement exactly one approved slice, run the relevant verification, stop, report what changed and what passed or failed, then ask the developer before continuing to the next slice.
+- Static checks: verification for every implementation slice includes the project's formatter, linter, and type check for the touched scope, next to its tests. When the project has none, report the gap once and propose a `build_ci_tooling` task instead of adding tooling silently.
 - Medium or high-risk `feature_update` work must protect the baseline before editing: identify current behavior, contracts, tests, owner, risk level, and unchanged behavior before delta design.
 - `feature_update` implementation may start only after the approved delta is explicit: old behavior, new behavior, unchanged behavior, regression evidence, slice plan, docs impact, and rollout or cleanup risk.
 - Feature flags, dark launches, compatibility paths, or rollback controls introduced by a `feature_update` must have cleanup or follow-up evidence before the update is called complete.

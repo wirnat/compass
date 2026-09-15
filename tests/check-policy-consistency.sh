@@ -105,6 +105,14 @@ for path in SKILL.md README.md references/documentation-policy.xml references/bo
   require_contains "$path" 'Documentation language' 'documentation language rule'
 done
 
+for path in SKILL.md README.md references/bootstrap-rules.xml docs/foundation/testing-principles.md assets/docs-seed/_templates/local-environment.md; do
+  require_contains "$path" 'Static checks' 'static checks rule'
+done
+for path in SKILL.md README.md; do
+  require_contains "$path" 'Code Intelligence' 'code intelligence policy'
+done
+require_contains 'SKILL.md' 'indexed commit' 'code index freshness check'
+
 # Compass ships English artifacts; asides in another language confuse models
 # that do not read it.
 indonesian="$(grep -RniwE --include='*.md' --include='*.xml' \

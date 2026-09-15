@@ -42,6 +42,7 @@ Services this project must run itself, and why the shared one is not enough, suc
 
 ## Tests
 
+- Static checks: {{format_lint_and_type_check_command}}
 - Unit: {{unit_test_command}}
 - Integration: {{integration_test_command}}. Data isolation: {{database_schema_or_prefix_per_run}}
 - End-to-end: {{e2e_test_command}}. Starts: {{services_needed}}
