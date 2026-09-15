@@ -3,7 +3,7 @@ type: architecture
 status: active
 owner: architecture
 created: 2026-05-21
-updated: 2026-05-21
+updated: 2026-09-15
 parent: "[[docs/architecture/README]]"
 tags:
   - docs/architecture
@@ -29,12 +29,13 @@ Compass is a reference-driven Codex skill package.
 - `assets/docs-seed/` stores common project documentation seeds.
 - `assets/orientation-presets/<preset>/docs/` stores preset-specific docs and workflows.
 - `scripts/bootstrap-docs.sh` copies seed and preset docs into a target project.
+- `scripts/docs-index.sh` prints an on-demand YAML index of a project's docs from note frontmatter.
 - `agents/openai.yaml` stores OpenAI plugin metadata.
 - `docs/` stores this repository's own Compass context.
 
 There is no application runtime, package manager, or compiled artifact in the
-current repository. The main executable behavior is the portable shell bootstrap
-script.
+current repository. The main executable behavior is the portable shell scripts
+under `scripts/`.
 
 ## Protected Boundaries
 
@@ -43,6 +44,7 @@ script.
 - Generic docs that every bootstrapped project receives belong in `assets/docs-seed/`.
 - Preset-specific docs belong in `assets/orientation-presets/<preset>/docs/`.
 - Bootstrap mechanics belong in `scripts/bootstrap-docs.sh`.
+- Docs index generation belongs in `scripts/docs-index.sh`.
 - Repository context and decisions belong in `docs/`.
 - Task memory artifacts for target projects belong under target project `docs/.tasks/`; task memory templates belong in `assets/docs-seed/_templates/`.
 

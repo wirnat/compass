@@ -34,6 +34,7 @@ that cannot be verified by scripts or static checks.
 | Workflow coverage | Ensure every task type has a workflow or an explicit unsupported-workflow policy. | Fast | `./tests/check-workflows.sh` |
 | Policy consistency | Ensure core gates do not drift across `SKILL.md`, `README.md`, references, and presets. | Fast | `./tests/check-policy-consistency.sh` |
 | Update gate | Ensure the fallback updater handles local fixtures without network. | Fast | `./tests/check-update-skill.sh` |
+| Docs index | Ensure the docs index covers every preset doc and handles frontmatter edge cases. | Fast | `./tests/check-docs-index.sh` |
 | Agent integration | Run a real headless agent session and verify transcript behavior. | Slow | Future `tests/agent/test-compass-routing.sh` |
 
 ## Current Baseline
@@ -134,6 +135,26 @@ Minimum checks:
 
 This stays separate from `scripts/smoke-test.sh` so the smoke test remains a
 small bootstrap-focused check.
+
+### `tests/check-docs-index.sh`
+
+Purpose: keep `scripts/docs-index.sh` output complete and parseable.
+
+Minimum checks:
+
+- Every non-template doc from each preset bootstrap is indexed exactly once,
+  without warnings.
+- `summary` wins over the first heading; the first heading and then the file
+  name are fallbacks.
+- Notes without frontmatter list only path and summary.
+- Superseded and archived notes are skipped and counted unless `--all` is
+  passed.
+- `_templates/` and hidden folders such as `.tasks/` are excluded.
+- Wikilinks in `related` become `.md` paths; block and inline lists give the
+  same output.
+- A `code` glob that matches no files produces a warning without failing.
+- Quotes, colons, and hashes in values stay valid YAML.
+- A missing docs directory exits 1; a missing option value exits 2.
 
 ## Agent Integration Tests
 

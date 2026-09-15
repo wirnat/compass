@@ -82,7 +82,8 @@
 
   <resume>
     <rule>At the start of a long Compass-guided task, inspect docs/.tasks for active relevant goals before creating a new task memory folder.</rule>
-    <rule>If exactly one active relevant goal exists, load goal.md, diagram.md, and memories.md before planning or implementation.</rule>
+    <rule>If exactly one active relevant goal exists, load goal.md in full and the SUMMARIES section plus the newest HISTORIES entry of memories.md before planning or implementation.</rule>
+    <rule>Read older HISTORIES entries or diagram.md only when the summaries are not enough; diagram.md is the human-facing view of the slice state already recorded in goal.md.</rule>
     <rule>If multiple active goals could match, ask one clarification question before choosing.</rule>
     <rule>If an active goal conflicts with the user's new request, treat that as a potential goal change and ask before superseding it.</rule>
   </resume>

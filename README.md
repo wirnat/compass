@@ -161,8 +161,8 @@ presets, workflows, scripts, or tests:
 
 The wrapper checks shell syntax, XML validity, bootstrap smoke behavior, docs
 links, workflow coverage, policy consistency, update-skill fallback behavior,
-and all preset bootstrap outputs. Slow headless agent tests are not part of the
-default suite.
+all preset bootstrap outputs, and docs index output. Slow headless agent tests
+are not part of the default suite.
 
 ## Routing Output Example
 
@@ -250,6 +250,8 @@ The files have different jobs:
 - `diagram.md`: Mermaid checkpoint diagram plus text fallback. Pending slices are gray, active is blue, done is green, blocked is red.
 - `memories.md`: `SUMMARIES` plus newest-first `HISTORIES`, including user intent, agent rationale snapshot, and agreement. It must not expose private chain-of-thought.
 
+When resuming, Compass reads `goal.md` in full and only the `SUMMARIES` section plus the newest `HISTORIES` entry of `memories.md`. `diagram.md` is for humans. Resume stays cheap as histories grow, and no separate manifest file is needed because `goal.md` already holds the goal status and slice list.
+
 At every slice boundary, Compass updates task memory before reporting the checkpoint. If a slice starts, completes, blocks, or changes, update the same folder. If the goal changes, create a new task folder, mark the old goal `superseded`, cross-link both folders, and record the reason in both `memories.md` files.
 
 Missing task memory templates in the target project do not waive the gate. Compass must use the installed templates or `references/task-memory.xml`, then report the documentation gap. Anak boleh lupa bawa penggaris; tugas menggambar garis lurus tetap ada.
@@ -270,6 +272,8 @@ Key docs used by Compass:
 - `docs/modules/*`
 - `docs/decisions/*`
 - `docs/reference/*`
+
+Compass does not load all of these. After the orientation lock and `docs/process/workflows.xml`, it runs `scripts/docs-index.sh`, which prints a YAML index built from each note's frontmatter: path, type, status, `summary`, `aliases`, `related`, and `code` globs. The agent loads only the notes whose summary or aliases match the task, or whose `code` globs match files it will touch. The index is generated on every run and never stored, so it cannot drift from the notes. Adding `summary` and `code` to frontmatter makes the selection sharper; see `docs/reference/note-schema.md`.
 
 If code and docs disagree, Compass should stop before broad changes and call out the conflict. Quietly choosing a side is how architecture turns into folklore.
 
@@ -321,7 +325,8 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   |-- task-memory.xml
 |   `-- task-types.xml
 |-- scripts/
-|   `-- bootstrap-docs.sh
+|   |-- bootstrap-docs.sh
+|   `-- docs-index.sh
 `-- tests/
     `-- run-tests.sh
 ```
@@ -330,8 +335,9 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 
 - `SKILL.md`: skill entry point, hard gates, routing rules, and project-docs integration.
 - `scripts/bootstrap-docs.sh`: idempotent script for seeding Compass docs into a target project.
+- `scripts/docs-index.sh`: prints an on-demand YAML index of a project's docs from note frontmatter so agents load only relevant notes.
 - `scripts/smoke-test.sh`: minimal script verification for preset listing, dry-run, failure paths, and no-overwrite behavior.
-- `tests/run-tests.sh`: deterministic test wrapper for shell syntax, XML validity, smoke tests, docs links, workflow coverage, policy consistency, update-skill fallback checks, and preset bootstrap checks.
+- `tests/run-tests.sh`: deterministic test wrapper for shell syntax, XML validity, smoke tests, docs links, workflow coverage, policy consistency, update-skill fallback checks, preset bootstrap checks, and docs index checks.
 - `references/classification.xml`: decision tree for task classification.
 - `references/task-memory.xml`: pre-implementation task memory gate, statuses, lifecycle, resume rules, and template fallback behavior.
 - `references/task-types.xml`: task taxonomy and commit hints.

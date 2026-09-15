@@ -140,14 +140,15 @@ Compass must treat the target project's `docs/` directory as the automatic proje
 
 At the start of every Compass-guided task, after the first-run bootstrap check, read the available project docs needed to understand the task:
 
-- Always read `docs/decisions/0001-orientation-lock.md` when it exists.
-- Always read `docs/README.md`, `docs/process/workflows.xml`, and the relevant category README files for the selected task area.
-- Read the architecture, foundation, and process docs linked by the orientation lock.
-- Read relevant `docs/modules/` notes before touching a module, domain, package, feature area, bounded context, or slice.
-- Read relevant `docs/decisions/` records before changing boundaries, dependencies, data ownership, contracts, build flow, or release flow.
-- Read `docs/reference/` when changing schemas, public contracts, naming rules, note structure, or orientation presets.
+- Always read `docs/decisions/0001-orientation-lock.md` when it exists, and `docs/process/workflows.xml`.
+- Choose the remaining docs from the docs index instead of opening category READMEs and notes one by one. Run `scripts/docs-index.sh --target <project-dir>`, resolved relative to this `SKILL.md` file's directory. It prints a YAML list of `docs/` notes with path, type, status, summary, aliases, related, and code globs, generated on demand from frontmatter. Superseded and archived notes are skipped unless `--all` is passed.
+- Select notes by matching the task topic against `summary` and `aliases`, matching the files you expect to touch against `code`, then following `related` one step. Load only the selected notes.
+- The selection must still cover the architecture, foundation, and process docs linked by the orientation lock; relevant `docs/modules/` notes before touching a module, domain, package, feature area, bounded context, or slice; relevant `docs/decisions/` records before changing boundaries, dependencies, data ownership, contracts, build flow, or release flow; and `docs/reference/` when changing schemas, public contracts, naming rules, note structure, or orientation presets.
+- If the script is missing or fails, fall back to reading `docs/README.md` and the relevant category README files, and record the fallback in the documentation context.
+- Report index warnings, such as a `code` glob that matches no files, as documentation gaps.
+- For symbol-level code lookup, use a code intelligence tool such as GitNexus when the agent has one. Compass does not require it.
 
-For work with gated design context or long/risky multi-slice risk, inspect `docs/.tasks/` for an active relevant goal after reading the orientation and process docs. If one active relevant goal exists, read its `goal.md`, `diagram.md`, and `memories.md` before planning or implementation. If multiple active goals could match the request, ask one clarification question before selecting one. If an active goal conflicts with the user's request, treat that as a possible goal change rather than silently reusing or overwriting it.
+For work with gated design context or long/risky multi-slice risk, inspect `docs/.tasks/` for an active relevant goal after reading the orientation and process docs. If one active relevant goal exists, read its `goal.md` in full and the `SUMMARIES` section plus the newest `HISTORIES` entry of `memories.md` before planning or implementation. Read older histories or `diagram.md` only when the summaries are not enough; keep updating all three files. If multiple active goals could match the request, ask one clarification question before selecting one. If an active goal conflicts with the user's request, treat that as a possible goal change rather than silently reusing or overwriting it.
 
 If a referenced doc is missing, continue with the best available docs and record the gap in the task output. Do not ask the user to add Compass docs to `AGENTS.md`. If `AGENTS.md` exists, read it as repository instruction context only; it is not the documentation integration mechanism.
 
@@ -217,7 +218,7 @@ If the target stack is unknown, do not guess by copying Go-shaped examples. Ask 
 2. Run the Session Update Gate once per Codex session before any project bootstrap, classification, planning, or implementation.
 3. Check missing seed docs and orientation lock. If docs are missing, offer preset choices before bootstrapping; do not auto-run bootstrap.
 4. If bootstrap just ran, adapt copied preset docs to the target language or stack before treating docs as ready.
-5. Build the project docs context from `docs/` using the Project Docs Integration rules.
+5. Build the project docs context from `docs/` using the Project Docs Integration rules: read the orientation lock and workflows, then select the remaining docs from `scripts/docs-index.sh` output.
 6. Classify the task using `references/classification.xml`.
 7. Load the matching task definition from `references/task-types.xml`.
 8. Load the matching workflow from project `docs/process/workflows.xml`. If the file or matching workflow type is missing, do not use a fallback workflow; seed, migrate, or adapt Compass docs first.
@@ -278,7 +279,7 @@ For planning or triage, respond with this XML shape:
   <workflow>
     <step>ordered step</step>
   </workflow>
-  <documentation-context>docs read, docs missing, or none found</documentation-context>
+  <documentation-context>docs loaded with a one-line reason each, docs missing, index warnings, or none found</documentation-context>
   <evidence>tests/checks/docs needed</evidence>
   <commit-hint>Conventional Commit type</commit-hint>
 </task-routing>

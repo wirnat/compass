@@ -3,7 +3,7 @@ type: decision
 status: active
 owner: architecture
 created: 2026-05-21
-updated: 2026-05-21
+updated: 2026-09-15
 parent: "[[docs/decisions/README]]"
 tags:
   - docs/decisions
@@ -24,7 +24,7 @@ Compass locks this project to the `existing-architecture-lock` preset.
 
 The repository is already organized as an installable Codex skill with a stable
 entrypoint, reference files, seed documentation assets, orientation presets, and
-one bootstrap script. Future work must extend that shape unless an explicit
+portable shell scripts. Future work must extend that shape unless an explicit
 architecture decision changes it.
 
 ## Rationale
@@ -34,6 +34,7 @@ architecture decision changes it.
 - `assets/docs-seed/` owns generic project documentation seed files.
 - `assets/orientation-presets/<preset>/docs/` owns preset-specific documentation and workflow material.
 - `scripts/bootstrap-docs.sh` owns idempotent docs bootstrap behavior.
+- `scripts/docs-index.sh` owns the on-demand docs index generated from note frontmatter.
 - `agents/openai.yaml` owns the OpenAI plugin metadata.
 
 This shape is small, explicit, and already documented in the public README. A new

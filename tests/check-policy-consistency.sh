@@ -55,6 +55,10 @@ researched-principles
 researched-workflow
 STALE_PHRASES
 
+for path in SKILL.md README.md references/documentation-policy.xml; do
+  require_contains "$path" 'scripts/docs-index.sh' 'docs index script'
+done
+
 # Seed docs shipped to projects must match this repo's own bootstrapped copy.
 # Hub READMEs listed below are intentionally customized for this repository.
 while IFS= read -r -d '' seed; do
