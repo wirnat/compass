@@ -46,6 +46,7 @@ related:
 
 ## Latest Evidence
 
+<!-- Replace this entry at each slice; record per-slice evidence in memories.md HISTORIES. -->
 - {{latest_evidence}}
 
 ## Goal Links

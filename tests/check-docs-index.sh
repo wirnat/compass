@@ -39,6 +39,15 @@ write_file() {
   cat > "$1"
 }
 
+repeat_lines() {
+  local i=0
+
+  while [ "$i" -lt "$1" ]; do
+    printf '%s\n' "$2"
+    i=$((i + 1))
+  done
+}
+
 trap cleanup EXIT
 
 [ -x "$INDEX" ] || fail 'missing executable script: scripts/docs-index.sh'
@@ -163,12 +172,14 @@ code=0
 
 # --tasks lists open task memory goals and warns about structure drift.
 tasks="$TMP_ROOT/tasks"
+# Compass-required headings from references/task-memory.xml.
+goal_body='## Non-Goals\n\n## Success Criteria\n\n## Slices\n\n## Latest Evidence\n\n## Goal Links\n'
+diagram_body='# Diagram\n\n## How To Read\n\n## Text Checkpoints\n'
 
 # Args: folder name, goal_status ("" omits it), goal.md line count (0 keeps the
 # natural size), SUMMARIES body line count.
 make_task() {
   local dir="$tasks/docs/.tasks/$1"
-  local i
 
   mkdir -p "$dir"
   {
@@ -177,20 +188,13 @@ make_task() {
       printf 'goal_status: %s\n' "$2"
     fi
     printf -- '---\n\n# Goal %s\n' "$1"
+    printf "$goal_body"
   } > "$dir/goal.md"
-  i=$(( $(wc -l < "$dir/goal.md") ))
-  while [ "$i" -lt "$3" ]; do
-    printf 'filler\n' >> "$dir/goal.md"
-    i=$((i + 1))
-  done
-  printf '# Diagram\n' > "$dir/diagram.md"
+  repeat_lines $(( $3 - $(wc -l < "$dir/goal.md") )) 'filler' >> "$dir/goal.md"
+  printf "$diagram_body" > "$dir/diagram.md"
   {
     printf '# Memories\n\n## SUMMARIES\n'
-    i=0
-    while [ "$i" -lt "$4" ]; do
-      printf 'summary line\n'
-      i=$((i + 1))
-    done
+    repeat_lines "$4" 'summary line'
     printf '## HISTORIES\n\n[2026-09-10 10:00 +08:00]\n'
   } > "$dir/memories.md"
 }
@@ -212,13 +216,18 @@ make_task ai-receptionist-g0 active 0 5
 make_task 20260811-1000_extra-sections active 0 5
 {
   printf '# Memories\n\n## SUMMARIES\nshort summary\n## Extra Detail\n'
-  i=0
-  while [ "$i" -lt 60 ]; do
-    printf 'detail line\n'
-    i=$((i + 1))
-  done
+  repeat_lines 60 'detail line'
   printf '## HISTORIES\n'
 } > "$tasks/docs/.tasks/20260811-1000_extra-sections/memories.md"
+make_task 20260812-1000_goal-without-core active 0 5
+printf -- '---\ngoal_status: active\n---\n\n# Goal\n\n## Slices\n' > "$tasks/docs/.tasks/20260812-1000_goal-without-core/goal.md"
+printf '# Diagram\n\n## How To Read\n' > "$tasks/docs/.tasks/20260812-1000_goal-without-core/diagram.md"
+make_task 20260813-1000_title-case active 0 5
+{
+  printf '# Memories\n\n## Summaries\n'
+  repeat_lines 61 'summary line'
+  printf '## Histories\n'
+} > "$tasks/docs/.tasks/20260813-1000_title-case/memories.md"
 
 tasks_output="$("$INDEX" --target "$tasks" --tasks)"
 
@@ -231,10 +240,14 @@ require_line "$tasks_output" '  - folder: "docs/.tasks/20260804-1000_memories-on
 require_line "$tasks_output" '  - "docs/.tasks/20260804-1000_memories-only: missing goal.md, diagram.md"' 'missing files warning'
 require_line "$tasks_output" '  - "docs/.tasks/20260805-1000_open-status: invalid goal_status: open"' 'invalid status warning'
 require_line "$tasks_output" '  - "docs/.tasks/20260806-1000_no-status: missing goal_status"' 'missing status warning'
-require_line "$tasks_output" '  - "docs/.tasks/20260807-1000_freeform-memories: memories.md lacks ## SUMMARIES or ## HISTORIES"' 'memories heading warning'
+require_line "$tasks_output" '  - "docs/.tasks/20260807-1000_freeform-memories: memories.md lacks required headings: ## SUMMARIES, ## HISTORIES"' 'memories heading warning'
 require_line "$tasks_output" '  - "docs/.tasks/20260808-1000_big-goal: goal.md has 121 lines (limit 120)"' 'goal size warning'
 require_line "$tasks_output" '  - "docs/.tasks/20260810-1000_long-summaries: memories.md SUMMARIES has 61 lines (limit 60)"' 'summaries size warning'
 require_line "$tasks_output" '  - "docs/.tasks/20260811-1000_extra-sections: memories.md SUMMARIES has 62 lines (limit 60)"' 'extra sections before HISTORIES count toward SUMMARIES'
+require_line "$tasks_output" '  - "docs/.tasks/20260812-1000_goal-without-core: goal.md lacks required headings: ## Non-Goals, ## Success Criteria, ## Latest Evidence, ## Goal Links"' 'Compass-required goal headings'
+require_line "$tasks_output" '  - "docs/.tasks/20260812-1000_goal-without-core: diagram.md lacks required headings: ## Text Checkpoints"' 'Compass-required diagram headings'
+require_line "$tasks_output" '  - "docs/.tasks/20260813-1000_title-case: memories.md SUMMARIES has 61 lines (limit 60)"' 'SUMMARIES heading matches case-insensitively'
+reject_text "$tasks_output" '20260813-1000_title-case: memories.md lacks' 'title-case headings satisfy the standard'
 require_line "$tasks_output" '  - "docs/.tasks/ai-receptionist-g0: folder name is not YYYYMMDD-HHMM_slug"' 'folder name warning'
 reject_text "$tasks_output" '20260801-1000_done-goal' 'completed goal hidden by default'
 reject_text "$tasks_output" '20260802-1000_superseded-goal' 'superseded goal hidden by default'
@@ -250,5 +263,56 @@ require_line "$all_tasks" 'skipped: 0' '--tasks --all skips nothing'
 no_tasks="$("$INDEX" --target "$TMP_ROOT/clean-solid-tdd" --tasks)"
 require_line "$no_tasks" 'tasks: []' 'project without docs/.tasks'
 require_line "$no_tasks" 'skipped: 0' 'project without docs/.tasks skips nothing'
+
+# Projects own their task templates: only Compass-required headings are enforced,
+# and project template headings only end the SUMMARIES region.
+# Args: project dir, task folder name; memories.md content comes from stdin.
+write_task_files() {
+  local dir="$1/docs/.tasks/$2"
+
+  mkdir -p "$dir"
+  printf -- '---\ngoal_status: active\n---\n\n# Goal %s\n' "$2" > "$dir/goal.md"
+  printf "$goal_body" >> "$dir/goal.md"
+  printf "$diagram_body" > "$dir/diagram.md"
+  cat > "$dir/memories.md"
+}
+
+custom="$TMP_ROOT/custom-tasks"
+printf '# {{goal_name}} Memories\n\n## SUMMARIES\n\n## VERIFIED FACTS\n\n## HISTORIES\n' \
+  | write_file "$custom/docs/_templates/task-memories.md"
+
+{
+  printf '## SUMMARIES\n'
+  repeat_lines 5 'summary line'
+  printf '## VERIFIED FACTS\n'
+  repeat_lines 70 'fact line'
+  printf '## HISTORIES\n'
+} | write_task_files "$custom" 20260901-1000_designed-sections
+
+printf '## SUMMARIES\nsummary line\n## HISTORIES\n' | write_task_files "$custom" 20260902-1000_missing-designed
+
+{
+  printf '## SUMMARIES\n'
+  repeat_lines 5 'summary line'
+  printf '## Agent Notes\n'
+  repeat_lines 60 'note line'
+  printf '## VERIFIED FACTS\nfact line\n## HISTORIES\n'
+} | write_task_files "$custom" 20260903-1000_agent-extra
+
+custom_output="$("$INDEX" --target "$custom" --tasks)"
+reject_text "$custom_output" '20260901-1000_designed-sections:' 'sections defined by the project template are not summary bloat'
+reject_text "$custom_output" '20260902-1000_missing-designed:' 'project template headings are not enforced'
+require_line "$custom_output" '  - "docs/.tasks/20260903-1000_agent-extra: memories.md SUMMARIES has 66 lines (limit 60)"' 'sections outside the project template count toward SUMMARIES'
+
+no_summary="$TMP_ROOT/no-summary-template"
+printf '## Decision Log\n\n## Session Snapshot\n' | write_file "$no_summary/docs/_templates/task-memories.md"
+{
+  printf '## Decision Log\n'
+  repeat_lines 100 'decision line'
+} | write_task_files "$no_summary" 20260904-1000_long-log
+
+no_summary_output="$("$INDEX" --target "$no_summary" --tasks)"
+require_line "$no_summary_output" '  - "docs/.tasks/20260904-1000_long-log: memories.md lacks required headings: ## SUMMARIES, ## HISTORIES"' 'only Compass-required headings are enforced'
+reject_text "$no_summary_output" 'SUMMARIES has' 'no summaries limit when the template has no SUMMARIES heading'
 
 printf 'Docs index checks passed.\n'

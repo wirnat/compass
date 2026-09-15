@@ -36,6 +36,20 @@
     <rule>Do not skip task memory because templates are missing.</rule>
   </templates>
 
+  <required-headings>
+    <purpose>Compass-standard headings every project task template must keep. Projects may add, reorder, or rename anything else; the Compass templates are samples.</purpose>
+    <heading file="goal.md">## Non-Goals</heading>
+    <heading file="goal.md">## Success Criteria</heading>
+    <heading file="goal.md">## Slices</heading>
+    <heading file="goal.md">## Latest Evidence</heading>
+    <heading file="goal.md">## Goal Links</heading>
+    <heading file="diagram.md">## How To Read</heading>
+    <heading file="diagram.md">## Text Checkpoints</heading>
+    <heading file="memories.md">## SUMMARIES</heading>
+    <heading file="memories.md">## HISTORIES</heading>
+    <rule>scripts/docs-index.sh --tasks checks these headings in every task folder, plus the headings of the project's own docs/_templates/task-*.md when that template exists.</rule>
+  </required-headings>
+
   <goal-statuses>
     <status name="active">The goal is currently in progress.</status>
     <status name="completed">The goal is finished and verified.</status>
@@ -54,6 +68,7 @@
     <file name="goal.md">
       <purpose>Source of truth for goal identity, status, description, approved scope, non-goals, success criteria, slice list, links to superseded or successor goals, and latest evidence.</purpose>
       <rule>Update goal.md whenever the goal status, approved scope, slice list, slice status, blocker, successor link, or latest evidence changes.</rule>
+      <rule>Keep goal.md as current state only: replace Latest Evidence at each slice instead of appending, record per-slice evidence in memories.md HISTORIES, and move durable research findings to docs/modules or a decision record.</rule>
     </file>
     <file name="diagram.md">
       <purpose>Human-readable checkpoint visualization using Mermaid plus text support.</purpose>
@@ -63,6 +78,7 @@
     <file name="memories.md">
       <purpose>Summaries and reverse-chronological histories for context recovery.</purpose>
       <rule>Keep SUMMARIES current with the latest compressed state.</rule>
+      <rule>Rewrite SUMMARIES at each checkpoint instead of appending, and keep it near 40 lines. Everything from SUMMARIES to the next heading defined by the project template is read on resume, so do not park detail sections there.</rule>
       <rule>For gated design work, SUMMARIES must include approved brainstorming, align-context, and design outputs: selected slice, scope, non-goals, decisions, trade-offs, open questions, behavior or delta design, test matrix or verification plan, implementation slices, and approval evidence.</rule>
       <rule>Keep HISTORIES newest first.</rule>
       <rule>The LLM memikirkan field must contain a rationale snapshot, not private chain-of-thought.</rule>
@@ -81,7 +97,9 @@
   </lifecycle>
 
   <resume>
-    <rule>At the start of a long Compass-guided task, inspect docs/.tasks for active relevant goals before creating a new task memory folder.</rule>
+    <rule>At the start of a long Compass-guided task, run scripts/docs-index.sh --tasks to list open goals before creating a new task memory folder, instead of opening every goal.md.</rule>
+    <rule>If an active goal's updated date is more than 14 days old, offer to mark it completed or cancelled before selecting a goal.</rule>
+    <rule>Report docs-index.sh --tasks warnings as documentation gaps; do not rewrite existing task memory without developer approval.</rule>
     <rule>If exactly one active relevant goal exists, load goal.md in full and the SUMMARIES section plus the newest HISTORIES entry of memories.md before planning or implementation.</rule>
     <rule>Read older HISTORIES entries or diagram.md only when the summaries are not enough; diagram.md is the human-facing view of the slice state already recorded in goal.md.</rule>
     <rule>If multiple active goals could match, ask one clarification question before choosing.</rule>

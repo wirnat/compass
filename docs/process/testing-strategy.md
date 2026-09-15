@@ -109,6 +109,8 @@ Minimum checks:
 - Every `assets/docs-seed/` file matches its `docs/` counterpart, except the
   intentionally customized `docs/README.md` and `docs/reference/README.md`, so
   shipped templates cannot fall behind this repository's own copy.
+- The seed task templates contain every heading listed under
+  `required-headings` in `references/task-memory.xml`.
 
 ### `tests/check-update-skill.sh`
 
@@ -155,6 +157,15 @@ Minimum checks:
 - A `code` glob that matches no files produces a warning without failing.
 - Quotes, colons, and hashes in values stay valid YAML.
 - A missing docs directory exits 1; a missing option value exits 2.
+- `--tasks` lists open goals with folder, `goal_status`, `updated`, and title,
+  skips completed, superseded, and cancelled goals unless `--all` is passed,
+  and prints `tasks: []` when `docs/.tasks/` is missing.
+- `--tasks` warns about missing task files, missing or invalid `goal_status`,
+  folder names that are not `YYYYMMDD-HHMM_slug`, missing Compass-required
+  headings (matched case-insensitively), and `goal.md` or the `SUMMARIES`
+  region over their limits. Limits are inclusive.
+- Project template headings are not enforced; they only end the `SUMMARIES`
+  region, so sections outside the project template count toward the limit.
 
 ## Agent Integration Tests
 

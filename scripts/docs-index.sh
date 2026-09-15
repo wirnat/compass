@@ -4,6 +4,7 @@ set -euo pipefail
 target_dir="$(pwd)"
 include_all=0
 tasks_mode=0
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Task memory stops being cheap to resume beyond these sizes.
 goal_line_limit=120
@@ -195,11 +196,57 @@ task_warning() {
   warnings+="  - $(yaml_quote "$1: $2")"$'\n'
 }
 
+# Emits "<SUMMARIES line count or -1><TAB><missing required headings>". Headings
+# match case-insensitively. BOUNDARY lists the headings that end the SUMMARIES
+# region: the Compass-required ones plus the project's own template headings, so
+# sections an agent adds outside the template count toward it.
+heading_prog='
+BEGIN {
+  n = split(ENVIRON["REQUIRED"], req, "\n")
+  m = split(ENVIRON["BOUNDARY"], bnd, "\n")
+  for (i = 1; i <= m; i++) if (bnd[i] != "") stop[tolower(bnd[i])] = 1
+  count = -1
+}
+/^## / {
+  line = $0; sub(/[ \t]+$/, "", line); line = tolower(line); seen[line] = 1
+  if (line == "## summaries") { s = 1; count = 0; next }
+  if (s && (line in stop)) s = 0
+}
+s { count++ }
+END {
+  missing = ""
+  for (i = 1; i <= n; i++) {
+    key = tolower(req[i])
+    if (req[i] != "" && !(key in seen)) missing = missing (missing == "" ? "" : ", ") req[i]
+  }
+  print count "\t" missing
+}
+'
+
+# Compass-required headings for a task file, from references/task-memory.xml.
+core_for() {
+  printf '%s\n' "$core_headings" | awk -F'\t' -v f="$1" '$1 == f { print $2 }'
+}
+
 index_tasks() {
   local name_re='^[0-9]{8}-[0-9]{4}_[A-Za-z0-9._-]+$'
-  local dir status entry kind value missing file lines has_summaries has_histories
+  local references="$script_dir/../references/task-memory.xml"
+  local dir status entry kind value missing file lines
 
   [[ -d docs/.tasks ]] || return 0
+
+  if [[ ! -f "$references" ]]; then
+    echo "Compass references not found: $references" >&2
+    exit 1
+  fi
+  core_headings="$(awk -F'"' '/<heading file="/ { h = $0; sub(/.*">/, "", h); sub(/<\/heading>.*/, "", h); print $2 "\t" h }' "$references")"
+  # Project template headings are not enforced; they only end the SUMMARIES region.
+  summary_boundaries="$(
+    core_for memories.md
+    if [[ -f docs/_templates/task-memories.md ]]; then
+      awk '/^## / { sub(/[ \t]+$/, ""); print }' docs/_templates/task-memories.md
+    fi
+  )"
 
   while IFS= read -r dir; do
     status=""
@@ -242,21 +289,14 @@ index_tasks() {
 
     [[ "${dir##*/}" =~ $name_re ]] || task_warning "$dir" 'folder name is not YYYYMMDD-HHMM_slug'
 
-    if [[ -f "$dir/memories.md" ]]; then
-      # Everything between SUMMARIES and HISTORIES is read on resume, so extra
-      # sections placed there count toward the limit.
-      read -r has_summaries has_histories lines < <(awk '
-        /^## SUMMARIES[ \t]*$/ { s = 1; seen_s = 1; next }
-        /^## HISTORIES[ \t]*$/ { s = 0; seen_h = 1; next }
-        s { n++ }
-        END { print seen_s + 0, seen_h + 0, n + 0 }
-      ' "$dir/memories.md")
-      if [[ "$has_summaries" -eq 0 || "$has_histories" -eq 0 ]]; then
-        task_warning "$dir" 'memories.md lacks ## SUMMARIES or ## HISTORIES'
-      elif (( lines > summaries_line_limit )); then
+    for file in goal.md diagram.md memories.md; do
+      [[ -f "$dir/$file" ]] || continue
+      IFS=$'\t' read -r lines missing < <(REQUIRED="$(core_for "$file")" BOUNDARY="$summary_boundaries" awk "$heading_prog" "$dir/$file")
+      [[ -z "$missing" ]] || task_warning "$dir" "$file lacks required headings: $missing"
+      if [[ "$file" == memories.md ]] && (( lines > summaries_line_limit )); then
         task_warning "$dir" "memories.md SUMMARIES has $lines lines (limit $summaries_line_limit)"
       fi
-    fi
+    done
   done < <(find docs/.tasks -mindepth 1 -maxdepth 1 -type d | LC_ALL=C sort)
 }
 

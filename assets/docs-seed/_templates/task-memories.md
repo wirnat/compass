@@ -18,6 +18,7 @@ related:
 
 ## SUMMARIES
 
+<!-- Rewrite at each checkpoint and keep this section near 40 lines. SUMMARIES and HISTORIES are Compass-required headings; add other sections as the project needs. -->
 {{conversation_summary}}
 
 ### Brainstorming Summary

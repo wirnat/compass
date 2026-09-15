@@ -59,6 +59,18 @@ for path in SKILL.md README.md references/documentation-policy.xml; do
   require_contains "$path" 'scripts/docs-index.sh' 'docs index script'
 done
 
+for path in SKILL.md README.md references/task-memory.xml; do
+  require_contains "$path" 'docs-index.sh --tasks' 'task memory index'
+done
+
+# The seed sample templates must carry every Compass-required task memory heading.
+required_count=0
+while IFS=$'\t' read -r file heading; do
+  require_contains "assets/docs-seed/_templates/task-${file%.md}.md" "$heading" 'Compass-required task memory heading'
+  required_count=$((required_count + 1))
+done < <(awk -F'"' '/<heading file="/ { h = $0; sub(/.*">/, "", h); sub(/<\/heading>.*/, "", h); print $2 "\t" h }' "$ROOT_DIR/references/task-memory.xml")
+[ "$required_count" -gt 0 ] || fail 'references/task-memory.xml lists no required task memory headings'
+
 # Seed docs shipped to projects must match this repo's own bootstrapped copy.
 # Hub READMEs listed below are intentionally customized for this repository.
 while IFS= read -r -d '' seed; do

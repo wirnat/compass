@@ -252,6 +252,8 @@ The files have different jobs:
 
 When resuming, Compass reads `goal.md` in full and only the `SUMMARIES` section plus the newest `HISTORIES` entry of `memories.md`. `diagram.md` is for humans. Resume stays cheap as histories grow, and no separate manifest file is needed because `goal.md` already holds the goal status and slice list.
 
+Compass finds open goals with `scripts/docs-index.sh --tasks`, which lists `docs/.tasks/` goals from `goal.md` frontmatter and warns about missing files, invalid `goal_status`, bad folder names, missing Compass-required headings, `goal.md` over 120 lines, or summaries over 60 lines. Task templates belong to each project and the Compass templates are samples: a project may change its sections freely as long as it keeps the headings listed under `required-headings` in `references/task-memory.xml`. To keep resume cheap, `goal.md` holds current state with one Latest Evidence entry replaced at each slice, per-slice evidence goes into `HISTORIES`, and `SUMMARIES` is rewritten at each checkpoint. Active goals untouched for more than 14 days are offered for closing before a goal is selected.
+
 At every slice boundary, Compass updates task memory before reporting the checkpoint. If a slice starts, completes, blocks, or changes, update the same folder. If the goal changes, create a new task folder, mark the old goal `superseded`, cross-link both folders, and record the reason in both `memories.md` files.
 
 Missing task memory templates in the target project do not waive the gate. Compass must use the installed templates or `references/task-memory.xml`, then report the documentation gap. Anak boleh lupa bawa penggaris; tugas menggambar garis lurus tetap ada.
