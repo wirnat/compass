@@ -209,6 +209,8 @@ Task templates belong to the project; the Compass templates are samples. A proje
 
 Keep task memory cheap to resume. `goal.md` holds current state only: goal, scope, non-goals, success criteria, the slice table, and one Latest Evidence entry that is replaced at each slice instead of appended. Record per-slice evidence in a `memories.md` `HISTORIES` entry, and move durable research findings to `docs/modules/` or a decision record. Rewrite `SUMMARIES` at each checkpoint instead of appending, keeping it near 40 lines; everything from `SUMMARIES` to the next heading defined by the project template is read on resume, so do not park detail sections there. `scripts/docs-index.sh --tasks` warns when a Compass-required heading is missing, when `goal.md` exceeds 120 lines, or when that summary region exceeds 60 lines.
 
+Longer material, such as an API contract, a JSON schema, a YAML contract, fixtures, or detailed notes, goes into supporting files in the task folder with no line limit. List each supporting file in the `goal.md` References section with when to read it, read it only when the current slice needs it, and when the goal completes, move files that stay the source of truth after the task to the project's durable location. `scripts/docs-index.sh --tasks` warns about supporting files that `goal.md` or `memories.md` does not link.
+
 Use these goal statuses only: `active`, `completed`, `superseded`, and `cancelled`.
 
 Use these slice statuses only: `pending`, `active`, `done`, and `blocked`.

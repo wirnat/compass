@@ -172,6 +172,9 @@ Minimum checks:
   region over their limits. Limits are inclusive.
 - Project template headings are not enforced; they only end the `SUMMARIES`
   region, so sections outside the project template count toward the limit.
+- `--tasks` warns about supporting files in a task folder that `goal.md` or
+  `memories.md` does not mention by file name or top folder; hidden files are
+  ignored.
 
 ## Agent Integration Tests
 

@@ -86,6 +86,11 @@ require_contains 'SKILL.md' 'that the agent did not start' 'local resource hard 
 require_contains 'assets/docs-seed/_templates/task-goal.md' "## Don't" "optional Do and Don't guardrails"
 require_contains 'references/task-memory.xml' "as a Don't" "rejected approaches recorded as a Don't"
 
+require_contains 'assets/docs-seed/_templates/task-goal.md' '## References' 'optional References section'
+for path in SKILL.md README.md references/task-memory.xml; do
+  require_contains "$path" 'supporting file' 'task supporting files rule'
+done
+
 # The seed sample templates must carry every Compass-required task memory heading.
 required_count=0
 while IFS=$'\t' read -r file heading; do

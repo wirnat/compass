@@ -62,6 +62,11 @@ Things that must not happen, each with its reason. Record an approach the develo
 <!-- Replace this entry at each slice; record per-slice evidence in memories.md HISTORIES. -->
 - {{latest_evidence}}
 
+<!-- Optional. List every supporting file in this folder with when to read it; docs-index.sh --tasks flags files that goal.md or memories.md does not link. -->
+## References
+
+- `{{supporting_file}}`: read when {{condition}}
+
 ## Goal Links
 
 - Previous goal: {{previous_goal_link}}

@@ -70,6 +70,8 @@
       <rule>Update goal.md whenever the goal status, approved scope, slice list, slice status, blocker, successor link, or latest evidence changes.</rule>
       <rule>Keep goal.md as current state only: replace Latest Evidence at each slice instead of appending, record per-slice evidence in memories.md HISTORIES, and move durable research findings to docs/modules or a decision record.</rule>
       <rule>goal.md may carry optional Do and Don't sections. When the developer rejects an approach at a gate, record it as a Don't with the reason. Before acting against a Don't, ask the developer first.</rule>
+      <rule>A task folder may hold supporting files, such as contracts, schemas, fixtures, or long notes, with no line limit. List each supporting file in the goal.md References section with when to read it, and read a supporting file only when the current slice needs it.</rule>
+      <rule>A supporting file that stays the source of truth after the task, such as an API contract or schema the code depends on, moves to the project's durable location (docs/reference, docs/runbooks, or the code location the project uses) when the goal completes, and the task keeps a link. docs/.tasks may be ignored by git, so it must not hold the only copy of a shared artifact.</rule>
     </file>
     <file name="diagram.md">
       <purpose>Human-readable checkpoint visualization using Mermaid plus text support.</purpose>
@@ -94,7 +96,7 @@
     <event name="slice-blocked">Mark the slice blocked in goal.md, record the blocker, update diagram.md to red, and add a memory history entry.</event>
     <event name="slice-changed">If the goal remains stable, update the existing task folder instead of creating a new folder.</event>
     <event name="goal-changed">Create a new task folder, mark the old goal superseded, cross-link both goals, and record the reason in both memories.md files.</event>
-    <event name="goal-completed">Mark the goal completed and record final evidence.</event>
+    <event name="goal-completed">Mark the goal completed, record final evidence, and move supporting files that stay the source of truth to their durable project location.</event>
   </lifecycle>
 
   <resume>
