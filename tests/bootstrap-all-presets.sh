@@ -31,6 +31,7 @@ check_preset_files() {
   require_file "$target/docs/_templates/task-goal.md"
   require_file "$target/docs/_templates/task-diagram.md"
   require_file "$target/docs/_templates/task-memories.md"
+  require_file "$target/docs/_templates/local-environment.md"
 
   xmllint --noout "$target/docs/process/workflows.xml"
 

@@ -104,6 +104,7 @@
     <doc>docs/_templates/task-goal.md</doc>
     <doc>docs/_templates/task-diagram.md</doc>
     <doc>docs/_templates/task-memories.md</doc>
+    <doc>docs/_templates/local-environment.md</doc>
   </seed-docs>
 
   <completion-evidence>

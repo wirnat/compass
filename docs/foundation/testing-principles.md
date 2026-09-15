@@ -31,6 +31,15 @@ Choose the cheapest test level that still proves the behavior.
 - Integration tests prove real infrastructure assumptions when fakes are not enough.
 - End-to-end tests prove important cross-layer flows that cannot be trusted through lower-level evidence alone.
 
+## Local Verification
+
+Integration and end-to-end tests run on the developer's machine, next to every other project there. Keep them repeatable and cheap:
+
+- Run them against the local environment described in `docs/process/local-environment.md`, never against remote databases or shared staging services unless the developer approves.
+- Isolate each run's data with its own database, schema, or key prefix, or clean up afterwards, so parallel runs and other projects are not affected.
+- Start only the dependencies the tests need, and reuse shared local services when they already run.
+- Write down the command that starts the environment and the command that runs the tests.
+
 ## TDD Use
 
 Use TDD when behavior is being added or changed:
@@ -58,3 +67,4 @@ Before claiming work is complete, state:
 - which command was run
 - whether the test failed first when that matters
 - what verification could not be run and why
+- which local environment integration or end-to-end tests ran against, when they were used

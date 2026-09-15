@@ -75,6 +75,8 @@ for path in SKILL.md README.md references/bootstrap-rules.xml docs/reference/ori
   require_contains "$path" 'infra-ops' 'infra-ops preset'
 done
 
+require_contains 'docs/foundation/testing-principles.md' 'local-environment.md' 'local verification principle'
+
 # The seed sample templates must carry every Compass-required task memory heading.
 required_count=0
 while IFS=$'\t' read -r file heading; do

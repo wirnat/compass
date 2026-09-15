@@ -58,6 +58,7 @@ check_scope() {
 check_required_file 'assets/docs-seed/_templates/task-goal.md'
 check_required_file 'assets/docs-seed/_templates/task-diagram.md'
 check_required_file 'assets/docs-seed/_templates/task-memories.md'
+check_required_file 'assets/docs-seed/_templates/local-environment.md'
 
 check_paths_in_file 'repository docs' "$ROOT_DIR" "$ROOT_DIR/docs/process/workflows.xml"
 
