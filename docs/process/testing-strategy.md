@@ -105,6 +105,9 @@ Minimum checks:
   the Session Update Gate docs.
 - No stale phrases remain for old rules, such as task memory being required only
   when both long/risky and 2+ slices are true.
+- Every `assets/docs-seed/` file matches its `docs/` counterpart, except the
+  intentionally customized `docs/README.md` and `docs/reference/README.md`, so
+  shipped templates cannot fall behind this repository's own copy.
 
 ### `tests/check-update-skill.sh`
 

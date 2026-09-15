@@ -20,6 +20,30 @@ related:
 
 {{conversation_summary}}
 
+### Brainstorming Summary
+
+{{brainstorming_summary}}
+
+### Align Context
+
+{{align_context_summary}}
+
+### Approved Design
+
+{{approved_design_summary}}
+
+### Decisions And Trade-offs
+
+{{decisions_tradeoffs}}
+
+### Open Questions
+
+{{open_questions}}
+
+### Verification Plan
+
+{{verification_plan}}
+
 ## HISTORIES
 
 [{{datetime:YYYY-MM-DD HH:mm TZ}}]

@@ -55,4 +55,15 @@ researched-principles
 researched-workflow
 STALE_PHRASES
 
+# Seed docs shipped to projects must match this repo's own bootstrapped copy.
+# Hub READMEs listed below are intentionally customized for this repository.
+while IFS= read -r -d '' seed; do
+  rel="${seed#$ROOT_DIR/assets/docs-seed/}"
+  case "$rel" in
+    README.md|reference/README.md) continue ;;
+  esac
+  [ -f "$ROOT_DIR/docs/$rel" ] || continue
+  cmp -s "$seed" "$ROOT_DIR/docs/$rel" || fail "assets/docs-seed/$rel and docs/$rel differ; update both copies"
+done < <(find "$ROOT_DIR/assets/docs-seed" -type f -print0)
+
 printf 'Policy consistency checks passed.\n'

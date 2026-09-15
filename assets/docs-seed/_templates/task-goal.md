@@ -26,6 +26,10 @@ related:
 
 {{goal_description}}
 
+## Approved Scope
+
+{{approved_scope}}
+
 ## Non-Goals
 
 - {{non_goal}}
