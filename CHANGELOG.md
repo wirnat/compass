@@ -5,6 +5,13 @@ All notable changes to Compass are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1](https://github.com/wirnat/compass/compare/v1.1.0...v1.1.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* remove ci-check.sh from Compass CI workflow ([f69cc4b](https://github.com/wirnat/compass/commit/f69cc4b70a9bfa5eaa8abf666e57cd95cd4ba69b))
+
 # [1.1.0](https://github.com/wirnat/compass/compare/v1.0.0...v1.1.0) (2026-09-24)
 
 
