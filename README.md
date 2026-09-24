@@ -139,6 +139,28 @@ When Compass is installed through the `skills` CLI, prefer the CLI-managed updat
 npx skills update
 ```
 
+For version-aware updates, use `scripts/update-skill.sh` directly:
+
+```bash
+# Track latest stable release (recommended for production)
+./scripts/update-skill.sh --skill-dir /path/to/compass --tag latest
+
+# Pin to a specific version
+./scripts/update-skill.sh --skill-dir /path/to/compass --tag v1.2.0
+
+# Track main branch (bleeding edge, default)
+./scripts/update-skill.sh --skill-dir /path/to/compass
+
+# Check only (no update)
+./scripts/update-skill.sh --skill-dir /path/to/compass --tag latest --check
+```
+
+| Mode | Behavior | Best For |
+|------|----------|----------|
+| `--branch main` (default) | Latest commit on main | Contributors, early adopters |
+| `--tag latest` | Latest release tag | Production users who want stability |
+| `--tag v1.2.0` | Pinned version | Lock to a known-good version |
+
 For git-backed, manual, or non-CLI installations, resolve the fallback scripts relative to the loaded skill directory:
 
 ```bash
