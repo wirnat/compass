@@ -547,7 +547,7 @@ The automatic release workflow handles version bumps based on commit messages, s
 
 Compass treats `docs/` as the project's context pack.
 
-Compass also creates and maintains a `<!-- compass:start -->...<!-- compass:end -->` block in agent gateway files during bootstrap. The script auto-detects existing files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.claude/rules/`, and `.cursor/rules/`. It writes the Compass block to every gateway file it finds, falling back to `AGENTS.md` when none exist. This block acts as a persistent reminder for any agent starting a new session that the project uses Compass workflow enforcement. The block includes Always Do rules, Never Do rules, and a Key Docs table. The LLM adapts the block to the project context after bootstrap, adding project-specific rules as needed.
+Compass also creates and maintains a `<!-- compass:start -->...<!-- compass:end -->` block in agent gateway files during bootstrap. The script auto-detects existing files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.claude/rules/`, and `.cursor/rules/`. It writes the Compass block to every gateway file it finds, falling back to `AGENTS.md` when none exist. The block is a compact router-first directive: it tells any agent starting a new session to invoke the Compass skill before any file edit and not to read `docs/` manually, because Compass selects the relevant docs itself. It deliberately lists no doc file paths, which would invite manual reading. The LLM adapts the block to the project context after bootstrap, adding project-specific rules as needed.
 
 Key docs used by Compass:
 
@@ -560,7 +560,7 @@ Key docs used by Compass:
 - `docs/decisions/*`
 - `docs/reference/*`
 
-Compass does not load all of these. After the orientation lock and `docs/process/workflows.xml`, it runs `scripts/docs-index.sh`, which prints a YAML index built from each note's frontmatter: path, type, status, `summary`, `aliases`, `related`, and `code` globs. The agent loads only the notes whose summary or aliases match the task, or whose `code` globs match files it will touch. The index is generated on every run and never stored, so it cannot drift from the notes. Adding `summary` and `code` to frontmatter makes the selection sharper; see `docs/reference/note-schema.md`.
+Compass does not load all of these. After the orientation lock and `docs/process/workflows.xml`, it runs `scripts/docs-index.sh`, which prints a YAML index built from each note's frontmatter: path, type, status, `summary`, `aliases`, `related`, and `code` globs. With `--match KEYWORDS` the index is pre-filtered to entries containing at least one comma-separated keyword (case-insensitive, matched against the full entry text), so the agent receives only the relevant notes plus a `matched` count; without the flag the agent selects notes itself from summary, aliases, and `code` globs. The index is generated on every run and never stored, so it cannot drift from the notes. Adding `summary` and `code` to frontmatter makes the selection sharper; see `docs/reference/note-schema.md`.
 
 If code and docs disagree, Compass should stop before broad changes and call out the conflict. Quietly choosing a side is how architecture turns into folklore.
 
@@ -647,7 +647,7 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 - `scripts/resolve-workflows.sh`: validates and merges custom workflow definitions from `docs/process/custom-workflows.xml` with preset workflows. Detects type conflicts, validates structure, and produces merged workflow references.
 - `scripts/ci-check.sh`: CI/CD integration script that runs 5 validation checks: bootstrap validation, workflow validation, docs index freshness, link integrity, and policy consistency. Supports `--strict` and `--quiet` modes for pipeline integration.
 - `scripts/version.sh`: semantic version management. Shows current version, bumps major/minor/patch, and creates annotated git tags. Reads from `VERSION` file.
-- `scripts/docs-index.sh`: prints an on-demand YAML index of a project's docs from note frontmatter so agents load only relevant notes.
+- `scripts/docs-index.sh`: prints an on-demand YAML index of a project's docs from note frontmatter so agents load only relevant notes. `--match KEYWORDS` filters entries by comma-separated keywords and reports the matched count.
 - `scripts/skills-check.sh`: reports, without network access, which recommended skills are installed and prints install commands for missing ones.
 - `scripts/lib/yaml.sh`: shared YAML quoting for Compass scripts.
 - `scripts/smoke-test.sh`: minimal script verification for preset listing, dry-run, failure paths, and no-overwrite behavior.

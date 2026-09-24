@@ -310,42 +310,21 @@ overwritten=0
 compass_agents_block() {
   cat <<'AGENTS'
 <!-- compass:start -->
-# Compass — Engineering Workflow
+# Compass Workflow Required
 
-This project uses [Compass](https://github.com/wirnat/compass) for engineering
-workflow enforcement. Architecture, process, and module documentation live
-under `docs/`. The authoritative workflow reference is
-`docs/process/workflows.xml`.
+**Before ANY file edit, script run, or implementation work — invoke the
+Compass skill first.** Compass classifies the task, selects the workflow,
+enforces gates, and loads only the docs needed for that task.
 
-## Always Do
+Do NOT read `docs/` files directly to understand the task. Compass handles
+doc selection via `docs-index.sh` and loads only what is relevant.
 
-- **MUST load the Compass skill and run its Session Update Gate** before any
-  implementation, docs, or planning work.
-- **MUST classify the task type** from `docs/process/workflows.xml` before the
-  first file edit: `new_feature`, `feature_update`, `bug_fix`, `refactor`,
-  `architecture_change`, `docs_only`, etc.
-- **MUST run `scripts/docs-index.sh`** after creating or modifying any note
-  under `docs/`.
-- **MUST report gate outcomes** before implementation: Session Update
-  (pass/skip), task memory (created/resumed/not-required).
+## Hard Rules
 
-## Never Do
-
-- NEVER start implementation without stating the workflow type and gate
-  outcomes.
-- NEVER edit locked architecture without a decision record under
-  `docs/decisions/`.
-- NEVER skip the Task Memory Gate for long or risky multi-slice work.
-
-## Key Docs
-
-| Doc | Purpose |
-|---|---|
-| `docs/decisions/0001-orientation-lock.md` | Architecture preset and locked orientation |
-| `docs/process/workflows.xml` | Active workflow types, risk tiers, gates |
-| `docs/foundation/engineering-philosophy.md` | Engineering philosophy |
-| `docs/foundation/architecture-principles.md` | Architecture principles |
-| `docs/foundation/testing-principles.md` | Testing principles |
+- Invoke Compass skill before any engineering work (feature, fix, refactor,
+  infra, docs, test, security, performance, release).
+- Never start implementation without Compass classification and gate outcomes.
+- Never edit locked architecture without a decision record.
 <!-- compass:end -->
 AGENTS
 }

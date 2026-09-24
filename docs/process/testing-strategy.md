@@ -167,6 +167,10 @@ Minimum checks:
 - A `code` glob that matches no files produces a warning without failing.
 - Quotes, colons, and hashes in values stay valid YAML.
 - A missing docs directory exits 1; a missing option value exits 2.
+- `--match` keeps only entries containing at least one comma-separated keyword
+  (case-insensitive), reports `match` and `matched` metadata, keeps top-level
+  keys on their own lines, prints `matched: 0` with an empty list when nothing
+  matches, and exits 2 when the option value is missing.
 - `--tasks` lists open goals with folder, `goal_status`, `updated`, and title,
   skips completed, superseded, and cancelled goals unless `--all` is passed,
   and prints `tasks: []` when `docs/.tasks/` is missing.

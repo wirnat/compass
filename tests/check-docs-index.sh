@@ -397,4 +397,33 @@ reject_text "$ignored_output" 'not committed while' 'ignored mode does not requi
 
 require_line "$tasks_output" 'tracking: "no-git"' 'project outside git'
 
+# --match filters entries by keyword (case-insensitive).
+match_output="$("$INDEX" --target "$fixture" --match "packing")"
+require_line "$match_output" '  - path: "docs/modules/packing.md"' '--match finds packing by summary/alias'
+reject_text "$match_output" '  - path: "docs/modules/billing.md"' '--match excludes non-matching entries'
+require_line "$match_output" 'match: "packing"' '--match reports keywords'
+require_line "$match_output" 'matched: 1' '--match reports matched count'
+require_line "$match_output" 'skipped: 2' '--match keeps top-level keys on their own lines'
+
+# --match is case-insensitive.
+match_upper="$("$INDEX" --target "$fixture" --match "PACKING")"
+require_line "$match_upper" '  - path: "docs/modules/packing.md"' '--match is case-insensitive'
+require_line "$match_upper" 'matched: 1' '--match case-insensitive count'
+
+# --match with multiple keywords matches any entry containing at least one.
+match_multi="$("$INDEX" --target "$fixture" --match "billing,packing")"
+require_line "$match_multi" '  - path: "docs/modules/packing.md"' '--match multi: packing'
+require_line "$match_multi" '  - path: "docs/modules/billing.md"' '--match multi: billing'
+require_line "$match_multi" 'matched: 2' '--match multi count'
+
+# --match with keyword matching nothing returns empty docs list.
+match_none="$("$INDEX" --target "$fixture" --match "zzz_no_such_keyword")"
+reject_text "$match_none" '  - path:' '--match no-match returns no entries'
+require_line "$match_none" 'matched: 0' '--match no-match count'
+
+# --match without value exits 2.
+code=0
+"$INDEX" --target "$fixture" --match >/dev/null 2>&1 || code=$?
+[ "$code" -eq 2 ] || fail "--match without value should exit 2, got $code"
+
 printf 'Docs index checks passed.\n'

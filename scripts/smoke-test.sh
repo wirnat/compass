@@ -127,4 +127,26 @@ if grep -qF '<!-- compass:start -->' "$override_target/CLAUDE.md"; then
   fail '--agents-file wrote to CLAUDE.md instead of only the specified file'
 fi
 
+# Gateway block must be router-first: directive to invoke Compass before any
+# file edit, and must NOT list doc file paths that invite manual reading.
+gw_target="$TMP_ROOT/gw-content"
+mkdir -p "$gw_target"
+"$BOOTSTRAP" --target "$gw_target" --preset clean-solid-tdd >/dev/null
+gw_content="$(<"$gw_target/AGENTS.md")"
+case "$gw_content" in
+  *"invoke the"*Compass*"first"*|*"Invoke Compass skill"*) ;;
+  *) fail 'gateway block missing router-first directive to invoke Compass' ;;
+esac
+if grep -qF '| Doc | Purpose |' "$gw_target/AGENTS.md"; then
+  fail 'gateway block still contains Key Docs table — invites manual doc reading'
+fi
+if grep -qF 'docs/decisions/0001-orientation-lock.md' "$gw_target/AGENTS.md"; then
+  fail 'gateway block still lists doc file paths'
+fi
+# Block must be compact: count lines between compass markers.
+block_lines=$(awk '/<!-- compass:start -->/{p=1} p{c++} /<!-- compass:end -->/{print c; exit}' "$gw_target/AGENTS.md")
+if [ "${block_lines:-0}" -gt 25 ]; then
+  fail "gateway block too long ($block_lines lines); should be compact router, not doc reference"
+fi
+
 printf 'Smoke tests passed.\n'

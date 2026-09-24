@@ -1,6 +1,6 @@
 ---
 name: compass
-description: Guide software engineering work by classifying the request, selecting the right workflow, enforcing gates, and bootstrapping durable project docs when they are missing. Use for features, fixes, refactors, architecture, docs, tests, migrations, tooling, performance, security, incidents, releases, or engineering workflow design in any software project.
+description: REQUIRED before ANY file edit, script run, or implementation work. Classifies the task, selects the workflow, enforces approval gates, selects only relevant docs. Use for ALL engineering work — features, fixes, refactors, architecture, docs, tests, migrations, tooling, performance, security, incidents, releases, config changes, and any code or infrastructure modification.
 metadata:
   short-description: Route engineering work with project principles
 ---
@@ -154,8 +154,9 @@ Compass also maintains a cross-IDE project memory layer in `docs/.memory/` to pr
 At the start of every Compass-guided task, after the first-run bootstrap check, read the available project docs needed to understand the task:
 
 - Always read `docs/decisions/0001-orientation-lock.md` when it exists, and `docs/process/workflows.xml`.
-- Choose the remaining docs from the docs index instead of opening category READMEs and notes one by one. Run `scripts/docs-index.sh --target <project-dir>`, resolved relative to this `SKILL.md` file's directory. It prints a YAML list of `docs/` notes with path, type, status, summary, aliases, related, and code globs, generated on demand from frontmatter. Superseded and archived notes are skipped unless `--all` is passed.
-- Select notes by matching the task topic against `summary` and `aliases`, matching the files you expect to touch against `code`, then following `related` one step. Load only the selected notes.
+- Use the docs index with `--match` to load only relevant notes instead of opening every file. Run `scripts/docs-index.sh --target <project-dir> --match <keywords>`, resolved relative to this `SKILL.md` file's directory. Extract 2-5 keywords from the classified task type and user request (e.g. `testing,bug_fix` for a test task, `architecture,boundary` for an architecture change). The flag keeps only entries whose text contains at least one keyword (case-insensitive match against path, type, summary, aliases, related, and code fields) and reports the keywords plus how many entries matched.
+- Without `--match`, the script prints the full YAML index; use this only when `--match` returns too few results or when exploring an unfamiliar project.
+- Load only the notes returned by the filtered index. Do not open additional notes beyond what `--match` returns unless the workflow phase explicitly requires it.
 - The selection must still cover the architecture, foundation, and process docs linked by the orientation lock; relevant `docs/modules/` notes before touching a module, domain, package, feature area, bounded context, or slice; relevant `docs/decisions/` records before changing boundaries, dependencies, data ownership, contracts, build flow, or release flow; and `docs/reference/` when changing schemas, public contracts, naming rules, note structure, or orientation presets.
 - If the script is missing or fails, fall back to reading `docs/README.md` and the relevant category README files, and record the fallback in the documentation context.
 - Report index warnings, such as a `code` glob that matches no files, as documentation gaps.
@@ -254,6 +255,21 @@ Adaptation rules:
 If the target stack is unknown, do not guess by copying Go-shaped examples. Ask the developer first; a wrong guess spreads into every generated doc.
 
 Documentation language: write Compass artifacts, project docs, and task memory in English by default, because many coding agents and models follow English instructions most reliably. A project may lock another documentation language in `docs/decisions/0001-orientation-lock.md`. Keep domain and business terms in their original language as part of the ubiquitous language. Chat with the developer follows the developer's own language preference.
+
+## Token-Efficient Routing
+
+Compass is designed to minimize token cost, not maximize doc reading. The
+workflow is:
+
+1. Invoke Compass (this skill).
+2. Compass classifies the task using `references/classification.xml` (~60 lines).
+3. Compass loads ONE matching workflow from `docs/process/workflows.xml`.
+4. Compass runs `docs-index.sh` and loads ONLY the docs relevant to that task.
+5. Implementation proceeds with minimal context.
+
+Do NOT pre-read project docs before invoking Compass. The skill handles
+selective doc loading — reading docs manually before classification wastes
+tokens on docs that may not be relevant to the task.
 
 ## Quick Start
 
