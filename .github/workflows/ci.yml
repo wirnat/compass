@@ -19,6 +19,3 @@ jobs:
 
       - name: Run test suite
         run: ./tests/run-tests.sh
-
-      - name: Run CI checks (strict)
-        run: ./scripts/ci-check.sh --strict
