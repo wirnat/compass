@@ -434,6 +434,58 @@ The CI check runs 5 validations:
 
 Use `--strict` to treat warnings as failures, `--quiet` for minimal output.
 
+## CI/CD Pipeline
+
+Compass includes GitHub Actions workflows for continuous integration and automated releases:
+
+### CI Workflow (`.github/workflows/ci.yml`)
+
+Runs automatically on every push to `main` and on pull requests:
+
+- Executes the full test suite (`./tests/run-tests.sh`)
+- Runs CI checks in strict mode (`./scripts/ci-check.sh --strict`)
+
+### Release Workflow (`.github/workflows/release.yml`)
+
+Fully automatic releases using [semantic-release](https://semantic-release.gitbook.io/) based on [Conventional Commits](https://www.conventionalcommits.org/):
+
+| Commit Prefix | Version Bump |
+|---------------|-------------|
+| `fix:` | patch (1.0.0 → 1.0.1) |
+| `feat:` | minor (1.0.0 → 1.1.0) |
+| `feat!:` or `BREAKING CHANGE:` | major (1.0.0 → 2.0.0) |
+
+When you push to `main` with a `feat:` or `fix:` commit, semantic-release automatically:
+
+1. Analyzes commit messages to determine the version bump
+2. Generates release notes
+3. Updates `CHANGELOG.md`
+4. Updates the `VERSION` file
+5. Commits changes with `chore(release): vX.Y.Z`
+6. Creates and pushes a git tag
+7. Creates a GitHub Release
+
+Other commit types (`docs:`, `refactor:`, `chore:`, etc.) do not trigger a release.
+
+Configuration is in `.releaserc.json`.
+
+### Version Management
+
+Versions are managed automatically by the release workflow. For manual control, use `scripts/version.sh`:
+
+```bash
+# Show current version
+./scripts/version.sh
+
+# Bump version manually (major, minor, or patch)
+./scripts/version.sh bump patch
+
+# Create git tag for current version
+./scripts/version.sh tag
+```
+
+The automatic release workflow handles version bumps based on commit messages, so manual version management is only needed for special cases.
+
 ## Automatic Docs Context
 
 Compass treats `docs/` as the project's context pack.
@@ -486,6 +538,8 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 ```text
 .
 |-- SKILL.md
+|-- VERSION
+|-- CHANGELOG.md
 |-- agents/
 |   `-- openai.yaml
 |-- assets/
@@ -515,7 +569,13 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   |-- memory-index.sh
 |   |-- resolve-workflows.sh
 |   |-- ci-check.sh
+|   |-- version.sh
 |   `-- skills-check.sh
+|-- .github/
+|   `-- workflows/
+|       |-- ci.yml
+|       `-- release.yml
+|-- .releaserc.json
 `-- tests/
     |-- run-tests.sh
     `-- benchmark.sh
@@ -529,6 +589,7 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 - `scripts/memory-index.sh`: generates a searchable YAML index of project memories. Supports `--scope` filtering (shared/local/all) and `--lifecycle` mode for reporting memory status (active, stale, expired, archived).
 - `scripts/resolve-workflows.sh`: validates and merges custom workflow definitions from `docs/process/custom-workflows.xml` with preset workflows. Detects type conflicts, validates structure, and produces merged workflow references.
 - `scripts/ci-check.sh`: CI/CD integration script that runs 5 validation checks: bootstrap validation, workflow validation, docs index freshness, link integrity, and policy consistency. Supports `--strict` and `--quiet` modes for pipeline integration.
+- `scripts/version.sh`: semantic version management. Shows current version, bumps major/minor/patch, and creates annotated git tags. Reads from `VERSION` file.
 - `scripts/docs-index.sh`: prints an on-demand YAML index of a project's docs from note frontmatter so agents load only relevant notes.
 - `scripts/skills-check.sh`: reports, without network access, which recommended skills are installed and prints install commands for missing ones.
 - `scripts/lib/yaml.sh`: shared YAML quoting for Compass scripts.
