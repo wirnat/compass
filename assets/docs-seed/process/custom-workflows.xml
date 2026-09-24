@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Custom workflows for this project.
+  
+  Add project-specific workflow types here. These are merged with the
+  preset workflows from docs/process/workflows.xml.
+  
+  Rules:
+  - Custom workflow types must NOT duplicate preset workflow type names.
+  - Each <workflow> must have a unique "type" attribute.
+  - Each <workflow> must have either <steps> or <phase> children.
+  - Use <phase> for multi-gated workflows; <steps> for simple linear workflows.
+-->
+<custom-workflows>
+  <purpose>Project-specific workflow types that extend the preset workflows.</purpose>
+
+  <!-- Example: Uncomment and adapt for your project.
+  <workflow type="data_pipeline">
+    <description>Add or modify a data pipeline stage.</description>
+    <steps>
+      <step order="1">Identify data sources, transforms, and sinks.</step>
+      <step order="2">Add schema validation for inputs and outputs.</step>
+      <step order="3">Implement the pipeline stage with idempotent operations.</step>
+      <step order="4">Add integration tests with sample data.</step>
+      <step order="5">Document the pipeline stage in docs/modules/.</step>
+    </steps>
+    <evidence>Schema validation, integration tests, and pipeline documentation.</evidence>
+  </workflow>
+  -->
+</custom-workflows>

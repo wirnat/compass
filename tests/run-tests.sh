@@ -30,11 +30,13 @@ done
 cd "$ROOT_DIR"
 
 bash -n scripts/bootstrap-docs.sh scripts/docs-index.sh scripts/skills-check.sh scripts/lib/yaml.sh \
-  scripts/update-skill.sh scripts/smoke-test.sh \
+  scripts/update-skill.sh scripts/smoke-test.sh scripts/memory-sync.sh scripts/memory-index.sh \
+  scripts/resolve-workflows.sh scripts/ci-check.sh \
   tests/bootstrap-all-presets.sh tests/check-doc-links.sh tests/check-docs-index.sh tests/check-skills-check.sh \
-  tests/check-policy-consistency.sh tests/check-update-skill.sh tests/check-workflows.sh tests/run-tests.sh
+  tests/check-policy-consistency.sh tests/check-update-skill.sh tests/check-workflows.sh tests/check-memory-sync.sh \
+  tests/check-resolve-workflows.sh tests/run-tests.sh tests/benchmark.sh
 
-xmllint --noout references/*.xml docs/process/workflows.xml assets/orientation-presets/*/docs/process/workflows.xml
+xmllint --noout references/*.xml docs/process/workflows.xml assets/docs-seed/process/custom-workflows.xml assets/orientation-presets/*/docs/process/workflows.xml
 
 ./scripts/smoke-test.sh
 ./tests/check-doc-links.sh
@@ -44,6 +46,12 @@ xmllint --noout references/*.xml docs/process/workflows.xml assets/orientation-p
 ./tests/bootstrap-all-presets.sh
 ./tests/check-docs-index.sh
 ./tests/check-skills-check.sh
+./tests/check-memory-sync.sh
+./tests/check-resolve-workflows.sh
+
+# CI integration check (--help and basic execution)
+./scripts/ci-check.sh --help > /dev/null
+./scripts/ci-check.sh --target "$ROOT_DIR" --quiet > /dev/null 2>&1 || true
 
 if command -v git >/dev/null 2>&1; then
   git diff --check

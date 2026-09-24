@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Compass memory provider definitions and classification rules.
+
+  Providers define where each agent stores project memory on disk.
+  Classification rules determine whether a memory belongs in shared/ (committed)
+  or local/ (gitignored) when imported into docs/.memory/.
+-->
+<memory-providers>
+
+  <!-- ===== Agent memory storage locations ===== -->
+
+  <provider name="claude-code">
+    <base-dir>~/.claude/projects/</base-dir>
+    <path-pattern>{encoded-project-path}/memory/</path-pattern>
+    <file-format>markdown with YAML frontmatter</file-format>
+    <index-file>MEMORY.md</index-file>
+    <description>
+      Claude Code stores memories as markdown files under
+      ~/.claude/projects/{encoded-path}/memory/. The project path is encoded
+      by replacing / with - (e.g. /Users/me/project becomes -Users-me-project).
+      MEMORY.md is a table of contents; each linked .md file holds one memory
+      with YAML frontmatter (name, description, metadata) and a markdown body.
+    </description>
+  </provider>
+
+  <provider name="qoder">
+    <base-dir>~/Library/Application Support/Qoder/SharedClientCache/</base-dir>
+    <path-pattern>cache/workingSpace/*__memories.md</path-pattern>
+    <file-format>internal indexed format</file-format>
+    <description>
+      Qoder stores memories in an internal indexed format. Cached memory
+      snapshots may appear as __memories.md files in the workingSpace cache,
+      but the canonical store is the memory index. Import from Qoder requires
+      exporting via the agent session or reading cached snapshots.
+    </description>
+  </provider>
+
+  <provider name="cursor">
+    <base-dir>{project-root}/.cursor/rules/</base-dir>
+    <path-pattern>*.mdc</path-pattern>
+    <file-format>MDC (markdown with frontmatter)</file-format>
+    <description>
+      Cursor stores project rules as .mdc files in .cursor/rules/. These are
+      project-local (already in the repo), so import is a simple copy with
+      format adaptation.
+    </description>
+  </provider>
+
+  <!-- ===== Classification rules ===== -->
+
+  <!--
+    Each rule has a scope (shared or local) and a set of keyword patterns.
+    Rules are evaluated top-to-bottom; first match wins. If no rule matches,
+    the memory is ambiguous and the agent must ask the user.
+  -->
+
+  <classification>
+
+    <!-- LOCAL: machine-specific, personal, or sensitive -->
+    <rule scope="local">
+      <description>External tool paths and binaries outside the project</description>
+      <patterns>
+        <pattern>/usr/local/</pattern>
+        <pattern>/opt/homebrew/</pattern>
+        <pattern>/Users/.*\/\.</pattern>
+        <pattern>my (path|machine|laptop|desktop|mac|pc)</pattern>
+        <pattern>GOPATH|GOROOT|JAVA_HOME|PYTHONPATH</pattern>
+        <pattern>npm (prefix|global)|pip (install|show)</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="local">
+      <description>Credentials, secrets, API keys</description>
+      <patterns>
+        <pattern>password|secret|api.?key|credential</pattern>
+        <pattern>SSH|\.env\.local|\.secrets</pattern>
+        <pattern>oauth|bearer|private.?key</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="local">
+      <description>Local ports, services, and dev infrastructure</description>
+      <patterns>
+        <pattern>localhost:\d|127\.0\.0\.1:\d</pattern>
+        <pattern>port \d{4,5}</pattern>
+        <pattern>my (redis|postgres|mongo|mysql|docker)</pattern>
+        <pattern>Docker socket|docker desktop</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="local">
+      <description>IDE configuration and personal workflow preferences</description>
+      <patterns>
+        <pattern>(vscode|cursor|intellij|vim|neovim|emacs) (config|setting|keybind)</pattern>
+        <pattern>I (prefer|like|use) (tabs|spaces|dark|light)</pattern>
+        <pattern>my (editor|IDE|terminal|shell)</pattern>
+        <pattern>font|theme|color.?scheme</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="local">
+      <description>OS-specific workarounds and machine environment</description>
+      <patterns>
+        <pattern>on my (mac|linux|windows|machine)</pattern>
+        <pattern>macOS|darwin|WSL|cygwin</pattern>
+        <pattern>brew install|apt.?get|pacman</pattern>
+        <pattern>xcode.*command.*line|rosetta</pattern>
+      </patterns>
+    </rule>
+
+    <!-- SHARED: team knowledge about the project -->
+    <rule scope="shared">
+      <description>Architecture, module boundaries, and dependency rules</description>
+      <patterns>
+        <pattern>module|layer|boundary|domain</pattern>
+        <pattern>depends on|imports from|owned by</pattern>
+        <pattern>clean architecture|vertical slice|DDD|bounded context</pattern>
+        <pattern>entry point|adapter|repository|service</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="shared">
+      <description>Coding conventions and naming patterns</description>
+      <patterns>
+        <pattern>convention|naming|style guide</pattern>
+        <pattern>always (use|name|write|end|start)</pattern>
+        <pattern>suffix|prefix|camelCase|snake_case|PascalCase</pattern>
+        <pattern>we (use|follow|prefer|enforce)</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="shared">
+      <description>Decision rationale and trade-offs</description>
+      <patterns>
+        <pattern>we (chose|decided|picked|selected)</pattern>
+        <pattern>because|trade.?off|rationale|why we</pattern>
+        <pattern>ADR|decision record</pattern>
+        <pattern>instead of|rather than</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="shared">
+      <description>Testing patterns and quality rules</description>
+      <patterns>
+        <pattern>test (strategy|pattern|convention)</pattern>
+        <pattern>integration test|unit test|E2E|fuzz</pattern>
+        <pattern>coverage|regression|fixture</pattern>
+        <pattern>mock|stub|fake|spy</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="shared">
+      <description>API contracts and data models</description>
+      <patterns>
+        <pattern>endpoint|route|handler|controller</pattern>
+        <pattern>request|response|payload|schema</pattern>
+        <pattern>migration|entity|aggregate</pattern>
+        <pattern>gRPC|REST|GraphQL|protobuf</pattern>
+      </patterns>
+    </rule>
+
+    <rule scope="shared">
+      <description>Deployment and process rules</description>
+      <patterns>
+        <pattern>deploy|release|staging|production</pattern>
+        <pattern>CI|CD|pipeline|workflow</pattern>
+        <pattern>branch strategy|merge policy</pattern>
+        <pattern>rollback|feature flag</pattern>
+      </patterns>
+    </rule>
+
+  </classification>
+
+</memory-providers>

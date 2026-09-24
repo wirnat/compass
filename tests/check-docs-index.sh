@@ -58,7 +58,7 @@ for preset_dir in "$ROOT_DIR"/assets/orientation-presets/*/; do
   target="$TMP_ROOT/$preset"
   "$BOOTSTRAP" --target "$target" --preset "$preset" >/dev/null
   output="$("$INDEX" --target "$target")"
-  expected="$(cd "$target" && find docs -name '*.md' -not -path 'docs/_templates/*' | LC_ALL=C sort)"
+  expected="$(cd "$target" && find docs -name '*.md' -not -path 'docs/_templates/*' -not -path 'docs/.memory/*' | LC_ALL=C sort)"
   actual="$(printf '%s\n' "$output" | sed -n 's/^  - path: "\(.*\)"$/\1/p')"
   [ "$expected" = "$actual" ] || fail "$preset: indexed paths differ from docs on disk"
   require_line "$output" 'skipped: 0' "$preset"

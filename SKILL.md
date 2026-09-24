@@ -99,7 +99,7 @@ After the user chooses, run:
 scripts/bootstrap-docs.sh --target . --preset <selected-preset>
 ```
 
-The bootstrap script seeds reference material. Do not report the docs as finished until the copied preset docs are adapted to the target project's language, framework, and repository conventions. For example, `clean-solid-tdd` source docs may contain Go-oriented examples such as `cmd/`, `internal/`, `.go`, `module.go`, or `adapters/postgres`; for a TypeScript, Python, Swift, Kotlin, frontend, or other project, rewrite the generated docs to equivalent stack-idiomatic folders and file names without losing the architecture detail, dependency rules, testing gates, or completion evidence.
+The bootstrap script seeds reference material. It also creates or updates a `<!-- compass:start -->...<!-- compass:end -->` block in the project's agent gateway files so that any agent starting a new session sees Compass as a standard project rule. The script auto-detects existing gateway files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.claude/rules/`, and `.cursor/rules/`. It writes the Compass block to every gateway file it finds. If none exist, it falls back to creating `AGENTS.md`. Use `--agents-file F` to write to a specific file instead of auto-detecting. Use `--skip-agents` to suppress this behavior entirely. Do not report the docs as finished until the copied preset docs and the gateway Compass blocks are adapted to the target project's language, framework, and repository conventions. For example, `clean-solid-tdd` source docs may contain Go-oriented examples such as `cmd/`, `internal/`, `.go`, `module.go`, or `adapters/postgres`; for a TypeScript, Python, Swift, Kotlin, frontend, or other project, rewrite the generated docs to equivalent stack-idiomatic folders and file names without losing the architecture detail, dependency rules, testing gates, or completion evidence.
 
 For `clean-solid-tdd`, review and adapt at minimum:
 
@@ -147,7 +147,9 @@ If the selected task type has no matching `<workflow type="...">` in the active 
 
 ## Project Docs Integration
 
-Compass must treat the target project's `docs/` directory as the automatic project context pack. A project that uses this skill does not need to duplicate or link Compass docs from `AGENTS.md`.
+Compass must treat the target project's `docs/` directory as the automatic project context pack. Compass also maintains a `<!-- compass:start -->...<!-- compass:end -->` block in agent gateway files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.claude/rules/compass.md`, `.cursor/rules/compass.mdc`) as a persistent reminder for agents that this project uses Compass workflow enforcement. During bootstrap, the script auto-detects existing gateway files and writes to all of them, falling back to `AGENTS.md` when none exist. The block may be adapted by the LLM to include project-specific rules.
+
+Compass also maintains a cross-IDE project memory layer in `docs/.memory/` to preserve project knowledge across sessions and tools. The memory layer splits into `docs/.memory/shared/` (team knowledge, committed) and `docs/.memory/local/` (machine-specific, gitignored). Use `scripts/memory-sync.sh` to detect and import memories from agent providers like Claude Code, Qoder, and Cursor. Load `references/memory-providers.xml` when classifying or importing memories.
 
 At the start of every Compass-guided task, after the first-run bootstrap check, read the available project docs needed to understand the task:
 
@@ -161,7 +163,7 @@ At the start of every Compass-guided task, after the first-run bootstrap check, 
 
 For work with gated design context or long/risky multi-slice risk, run `scripts/docs-index.sh --tasks --target <project-dir>` after reading the orientation and process docs; it lists open goals from `goal.md` frontmatter so you do not open every task folder. If an active goal's `updated` date is more than 14 days old, offer to mark it `completed` or `cancelled` before selecting a goal. When closed goals are still present, offer close-out before starting new work. Report `--tasks` warnings as documentation gaps, and do not rewrite existing task memory without developer approval. If one active relevant goal exists, read its `goal.md` in full and the `SUMMARIES` section plus the newest `HISTORIES` entry of `memories.md` before planning or implementation. Read older histories or `diagram.md` only when the summaries are not enough; keep updating all three files. If multiple active goals could match the request, ask one clarification question before selecting one. If an active goal conflicts with the user's request, treat that as a possible goal change rather than silently reusing or overwriting it.
 
-If a referenced doc is missing, continue with the best available docs and record the gap in the task output. Do not ask the user to add Compass docs to `AGENTS.md`. If `AGENTS.md` exists, read it as repository instruction context only; it is not the documentation integration mechanism.
+If a referenced doc is missing, continue with the best available docs and record the gap in the task output. If agent gateway files exist (`AGENTS.md`, `CLAUDE.md`, etc.), read them for both the Compass block (project-specific workflow reminders) and any other repository instructions.
 
 When planning or implementing, ground architecture, naming, test strategy, and documentation updates in the loaded project docs. If code and docs disagree, stop before broad changes and state the conflict.
 
@@ -341,3 +343,4 @@ For implementation, keep the same classification internally and report it in the
 - `assets/orientation-presets/<preset>/docs/process/workflows.xml`: preset-specific workflow copied to project `docs/process/workflows.xml`.
 - `references/bootstrap-rules.xml`: documentation bootstrap behavior.
 - `references/documentation-policy.xml`: generic documentation taxonomy and source-of-truth rules.
+- `references/memory-providers.xml`: memory provider locations and classification rules for cross-IDE memory sync.

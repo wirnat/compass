@@ -56,6 +56,7 @@ Compass gives a project the enforcement points needed to produce higher-quality 
 - **Ready-to-use presets**: Clean Architecture, Vertical Slice, DDD, existing architecture, or research-based orientation.
 - **Project-owned workflow**: the active workflow lives in one place, `docs/process/workflows.xml`.
 - **Task Memory Gate**: approved gated design context or long/risky multi-slice work must create or resume a durable `docs/.tasks/` goal, diagram, and memory artifact before implementation starts.
+- **Cross-IDE memory sync**: project knowledge persists across sessions and tools in `docs/.memory/`, split into shared (team, committed) and local (machine-specific, gitignored).
 - **Evidence-driven execution**: each task type defines the proof needed before work can be called complete.
 
 The result: the agent knows what quality means in this project before it writes code.
@@ -97,11 +98,12 @@ Compass follows this flow:
 3. If not, offer orientation presets and bootstrap only after the developer chooses.
 4. Seed project docs, including `docs/decisions/0001-orientation-lock.md`.
 5. Copy the selected preset workflow to `docs/process/workflows.xml`.
-6. Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.
-7. Classify the task by engineering risk, not by wording alone.
-8. Run the active workflow from `docs/process/workflows.xml`.
-9. Before implementation, run the Task Memory Gate: for approved gated design context or long/risky multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment and report `created`, `resumed`, or `not-required`.
-10. Allow implementation only through the workflow's gates and required evidence.
+6. Create or update a `<!-- compass:start -->...<!-- compass:end -->` block in agent gateway files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.claude/rules/`, `.cursor/rules/`) so any agent starting a new session knows this project uses Compass. Auto-detects existing files; falls back to `AGENTS.md`.
+7. Read relevant project docs: orientation lock, architecture, foundation, process, module docs, and decisions.
+8. Classify the task by engineering risk, not by wording alone.
+9. Run the active workflow from `docs/process/workflows.xml`.
+10. Before implementation, run the Task Memory Gate: for approved gated design context or long/risky multi-slice work, inspect or create `docs/.tasks/<task>/` after goal alignment and report `created`, `resumed`, or `not-required`.
+11. Allow implementation only through the workflow's gates and required evidence.
 
 Important rule: **Compass does not use a root-skill workflow fallback.** If a project does not have `docs/process/workflows.xml`, Compass must seed or migrate the project docs first. One active workflow source. Two compasses on one desk is how people start arguing with furniture.
 
@@ -325,11 +327,118 @@ At every slice boundary, Compass updates task memory before reporting the checkp
 
 Missing task memory templates in the target project do not waive the gate. Compass must use the installed templates or `references/task-memory.xml`, then report the documentation gap.
 
+## Cross-IDE Memory Sync
+
+Compass maintains project knowledge across sessions and tools in `docs/.memory/`. The memory layer splits into two areas:
+
+- `docs/.memory/shared/`: team knowledge committed to version control
+- `docs/.memory/local/`: machine-specific knowledge gitignored per developer
+
+When developers use different IDEs or agents (Claude Code, Qoder, Cursor, etc.), each tool may accumulate its own project memories. `scripts/memory-sync.sh` detects these provider-specific memories, classifies each as shared or local using keyword-based rules from `references/memory-providers.xml`, and imports them into the Compass memory structure.
+
+Import memories from a specific provider:
+
+```bash
+./scripts/memory-sync.sh --target /path/to/project --provider claude-code
+```
+
+Auto-detect all providers:
+
+```bash
+./scripts/memory-sync.sh --target /path/to/project
+```
+
+Preview without writing:
+
+```bash
+./scripts/memory-sync.sh --target /path/to/project --dry-run
+```
+
+The bootstrap script creates the `docs/.memory/` structure automatically and adds `docs/.memory/local/` to `.gitignore`.
+
+### Memory Lifecycle
+
+Memories include lifecycle fields in their frontmatter:
+
+- `status`: `active`, `stale`, `archived`, or `deprecated`
+- `expires`: ISO-8601 expiration date (empty = no expiration)
+- `related`: list of related memory or doc paths
+
+Use `memory-index.sh --lifecycle` to report on memory health:
+
+```bash
+./scripts/memory-index.sh --target /path/to/project --lifecycle
+```
+
+This reports each memory's lifecycle state: active, stale (>90 days old), expired (past expiration date), or archived/deprecated.
+
+### Audit Trail
+
+Use `--verbose` with `memory-sync.sh` for detailed classification and import logging:
+
+```bash
+./scripts/memory-sync.sh --target /path/to/project --verbose
+```
+
+Operations are logged to `docs/.memory/sync-log.json` with timestamp, provider, source, classification, destination, and outcome for each memory processed.
+
+## Custom Workflows
+
+Projects can extend preset workflows with custom task types. Create `docs/process/custom-workflows.xml` (seeded during bootstrap) and add your workflow definitions:
+
+```xml
+<custom-workflows>
+  <workflow type="data_pipeline">
+    <description>Add or modify a data pipeline stage.</description>
+    <steps>
+      <step order="1">Identify data sources and sinks.</step>
+      <step order="2">Add schema validation.</step>
+      <step order="3">Implement pipeline stage.</step>
+    </steps>
+    <evidence>Schema validation and integration tests.</evidence>
+  </workflow>
+</custom-workflows>
+```
+
+Validate and merge with preset workflows:
+
+```bash
+# Validate custom workflows
+./scripts/resolve-workflows.sh --target /path/to/project --validate
+
+# Merge into resolved file
+./scripts/resolve-workflows.sh --target /path/to/project --output docs/process/resolved-workflows.xml
+```
+
+Custom workflow types must not conflict with preset types. The validator checks for duplicates, missing elements, and structural issues.
+
+## CI/CD Integration
+
+Use `scripts/ci-check.sh` in CI pipelines to enforce Compass docs quality:
+
+```bash
+# GitHub Actions
+- run: ./scripts/ci-check.sh --target .
+
+# GitLab CI
+script:
+  - ./scripts/ci-check.sh --target . --strict
+```
+
+The CI check runs 5 validations:
+1. Bootstrap validation (required files, XML, orientation lock, gateways)
+2. Custom workflow validation (structure, conflicts)
+3. Docs index freshness (index matches current docs)
+4. Link integrity (internal doc links valid)
+5. Policy consistency (classification and documentation rules)
+
+Use `--strict` to treat warnings as failures, `--quiet` for minimal output.
+
 ## Automatic Docs Context
 
 Compass treats `docs/` as the project's context pack.
 
-That means a project does not need to copy Compass doc links into `AGENTS.md`. `AGENTS.md` can still hold local agent instructions, but Compass learns the project from `docs/`.
+Compass also creates and maintains a `<!-- compass:start -->...<!-- compass:end -->` block in agent gateway files during bootstrap. The script auto-detects existing files: `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.claude/rules/`, and `.cursor/rules/`. It writes the Compass block to every gateway file it finds, falling back to `AGENTS.md` when none exist. This block acts as a persistent reminder for any agent starting a new session that the project uses Compass workflow enforcement. The block includes Always Do rules, Never Do rules, and a Key Docs table. The LLM adapts the block to the project context after bootstrap, adding project-specific rules as needed.
 
 Key docs used by Compass:
 
@@ -394,6 +503,7 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   |-- bootstrap-rules.xml
 |   |-- classification.xml
 |   |-- documentation-policy.xml
+|   |-- memory-providers.xml
 |   |-- task-memory.xml
 |   `-- task-types.xml
 |-- scripts/
@@ -401,25 +511,36 @@ Compass uses an engineering task taxonomy so every request is not treated as the
 |   |-- docs-index.sh
 |   |-- lib/
 |   |   `-- yaml.sh
+|   |-- memory-sync.sh
+|   |-- memory-index.sh
+|   |-- resolve-workflows.sh
+|   |-- ci-check.sh
 |   `-- skills-check.sh
 `-- tests/
-    `-- run-tests.sh
+    |-- run-tests.sh
+    `-- benchmark.sh
 ```
 
 ## Important Files
 
 - `SKILL.md`: skill entry point, hard gates, routing rules, and project-docs integration.
-- `scripts/bootstrap-docs.sh`: idempotent script for seeding Compass docs into a target project.
+- `scripts/bootstrap-docs.sh`: idempotent script for seeding Compass docs into a target project. Also creates or updates Compass blocks in agent gateway files — auto-detects `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `COPILOT.md`, `.claude/rules/`, `.cursor/rules/`; falls back to `AGENTS.md`. Use `--skip-agents` to suppress or `--agents-file F` to target a specific file. Also initializes the `docs/.memory/` structure with shared/ and local/ subdirectories. Supports `--validate` to check existing docs without writing, and `--update` for incremental updates with three-way merge (preserves user customizations, detects conflicts).
+- `scripts/memory-sync.sh`: detects and imports agent memories from providers like Claude Code, Qoder, and Cursor into `docs/.memory/`. Classifies each memory as shared or local using keyword-based rules from `references/memory-providers.xml` (single source of truth). Validates memory files before import, detects duplicates via content hashing, and supports `--verbose` for detailed audit logging to `docs/.memory/sync-log.json`.
+- `scripts/memory-index.sh`: generates a searchable YAML index of project memories. Supports `--scope` filtering (shared/local/all) and `--lifecycle` mode for reporting memory status (active, stale, expired, archived).
+- `scripts/resolve-workflows.sh`: validates and merges custom workflow definitions from `docs/process/custom-workflows.xml` with preset workflows. Detects type conflicts, validates structure, and produces merged workflow references.
+- `scripts/ci-check.sh`: CI/CD integration script that runs 5 validation checks: bootstrap validation, workflow validation, docs index freshness, link integrity, and policy consistency. Supports `--strict` and `--quiet` modes for pipeline integration.
 - `scripts/docs-index.sh`: prints an on-demand YAML index of a project's docs from note frontmatter so agents load only relevant notes.
 - `scripts/skills-check.sh`: reports, without network access, which recommended skills are installed and prints install commands for missing ones.
 - `scripts/lib/yaml.sh`: shared YAML quoting for Compass scripts.
 - `scripts/smoke-test.sh`: minimal script verification for preset listing, dry-run, failure paths, and no-overwrite behavior.
-- `tests/run-tests.sh`: deterministic test wrapper for shell syntax, XML validity, smoke tests, docs links, workflow coverage, policy consistency, update-skill fallback checks, preset bootstrap checks, and docs index checks.
+- `tests/run-tests.sh`: deterministic test wrapper for shell syntax, XML validity, smoke tests, docs links, workflow coverage, policy consistency, update-skill fallback checks, preset bootstrap checks, docs index checks, memory sync checks, workflow resolution checks, and CI check verification.
+- `tests/benchmark.sh`: performance benchmarks for Compass scripts at scale (configurable memory and doc counts).
 - `references/classification.xml`: decision tree for task classification.
 - `references/task-memory.xml`: pre-implementation task memory gate, statuses, lifecycle, resume rules, and template fallback behavior.
 - `references/task-types.xml`: task taxonomy and commit hints.
 - `references/bootstrap-rules.xml`: bootstrap rules and completion evidence.
 - `references/documentation-policy.xml`: docs taxonomy and source-of-truth rules.
+- `references/memory-providers.xml`: memory provider locations (Claude Code, Qoder, Cursor) and keyword-based classification rules for shared/local memory sync.
 - `references/recommended-skills.xml`: optional skills that strengthen Compass phases.
 - `assets/docs-seed/`: base docs and task memory templates copied into `docs/`.
 - `assets/orientation-presets/`: architecture, principle, process, and workflow presets.
