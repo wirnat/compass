@@ -17,11 +17,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: lts/*
+
+      - name: Install semantic-release and plugins
+        run: npm install --no-save semantic-release @semantic-release/changelog @semantic-release/exec @semantic-release/git
 
       - name: Run semantic-release
         env:
