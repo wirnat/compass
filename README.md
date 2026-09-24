@@ -107,6 +107,41 @@ Compass follows this flow:
 
 Important rule: **Compass does not use a root-skill workflow fallback.** If a project does not have `docs/process/workflows.xml`, Compass must seed or migrate the project docs first. One active workflow source. Two compasses on one desk is how people start arguing with furniture.
 
+## Installation
+
+### Option 1: Via skills CLI (recommended)
+
+```bash
+npx skills add wirnat/compass
+```
+
+This installs Compass as a skill that coding agents (Claude Code, Qoder, Cursor, etc.) can use. Update with:
+
+```bash
+npx skills update
+```
+
+### Option 2: From source (git clone)
+
+```bash
+git clone https://github.com/wirnat/compass.git
+cd compass
+```
+
+Then point your agent to load `SKILL.md` from the cloned directory. Update manually:
+
+```bash
+# Track latest stable release
+./scripts/update-skill.sh --tag latest
+
+# Or track main branch (bleeding edge)
+git pull origin main
+```
+
+### Option 3: Manual download
+
+Download the [latest release](https://github.com/wirnat/compass/releases/latest) and extract it. Point your agent to load `SKILL.md` from the extracted directory.
+
 ## Quick Start
 
 List available presets:
