@@ -5,6 +5,13 @@ All notable changes to Compass are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.2.0](https://github.com/wirnat/compass/compare/v1.1.1...v1.2.0) (2026-09-24)
+
+
+### Features
+
+* add docs-index --match, slim gateway block ([ed410b4](https://github.com/wirnat/compass/commit/ed410b44c371bc2ef6315fdd8edde68184e1c4ab))
+
 ## [1.1.1](https://github.com/wirnat/compass/compare/v1.1.0...v1.1.1) (2026-09-24)
 
 
